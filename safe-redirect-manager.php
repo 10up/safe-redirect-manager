@@ -441,12 +441,15 @@ class SRM_Safe_Redirect_Manager {
 		
 		foreach ( $redirects as $redirect ) {
 			
-			$redirect_from = $redirect['redirect_from'];
+			$redirect_from = untrailingslashit( $redirect['redirect_from'] );
+			if ( empty( $redirect_from ) )
+				$redirect_from = '/'; // this only happens in the case where there is a redirect on the root
+				
 			$redirect_to = $redirect['redirect_to'];
 			$status_code = $redirect['status_code'];
 			
 			// check if requested path is the same as the redirect from path
-			if ( $requested_path == untrailingslashit( $redirect_from )  ) {
+			if ( $requested_path == $redirect_from ) {
 				
 				// whitelist redirect to host if necessary
 				$parsed_redirect = parse_url( $redirect_to );
@@ -513,16 +516,6 @@ class SRM_Safe_Redirect_Manager {
             $path = preg_replace( '/^(http:\/\/|https:\/\/)(www\.)?[^\/?]+\/?(.*)/i', '/$3', $path );
         elseif ( strpos( $path, '/' ) !== 0 )
             $path = '/' . $path;
-        
-        
-        // Now make sure this doesn't contain something stupid like /wp-admin. Contains regex
-		// You can filter this blacklist with the tag srm_redirect_from_blacklist
-        $blacklist = apply_filters( 'srm_redirect_from_blacklist', array( '\/wp-admin', '\/wp-includes', '^\/index\.php', '^\/\??$' ) );
-        
-        foreach ( $blacklist as $bad_string ) {
-            if ( preg_match( '/' . $bad_string . '/i', $path ) )
-                return '';
-        }
         
         return esc_url_raw( $path );
     }
