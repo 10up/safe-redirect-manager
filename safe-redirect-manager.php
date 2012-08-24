@@ -435,7 +435,13 @@ class SRM_Safe_Redirect_Manager {
 		global $post;
 		$old_post = $post;
 		
-		$redirect_query = new WP_Query( array( 'posts_per_page' => 1000, 'post_type' => $this->redirect_post_type ) );
+		$args = array(
+			'posts_per_page' => 1000,
+			'post_type' => $this->redirect_post_type,
+			'no_found_rows' => true,
+			'update_term_cache' => false,
+		);
+		$redirect_query = new WP_Query( $args );
 		$redirect_cache = array();
 		
 		if ( $redirect_query->have_posts() ) {
