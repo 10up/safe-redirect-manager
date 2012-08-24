@@ -49,9 +49,9 @@ class SRM_Safe_Redirect_Manager {
      * @return object
      */
     public function __construct() {
+		add_action( 'init', array( $this, 'action_register_post_types' ) );
         add_action( 'parse_request', array( $this, 'action_parse_request' ), 0 );
 		add_action( 'after_theme_setup', array( $this, 'action_load_texthost' ) );
-		add_action( 'init', array( $this, 'action_register_post_types' ) );
 		add_action( 'save_post', array( $this, 'action_save_post' ) );
 		add_filter( 'manage_' . $this->redirect_post_type . '_posts_columns' , array( $this, 'filter_redirect_columns' ) );
 		add_action( 'manage_' . $this->redirect_post_type . '_posts_custom_column' , array( $this, 'action_custom_redirect_columns' ), 10, 2 );
@@ -60,7 +60,17 @@ class SRM_Safe_Redirect_Manager {
 		add_action( 'admin_notices', array( $this, 'action_redirect_chain_alert' ) );    
 		add_filter( 'the_title', array( $this, 'filter_admin_title' ), 100, 2 );
 		add_action( 'admin_init', array( $this, 'action_admin_init' ) );
+		add_filter( 'bulk_actions-' . 'edit-redirect_rule', array( $this, 'filter_bulk_actions' ) ); 
     }
+	
+	/**
+	 * Removes bulk actions from post manager
+	 *
+	 * @return array
+	 */
+	public function filter_bulk_actions() {
+		return array();
+	}
 	
 	/**
 	 * Echoes admin message if redirect chains exist
@@ -277,10 +287,10 @@ class SRM_Safe_Redirect_Manager {
 	 */
 	public function action_register_post_types() {
 		$redirect_labels = array(
-			'name' => _x( 'Redirect Rules', 'post type general name' ),
+			'name' => _x( 'Safe Redirect Manager', 'post type general name' ),
 			'singular_name' => _x( 'Redirect', 'post type singular name' ),
 			'add_new' => _x( 'Create Redirect Rule', $this->redirect_post_type ),
-			'add_new_item' => __( 'Add New Redirect Rule', 'safe-redirect-manager' ),
+			'add_new_item' => __( 'Safe Redirect Manager', 'safe-redirect-manager' ),
 			'edit_item' => __( 'Edit Redirect Rule', 'safe-redirect-manager' ),
 			'new_item' => __( 'New Redirect Rule', 'safe-redirect-manager' ),
 			'all_items' => __( 'All Redirects', 'safe-redirect-manager' ),
@@ -397,27 +407,34 @@ class SRM_Safe_Redirect_Manager {
 	 * Force update on the redirect cache and return cache
 	 *
 	 * @since 1.0
-	 * @uses get_posts, set_transient, get_post_meta
+	 * @uses set_transient, get_post_meta, the_post, have_posts, get_the_ID
 	 * @return array
 	 */
 	public function update_redirect_cache() {
-		$redirects = get_posts( array( 'numberposts' => 1000, 'post_type' => $this->redirect_post_type ) );
+		global $post;
+		$old_post = $post;
+		
+		$redirect_query = new WP_Query( array( 'posts_per_page' => 1000, 'post_type' => $this->redirect_post_type ) );
 		$redirect_cache = array();
 		
-		foreach ( $redirects as $redirect ) {
-			$redirect_from = get_post_meta( $redirect->ID, $this->meta_key_redirect_from, true );
-			$redirect_to = get_post_meta( $redirect->ID, $this->meta_key_redirect_to, true );
-			$status_code = get_post_meta( $redirect->ID, $this->meta_key_redirect_status_code, true );
-			
-			if ( ! empty( $redirect_from ) && ! empty( $redirect_to ) ) {
-				$redirect_cache[] = array(
-										  'redirect_from' => $redirect_from,
-										  'redirect_to' => $redirect_to,
-										  'status_code' => absint( $status_code )
-									);
+		if ( $redirect_query->have_posts() ) {
+			while ( $redirect_query->have_posts() ) {
+				$redirect_query->the_post();
+				
+				$redirect_from = get_post_meta( get_the_ID(), $this->meta_key_redirect_from, true );
+				$redirect_to = get_post_meta( get_the_ID(), $this->meta_key_redirect_to, true );
+				$status_code = get_post_meta( get_the_ID(), $this->meta_key_redirect_status_code, true );
+				
+				if ( ! empty( $redirect_from ) && ! empty( $redirect_to ) ) {
+					$redirect_cache[] = array(
+						'redirect_from' => $redirect_from,
+						'redirect_to' => $redirect_to,
+						'status_code' => absint( $status_code )
+					);
+				}
 			}
 		}
-		
+		$post = $old_post;
 		set_transient( $this->cache_key_redirects, $redirect_cache );
 		
 		return $redirect_cache;
