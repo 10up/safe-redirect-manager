@@ -70,7 +70,8 @@ class SRM_Safe_Redirect_Manager {
 	 * @return void
 	 */
 	public function action_redirect_chain_alert() {
-		if ( current_user_can( 'manage_options' ) && $this->check_for_possible_redirect_loops() ) {
+		global $post;
+		if ( is_object( $post ) && $this->redirect_post_type == $post->post_type && $this->check_for_possible_redirect_loops() ) {
 		?>
 			<div class="updated">
 				<p><?php _e( 'Safe Redirect Manager Warning: Possible redirect loops and/or chains have been created.', 'safe-redirect-manager' ); ?></p>
@@ -83,6 +84,7 @@ class SRM_Safe_Redirect_Manager {
 	 * Check for potential redirect loops or chains
 	 *
 	 * @since 1.0
+	 * @uses home_url
 	 * @return boolean
 	 */
 	public function check_for_possible_redirect_loops() {
