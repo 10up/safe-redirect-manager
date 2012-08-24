@@ -437,7 +437,7 @@ class SRM_Safe_Redirect_Manager {
 		
 		$args = array(
 			'posts_per_page' => 1000,
-			'post_type' => $this->redirect_post_type
+			'post_type' => $this->redirect_post_type,
 			'no_found_rows' => true,
 			'update_term_cache' => false,
 		);
