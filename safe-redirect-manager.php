@@ -60,8 +60,30 @@ class SRM_Safe_Redirect_Manager {
 		add_action( 'admin_notices', array( $this, 'action_redirect_chain_alert' ) );    
 		add_filter( 'the_title', array( $this, 'filter_admin_title' ), 100, 2 );
 		add_action( 'admin_init', array( $this, 'action_admin_init' ) );
-		add_filter( 'bulk_actions-' . 'edit-redirect_rule', array( $this, 'filter_bulk_actions' ) ); 
+		add_filter( 'bulk_actions-' . 'edit-redirect_rule', array( $this, 'filter_bulk_actions' ) );
+		add_action( 'admin_print_styles-edit.php', array( $this, 'action_print_logo_css' ), 10, 1 );
+		add_action( 'admin_print_styles-post.php', array( $this, 'action_print_logo_css' ), 10, 1 );
     }
+	
+	/**
+	 * Swap tools logo for plugin logo
+	 *
+	 * @uses plugins_url
+	 * @return void
+	 */
+	public function action_print_logo_css() {
+		global $post;
+		if ( is_object( $post ) && $this->redirect_post_type == $post->post_type ) {
+		?>
+			<style type="text/css">
+				#icon-tools {
+					background: url("<?php echo plugins_url(); ?>/safe-redirect-manager/images/icon32x32.png") no-repeat top left !important;
+					margin-right: 0;
+				}
+			</style>
+		<?php
+		}
+	}
 	
 	/**
 	 * Removes bulk actions from post manager
@@ -293,7 +315,7 @@ class SRM_Safe_Redirect_Manager {
 			'add_new_item' => __( 'Safe Redirect Manager', 'safe-redirect-manager' ),
 			'edit_item' => __( 'Edit Redirect Rule', 'safe-redirect-manager' ),
 			'new_item' => __( 'New Redirect Rule', 'safe-redirect-manager' ),
-			'all_items' => __( 'All Redirects', 'safe-redirect-manager' ),
+			'all_items' => __( 'Safe Redirect Manager', 'safe-redirect-manager' ),
 			'view_item' => __( 'View Redirect Rule', 'safe-redirect-manager' ),
 			'search_items' => __( 'Search Redirects', 'safe-redirect-manager' ),
 			'not_found' =>  __( 'No redirect rules found.', 'safe-redirect-manager' ),
@@ -306,14 +328,13 @@ class SRM_Safe_Redirect_Manager {
 		  'public' => false,
 		  'publicly_queryable' => true,
 		  'show_ui' => true, 
-		  'show_in_menu' => true, 
+		  'show_in_menu' => 'tools.php', 
 		  'query_var' => false,
 		  'rewrite' => false,
 		  'capability_type' => 'post',
 		  'has_archive' => false, 
 		  'hierarchical' => false,
 		  'register_meta_box_cb' => array( $this, 'action_redirect_rule_metabox' ),
-		  'menu_icon' => plugins_url() . '/safe-redirect-manager/images/safe-redirect-icon.png',
 		  'menu_position' => 80,
 		  'supports' => array( '' )
 		); 
