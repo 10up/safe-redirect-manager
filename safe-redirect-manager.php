@@ -65,6 +65,7 @@ class SRM_Safe_Redirect_Manager {
 		add_filter( 'bulk_actions-' . 'edit-redirect_rule', array( $this, 'filter_bulk_actions' ) );
 		add_action( 'admin_print_styles-edit.php', array( $this, 'action_print_logo_css' ), 10, 1 );
 		add_action( 'admin_print_styles-post.php', array( $this, 'action_print_logo_css' ), 10, 1 );
+		add_action( 'admin_print_styles-post-new.php', array( $this, 'action_print_logo_css' ), 10, 1 );
     }
 	
 	/**
@@ -107,7 +108,7 @@ class SRM_Safe_Redirect_Manager {
 	 * @return void
 	 */
 	public function action_redirect_chain_alert() {
-		global $post;
+		global $post, $hook_suffix;
 		if ( is_object( $post ) && $this->redirect_post_type == $post->post_type ) {
 			if ( $this->check_for_possible_redirect_loops() ) {
 			?>
@@ -117,6 +118,7 @@ class SRM_Safe_Redirect_Manager {
 			<?php
 			} if ( $this->max_redirects_reached() ) {
 			?>
+				<?php if ( 'post-new.php' == $hook_suffix ) : ?><style type="text/css">#post { display: none; }</style><?php endif; ?>
 				<div class="error">
 					<p><?php _e( 'Safe Redirect Manager Error: You have reached the maximum allowable number of redirects', 'safe-redirect-manager' ); ?></p>
 				</div>
