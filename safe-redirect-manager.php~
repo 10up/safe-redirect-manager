@@ -80,9 +80,6 @@ class SRM_Safe_Redirect_Manager {
 					background: url("<?php echo plugins_url(); ?>/safe-redirect-manager/images/icon32x32.png") no-repeat top left !important;
 					margin-right: 0;
 				}
-				#visibility {
-					display: none;
-				}
 			</style>
 		<?php
 		}
@@ -438,13 +435,7 @@ class SRM_Safe_Redirect_Manager {
 		global $post;
 		$old_post = $post;
 		
-		$args = array(
-			'posts_per_page' => 1000,
-			'post_type' => $this->redirect_post_type,
-			'no_found_rows' => true,
-			'update_term_cache' => false,
-		);
-		$redirect_query = new WP_Query( $args );
+		$redirect_query = new WP_Query( array( 'posts_per_page' => 1000, 'post_type' => $this->redirect_post_type ) );
 		$redirect_cache = array();
 		
 		if ( $redirect_query->have_posts() ) {
