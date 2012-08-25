@@ -138,7 +138,7 @@ class SRM_Safe_Redirect_Manager {
 		$redirects = $this->update_redirect_cache();
 		$max_redirects = apply_filters( 'srm_max_redirects', $this->default_max_redirects );
 		
-		return ( count( $redirects ) < $max_redirects );
+		return ( count( $redirects ) >= $max_redirects );
 	}
 	
 	/**
