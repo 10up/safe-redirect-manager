@@ -40,6 +40,8 @@ class SRM_Safe_Redirect_Manager {
 	public $valid_status_codes = array( 301, 302, 303, 403, 404 );
 	
 	private $whitelist_hosts = array();
+	
+	public $default_max_redirects = 150;
     
     /**
      * Sets up redirect manager
@@ -106,13 +108,35 @@ class SRM_Safe_Redirect_Manager {
 	 */
 	public function action_redirect_chain_alert() {
 		global $post;
-		if ( is_object( $post ) && $this->redirect_post_type == $post->post_type && $this->check_for_possible_redirect_loops() ) {
-		?>
-			<div class="updated">
-				<p><?php _e( 'Safe Redirect Manager Warning: Possible redirect loops and/or chains have been created.', 'safe-redirect-manager' ); ?></p>
-			</div>
-		<?php
+		if ( is_object( $post ) && $this->redirect_post_type == $post->post_type ) {
+			if ( $this->check_for_possible_redirect_loops() ) {
+			?>
+				<div class="updated">
+					<p><?php _e( 'Safe Redirect Manager Warning: Possible redirect loops and/or chains have been created.', 'safe-redirect-manager' ); ?></p>
+				</div>
+			<?php
+			} if ( $this->max_redirects_reached() ) {
+			?>
+				<div class="error">
+					<p><?php _e( 'Safe Redirect Manager Error: You have reached the maximum allowable number of redirects', 'safe-redirect-manager' ); ?></p>
+				</div>
+			<?php
+			}
 		}
+	}
+	
+	/**
+	 * Returns true if max redirects have been reached
+	 *
+	 * @since 1.0
+	 * @uses apply_filters
+	 * @return bool
+	 */
+	public function max_redirects_reached() {
+		$redirects = $this->update_redirect_cache();
+		$max_redirects = apply_filters( 'srm_max_redirects', $this->default_max_redirects );
+		
+		return ( count( $redirects ) < $max_redirects );
 	}
 	
 	/**
