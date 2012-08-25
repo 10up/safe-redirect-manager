@@ -43,16 +43,16 @@ class SRM_Safe_Redirect_Manager {
 	
 	public $default_max_redirects = 150;
     
-    /**
-     * Sets up redirect manager
-     *
-     * @since 1.0
-     * @uses add_action, add_filter
-     * @return object
-     */
-    public function __construct() {
+	/**
+	 * Sets up redirect manager
+	 *
+	 * @since 1.0
+	 * @uses add_action, add_filter
+	 * @return object
+	 */
+	public function __construct() {
 		add_action( 'init', array( $this, 'action_register_post_types' ) );
-        add_action( 'parse_request', array( $this, 'action_parse_request' ), 0 );
+		add_action( 'parse_request', array( $this, 'action_parse_request' ), 0 );
 		add_action( 'after_theme_setup', array( $this, 'action_load_texthost' ) );
 		add_action( 'save_post', array( $this, 'action_save_post' ) );
 		add_filter( 'manage_' . $this->redirect_post_type . '_posts_columns' , array( $this, 'filter_redirect_columns' ) );
@@ -66,7 +66,7 @@ class SRM_Safe_Redirect_Manager {
 		add_action( 'admin_print_styles-edit.php', array( $this, 'action_print_logo_css' ), 10, 1 );
 		add_action( 'admin_print_styles-post.php', array( $this, 'action_print_logo_css' ), 10, 1 );
 		add_action( 'admin_print_styles-post-new.php', array( $this, 'action_print_logo_css' ), 10, 1 );
-    }
+	}
 	
 	/**
 	 * Swap tools logo for plugin logo
@@ -211,7 +211,7 @@ class SRM_Safe_Redirect_Manager {
 	 * @uses esc_url, get_permalink, add_query_var, wp_post_revision_title
 	 * @return array
 	 */
-	function filter_redirect_updated_messages( $messages ) {
+	public function filter_redirect_updated_messages( $messages ) {
 		global $post, $post_ID;
 	  
 		$messages[$this->redirect_post_type] = array(
@@ -245,7 +245,6 @@ class SRM_Safe_Redirect_Manager {
 	 * @return void
 	 */
 	public function action_transition_post_status( $new_status, $old_status, $post ) {
-		
 		if ( ! is_object( $post ) )
 			return;
 		
@@ -433,14 +432,14 @@ class SRM_Safe_Redirect_Manager {
 		load_plugin_textdomain( 'safe-redirect-manager', false, dirname( plugin_basename( __FILE__ ) ) . '/localization/' );
 	}
     
-    /**
-     * Apply whitelisted hosts to allowed_redirect_hosts filter
-     *
-     * @since 1.0
-     * @param array $content
-     * @return array
-     */
-    public function filter_allowed_redirect_hosts( $content ) {
+	/**
+	 * Apply whitelisted hosts to allowed_redirect_hosts filter
+	 *
+	 * @since 1.0
+	 * @param array $content
+	 * @return array
+	 */
+	public function filter_allowed_redirect_hosts( $content ) {
         
 		foreach ( $this->whitelist_hosts as $host ) {
 			$without_www = preg_replace( '/^www\./i', '', $host );
@@ -450,8 +449,8 @@ class SRM_Safe_Redirect_Manager {
 			if ( ! in_array( $with_www, $content ) ) $content[] = $with_www;
 		}
 		
-        return $content;
-    }
+        	return $content;
+    	}
     
 	/**
 	 * Force update on the redirect cache and return cache
@@ -496,18 +495,18 @@ class SRM_Safe_Redirect_Manager {
 		return $redirect_cache;
 	}
     
-    /**
-     * Check current url against redirects
-     *
-     * @since 1.0
-     * @param object $current_request
-     * @uses esc_url_raw, wp_safe_redirect, untrailingslashit, get_transient, add_filter
-     * @return void
-     */
-    public function action_parse_request( $current_request ) {
+	/**
+	 * Check current url against redirects
+	 *
+	 * @since 1.0
+	 * @param object $current_request
+	 * @uses esc_url_raw, wp_safe_redirect, untrailingslashit, get_transient, add_filter
+	 * @return void
+	 */
+	public function action_parse_request( $current_request ) {
         
-        // get requested path and add a / before it
-        $requested_path = '/' . ltrim( trim( $current_request->request ), '/' );
+        	// get requested path and add a / before it
+		$requested_path = '/' . ltrim( trim( $current_request->request ), '/' );
         
 		// get redirects from cache or recreate it
 		if ( false === ( $redirects = get_transient( $this->cache_key_redirects ) ) ) {
@@ -541,59 +540,59 @@ class SRM_Safe_Redirect_Manager {
 				exit;
 			}
 		}
-    }
+	}
     
-    /**
-     * Sanitize redirect to path
-     *
-     * The only difference between this function and just calling esc_url_raw is
-     * esc_url_raw( 'test' ) == 'http://test', whereas sanitize_redirect_path( 'test' ) == '/test'
-     *
-     * @since 1.0
-     * @param string $path
-     * @uses esc_url_raw
-     * @return string
-     */
-    public function sanitize_redirect_to( $path ) {
-        $path = trim( $path );
+	/**
+	 * Sanitize redirect to path
+	 *
+	 * The only difference between this function and just calling esc_url_raw is
+	 * esc_url_raw( 'test' ) == 'http://test', whereas sanitize_redirect_path( 'test' ) == '/test'
+	 *
+	 * @since 1.0
+	 * @param string $path
+	 * @uses esc_url_raw
+	 * @return string
+	 */
+	public function sanitize_redirect_to( $path ) {
+        	$path = trim( $path );
         
-        if (  preg_match( '/^www\./i', $path ) )
-            $path = 'http://' . $path;
+        	if (  preg_match( '/^www\./i', $path ) )
+            	$path = 'http://' . $path;
         
-        if ( ! preg_match( '/^https?:\/\//i', $path ) )
-            if ( strpos( $path, '/' ) !== 0 )
-                $path = '/' . $path;
+        	if ( ! preg_match( '/^https?:\/\//i', $path ) )
+            		if ( strpos( $path, '/' ) !== 0 )
+                		$path = '/' . $path;
         
-        return esc_url_raw( $path );
-    }
+        	return esc_url_raw( $path );
+	}
     
-    /**
-     * Sanitize redirect from path
-     *
-     * @since 1.0
-     * @param string $path
-     * @uses esc_url_raw
-     * @return string
-     */
-    public function sanitize_redirect_from( $path ) {
+	/**
+	 * Sanitize redirect from path
+	 *
+	 * @since 1.0
+	 * @param string $path
+	 * @uses esc_url_raw
+	 * @return string
+	 */
+	public function sanitize_redirect_from( $path ) {
         
-        $path = trim( $path );
+        	$path = trim( $path );
         
-        if ( empty( $path ) )
-            return '';
+        	if ( empty( $path ) )
+            		return '';
         
-        // dont accept paths starting with a .
-        if ( strpos( $path, '.' ) === 0 )
-            return '';
+        	// dont accept paths starting with a .
+        	if ( strpos( $path, '.' ) === 0 )
+            		return '';
         
-        // turn path in to absolute
-        if ( preg_match( '/https?:\/\//i', $path ) )
-            $path = preg_replace( '/^(http:\/\/|https:\/\/)(www\.)?[^\/?]+\/?(.*)/i', '/$3', $path );
-        elseif ( strpos( $path, '/' ) !== 0 )
-            $path = '/' . $path;
+        	// turn path in to absolute
+        	if ( preg_match( '/https?:\/\//i', $path ) )
+            		$path = preg_replace( '/^(http:\/\/|https:\/\/)(www\.)?[^\/?]+\/?(.*)/i', '/$3', $path );
+        	elseif ( strpos( $path, '/' ) !== 0 )
+            		$path = '/' . $path;
         
-        return esc_url_raw( $path );
-    }
+        	return esc_url_raw( $path );
+    	}
 }
 
 new SRM_Safe_Redirect_Manager();
