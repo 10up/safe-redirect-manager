@@ -11,6 +11,8 @@ Safely and easily manage your websites HTTP redirects.
 
 Safe Redirect Manager is a HTTP redirect manager for WordPress. An easy-to-use UI allows you to redirect locations to new URL's with the HTTP status codes of your chosing. The plugin uses the wp_safe_redirect function which only allows redirects to whitelisted hosts for security purposes. The plugin automatically handles whitelisting hosts for you.
 
+[Fork the plugin on GitHub.](https://github.com/tlovett1/Safe-Redirect-Manager)
+
 == Installation ==
 
 Extract the zip file and just drop the contents in the wp-content/plugins/ directory of your WordPress installation and then activate the Plugin from Plugins page.
