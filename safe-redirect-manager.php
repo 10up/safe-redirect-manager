@@ -4,7 +4,7 @@ Plugin Name: Safe Redirect Manager
 Plugin URI: http://www.10up.com
 Description: Easily and safely manage HTTP redirects.
 Author: Taylor Lovett (10up LLC), VentureBeat
-Version: 1.0
+Version: 1.1
 Author URI: http://www.10up.com
 
 GNU General Public License, Free Software Foundation <http://creativecommons.org/licenses/GPL/2.0/>
@@ -75,8 +75,7 @@ class SRM_Safe_Redirect_Manager {
 	 * @return void
 	 */
 	public function action_print_logo_css() {
-		global $post;
-		if ( is_object( $post ) && $this->redirect_post_type == $post->post_type ) {
+		if ( $this->is_whitelisted_page() ) {
 		?>
 			<style type="text/css">
 				#icon-tools {
@@ -101,15 +100,26 @@ class SRM_Safe_Redirect_Manager {
 	}
 	
 	/**
+	 * Whether or not this is an admin page specific to the plugin
+	 *
+	 * @since 1.1
+	 * @uses get_post_type
+	 * @return bool
+ 	 */
+	private function is_whitelisted_page() {
+		return (bool) ( get_post_type() == $this->redirect_post_type || ( isset( $_GET['post_type'] ) && $this->redirect_post_type == $_GET['post_type'] ) );	
+	}  
+	
+	/**
 	 * Echoes admin message if redirect chains exist
 	 *
 	 * @since 1.0
-	 * @uses current_user_can, get_post_type
+	 * @uses current_user_can
 	 * @return void
 	 */
 	public function action_redirect_chain_alert() {
 		global $hook_suffix;
-		if ( $this->redirect_post_type == get_post_type() ) {
+		if ( $this->is_whitelisted_page() ) {
 			if ( $this->check_for_possible_redirect_loops() ) {
 			?>
 				<div class="updated">
@@ -332,7 +342,7 @@ class SRM_Safe_Redirect_Manager {
 	 * Registers post types for plugin
 	 *
 	 * @since 1.0
-	 * @uses register_post_type, _x
+	 * @uses register_post_type, _x, plugins_url
 	 * @return void
 	 */
 	public function action_register_post_types() {

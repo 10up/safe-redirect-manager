@@ -14,3 +14,11 @@ Safe Redirect Manager is a HTTP redirect manager for WordPress. An easy-to-use U
 == Installation ==
 
 Extract the zip file and just drop the contents in the wp-content/plugins/ directory of your WordPress installation and then activate the Plugin from Plugins page.
+
+== Changelog ==
+
+= 1.1 =
+*   safe-redirect-manager.php - plugin_url() used properly, is_whitelisted_page function
+
+= 1.0 =
+*   Plugin released
