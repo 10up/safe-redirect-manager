@@ -77,7 +77,7 @@ class SRM_Safe_Redirect_Manager {
 		?>
 			<style type="text/css">
 				#icon-tools {
-					background: url("<?php echo plugins_url(); ?>/safe-redirect-manager/images/icon32x32.png") no-repeat top left !important;
+					background: url("<?php echo plugins_url( 'images/icon32x32.png', __FILE__ ); ?>") no-repeat top left !important;
 					margin-right: 0;
 				}
 			</style>
