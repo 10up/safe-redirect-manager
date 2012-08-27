@@ -80,7 +80,7 @@ class SRM_Safe_Redirect_Manager {
 		?>
 			<style type="text/css">
 				#icon-tools {
-					background: url("<?php echo plugins_url(); ?>/safe-redirect-manager/images/icon32x32.png") no-repeat top left !important;
+					background: url("<?php echo plugins_url( 'images/icon32x32.png', __FILE__ ); ?>") no-repeat top left !important;
 					margin-right: 0;
 				}
 				#visibility {
@@ -104,12 +104,12 @@ class SRM_Safe_Redirect_Manager {
 	 * Echoes admin message if redirect chains exist
 	 *
 	 * @since 1.0
-	 * @uses current_user_can
+	 * @uses current_user_can, get_post_type
 	 * @return void
 	 */
 	public function action_redirect_chain_alert() {
-		global $post, $hook_suffix;
-		if ( is_object( $post ) && $this->redirect_post_type == $post->post_type ) {
+		global $hook_suffix;
+		if ( $this->redirect_post_type == get_post_type() ) {
 			if ( $this->check_for_possible_redirect_loops() ) {
 			?>
 				<div class="updated">
@@ -332,7 +332,7 @@ class SRM_Safe_Redirect_Manager {
 	 * Registers post types for plugin
 	 *
 	 * @since 1.0
-	 * @uses register_post_type, _x, plugins_url
+	 * @uses register_post_type, _x
 	 * @return void
 	 */
 	public function action_register_post_types() {
