@@ -75,7 +75,7 @@ class SRM_Safe_Redirect_Manager {
 	 * @return void
 	 */
 	public function action_print_logo_css() {
-		if ( $this->is_whitelisted_page() ) {
+		if ( $this->is_plugin_page() ) {
 		?>
 			<style type="text/css">
 				#icon-tools {
@@ -106,7 +106,7 @@ class SRM_Safe_Redirect_Manager {
 	 * @uses get_post_type
 	 * @return bool
  	 */
-	private function is_whitelisted_page() {
+	private function is_plugin_page() {
 		return (bool) ( get_post_type() == $this->redirect_post_type || ( isset( $_GET['post_type'] ) && $this->redirect_post_type == $_GET['post_type'] ) );	
 	}  
 	
@@ -119,7 +119,7 @@ class SRM_Safe_Redirect_Manager {
 	 */
 	public function action_redirect_chain_alert() {
 		global $hook_suffix;
-		if ( $this->is_whitelisted_page() ) {
+		if ( $this->is_plugin_page() ) {
 			if ( $this->check_for_possible_redirect_loops() ) {
 			?>
 				<div class="updated">
