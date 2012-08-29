@@ -361,17 +361,18 @@ class SRM_Safe_Redirect_Manager {
 			'parent_item_colon' => '',
 			'menu_name' => __( 'Safe Redirect Manager', 'safe-redirect-manager' )
 		);
-		$this_capability = 'edit_posts';
-		$this_capability = apply_filters( 'safe_redirect_restrict_to_capability', $this_capability );
+		$redirect_capability = 'manage_options';
+		$redirect_capability = apply_filters( 'srm_restrict_to_capability', $redirect_capability );
 		$capabilities = array(
-  							 	'edit_post'          => $this_capability,
-							    'read_post'          => $this_capability,
-							    'delete_post'        => $this_capability,
-							    'edit_posts'         => $this_capability,
-							    'edit_others_posts'  => $this_capability,
-							    'publish_posts'      => $this_capability,
-							    'read_private_posts' => $this_capability
+			'edit_post' => $redirect_capability,
+			'read_post' => $redirect_capability,
+			'delete_post' => $redirect_capability,
+			'edit_posts' => $redirect_capability,
+			'edit_others_posts' => $redirect_capability,
+			'publish_posts' => $redirect_capability,
+			'read_private_posts' => $redirect_capability
 		);
+		
 		$redirect_args = array(
 		  'labels' => $redirect_labels,
 		  'public' => false,
