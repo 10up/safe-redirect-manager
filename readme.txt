@@ -20,7 +20,7 @@ Extract the zip file and just drop the contents in the wp-content/plugins/ direc
 == Changelog ==
 
 = 1.2 =
-*   safe-redirect-manager.php - manage_options capabilitiy required to use redirect manager
+*   safe-redirect-manager.php - manage_options capabilitiy required to use redirect manager, remove checkbox column, hide view switcher, fix search feature, hide privacy stuff for bulk edit
 
 = 1.1 =
 *   safe-redirect-manager.php - plugin_url() used properly, is_plugin_page function
