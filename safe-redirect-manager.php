@@ -82,7 +82,7 @@ class SRM_Safe_Redirect_Manager {
 					background: url("<?php echo plugins_url( 'images/icon32x32.png', __FILE__ ); ?>") no-repeat top left !important;
 					margin-right: 0;
 				}
-				#visibility {
+				#visibility, .view-switch {
 					display: none;
 				}
 			</style>
@@ -297,8 +297,11 @@ class SRM_Safe_Redirect_Manager {
 		$columns['title'] = __( 'Redirect From', 'safe-redirect-manager' );
 		
 		// Move date column to the back
-		unset($columns['date']);
+		unset( $columns['date'] );
 		$columns['date'] = __( 'Date', 'safe-redirect-manager' );
+		
+		// get rid of checkboxes
+		unset( $columns['cb'] );
 		
 		return $columns;
 	}
