@@ -19,7 +19,7 @@ Extract the zip file and just drop the contents in the wp-content/plugins/ direc
 
 == Changelog ==
 
-= 1.1 =
+= 1.2 =
 *   safe-redirect-manager.php - manage_options capabilitiy required to use redirect manager
 
 = 1.1 =
