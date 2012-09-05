@@ -649,7 +649,7 @@ class SRM_Safe_Redirect_Manager {
 					$this->whitelist_hosts[] = $parsed_redirect['host'];
 					add_filter( 'allowed_redirect_hosts' , array( $this, 'filter_allowed_redirect_hosts' ) );
 				}
-					
+				
 				// if we have a valid status code, then redirect with it
 				if ( in_array( $status_code, $this->valid_status_codes ) )
 					wp_safe_redirect( esc_url_raw( $redirect_to ), $status_code );
@@ -713,4 +713,5 @@ class SRM_Safe_Redirect_Manager {
     	}
 }
 
-new SRM_Safe_Redirect_Manager();
+global $safe_redirect_manager;
+$safe_redirect_manager = new SRM_Safe_Redirect_Manager();
