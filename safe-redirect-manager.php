@@ -97,8 +97,10 @@ class SRM_Safe_Redirect_Manager {
 	/**
 	 * Return distinct search results
 	 *
+	 * @since 1.2
 	 * @param string $distinct
-	 * return string
+	 * @uses get_query_var
+	 * @return string
 	 */
 	public function filter_search_distinct( $distinct ) {
 		if ( $this->redirect_post_type != get_query_var( 'post_type' ) )
