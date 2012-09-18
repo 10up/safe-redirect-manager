@@ -17,7 +17,15 @@ Safe Redirect Manager is a HTTP redirect manager for WordPress. An easy-to-use U
 
 Extract the zip file and just drop the contents in the wp-content/plugins/ directory of your WordPress installation and then activate the Plugin from Plugins page.
 
+== Screenshots ==
+
+1. This view shows all your redirects. You can filter them by date or even search through them.
+2. This is the edit redirect page. Specify a "from" path, "to" path/URL, and a status code. You can schedule redirects for later dates just like posts.
+
 == Changelog ==
+
+= 1.3 =
+* safe-redirect-manager.php - Globalize SRM class for use in themes/plugins/scripts. Added create_redirect method to make importing easier.
 
 = 1.2 =
 *   safe-redirect-manager.php - manage_options capabilitiy required to use redirect manager, remove checkbox column, hide view switcher, fix search feature, hide privacy stuff for bulk edit
