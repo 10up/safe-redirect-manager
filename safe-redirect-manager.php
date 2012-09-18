@@ -4,7 +4,7 @@ Plugin Name: Safe Redirect Manager
 Plugin URI: http://www.10up.com
 Description: Easily and safely manage HTTP redirects.
 Author: Taylor Lovett (10up LLC), VentureBeat
-Version: 1.2
+Version: 1.3
 Author URI: http://www.10up.com
 
 GNU General Public License, Free Software Foundation <http://creativecommons.org/licenses/GPL/2.0/>
@@ -189,6 +189,45 @@ class SRM_Safe_Redirect_Manager {
 	 */
 	public function filter_bulk_actions() {
 		return array();
+	}
+	
+	/**
+	 * Creates a redirect post, this function will be useful for import/exports scripts
+	 *
+	 * @param string $redirect_from
+	 * @param string $redirect_to
+	 * @param int $status_code
+	 * @since 1.3
+	 * @uses wp_insert_post, update_post_meta
+	 * @return int
+	 */
+	public function create_redirect( $redirect_from, $redirect_to, $status_code ) {
+		$sanitized_redirect_from = $this->sanitize_redirect_from( $redirect_from );
+		$sanitized_redirect_to = $this->sanitize_redirect_to( $redirect_to );
+		$sanitized_status_code = absint( $status_code );
+		
+		// check and make sure no parameters are empty or invalid after sanitation
+		if ( empty( $sanitized_redirect_from ) || empty( $sanitized_redirect_to ) || ! in_array( $sanitized_status_code, $this->valid_status_codes ) )
+			return 0;
+		
+		// create the post
+		$post_args = array(
+			'post_type' => $this->redirect_post_type,
+			'post_status' => 'publish',
+			'post_author' => 1
+		);
+		
+		$post_id = wp_insert_post(  $post_args );
+		
+		if ( 0 >= $post_id )
+			return 0;
+		
+		// update the posts meta info
+		update_post_meta( $post_id, $this->meta_key_redirect_from, $sanitized_redirect_from );
+		update_post_meta( $post_id, $this->meta_key_redirect_to, $sanitized_redirect_to );
+		update_post_meta( $post_id, $this->meta_key_redirect_status_code, $sanitized_status_code );
+		
+		return $post_id;
 	}
 	
 	/**
@@ -567,8 +606,8 @@ class SRM_Safe_Redirect_Manager {
 			if ( ! in_array( $with_www, $content ) ) $content[] = $with_www;
 		}
 		
-        	return $content;
-    	}
+		return $content;
+	}
     
 	/**
 	 * Force update on the redirect cache and return cache
@@ -672,16 +711,16 @@ class SRM_Safe_Redirect_Manager {
 	 * @return string
 	 */
 	public function sanitize_redirect_to( $path ) {
-        	$path = trim( $path );
+		$path = trim( $path );
         
-        	if (  preg_match( '/^www\./i', $path ) )
-            	$path = 'http://' . $path;
+		if (  preg_match( '/^www\./i', $path ) )
+			$path = 'http://' . $path;
         
-        	if ( ! preg_match( '/^https?:\/\//i', $path ) )
-            		if ( strpos( $path, '/' ) !== 0 )
-                		$path = '/' . $path;
+		if ( ! preg_match( '/^https?:\/\//i', $path ) )
+			if ( strpos( $path, '/' ) !== 0 )
+				$path = '/' . $path;
         
-        	return esc_url_raw( $path );
+		return esc_url_raw( $path );
 	}
     
 	/**
@@ -694,23 +733,23 @@ class SRM_Safe_Redirect_Manager {
 	 */
 	public function sanitize_redirect_from( $path ) {
         
-        	$path = trim( $path );
+		$path = trim( $path );
+		
+		if ( empty( $path ) )
+            	return '';
         
-        	if ( empty( $path ) )
-            		return '';
+		// dont accept paths starting with a .
+		if ( strpos( $path, '.' ) === 0 )
+			return '';
         
-        	// dont accept paths starting with a .
-        	if ( strpos( $path, '.' ) === 0 )
-            		return '';
+		// turn path in to absolute
+		if ( preg_match( '/https?:\/\//i', $path ) )
+			$path = preg_replace( '/^(http:\/\/|https:\/\/)(www\.)?[^\/?]+\/?(.*)/i', '/$3', $path );
+		elseif ( strpos( $path, '/' ) !== 0 )
+			$path = '/' . $path;
         
-        	// turn path in to absolute
-        	if ( preg_match( '/https?:\/\//i', $path ) )
-            		$path = preg_replace( '/^(http:\/\/|https:\/\/)(www\.)?[^\/?]+\/?(.*)/i', '/$3', $path );
-        	elseif ( strpos( $path, '/' ) !== 0 )
-            		$path = '/' . $path;
-        
-        	return esc_url_raw( $path );
-    	}
+		return esc_url_raw( $path );
+	}
 }
 
 global $safe_redirect_manager;
