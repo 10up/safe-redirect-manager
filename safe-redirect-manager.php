@@ -4,7 +4,7 @@ Plugin Name: Safe Redirect Manager
 Plugin URI: http://www.10up.com
 Description: Easily and safely manage HTTP redirects.
 Author: Taylor Lovett (10up LLC), VentureBeat
-Version: 1.3
+Version: 1.4
 Author URI: http://www.10up.com
 
 GNU General Public License, Free Software Foundation <http://creativecommons.org/licenses/GPL/2.0/>
@@ -274,11 +274,14 @@ class SRM_Safe_Redirect_Manager {
 	 * Returns true if max redirects have been reached
 	 *
 	 * @since 1.0
-	 * @uses apply_filters
+	 * @uses apply_filters, get_transient
 	 * @return bool
 	 */
 	public function max_redirects_reached() {
-		$redirects = $this->update_redirect_cache();
+		if ( false === ( $redirects = get_transient( $this->cache_key_redirects ) ) ) {
+			$redirects = $this->update_redirect_cache();
+		}
+		
 		$max_redirects = apply_filters( 'srm_max_redirects', $this->default_max_redirects );
 		
 		return ( count( $redirects ) >= $max_redirects );
@@ -288,11 +291,13 @@ class SRM_Safe_Redirect_Manager {
 	 * Check for potential redirect loops or chains
 	 *
 	 * @since 1.0
-	 * @uses home_url
+	 * @uses home_url, get_transient
 	 * @return boolean
 	 */
 	public function check_for_possible_redirect_loops() {
-		$redirects = $this->update_redirect_cache();
+		if ( false === ( $redirects = get_transient( $this->cache_key_redirects ) ) ) {
+			$redirects = $this->update_redirect_cache();
+		}
 		
 		$current_url = parse_url( home_url() );
 		$this_host = ( is_array( $current_url ) && ! empty( $current_url['host'] ) ) ? $current_url['host'] : '';
