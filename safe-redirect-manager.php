@@ -340,7 +340,7 @@ class SRM_Safe_Redirect_Manager {
 	 * @uses is_admin, get_post_meta
 	 * @return string
 	 */
-	public function filter_admin_title( $title, $post_id ) {
+	public function filter_admin_title( $title, $post_id = 0 ) {
 		if ( ! is_admin() || false === ( $redirect = get_post( $post_id ) ) || $redirect->post_type != $this->redirect_post_type )
 			return $title;
 		
