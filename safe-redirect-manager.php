@@ -685,6 +685,11 @@ class SRM_Safe_Redirect_Manager {
 				
 			$redirect_to = $redirect['redirect_to'];
 			$status_code = $redirect['status_code'];
+
+			if ( apply_filters( 'srm_case_insensitive_redirects', true ) ) {
+				$requested_path = strtolower( $requested_path );
+				$redirect_from = strtolower( $redirect_from );
+			}
 			
 			// check if requested path is the same as the redirect from path
 			$matched_path = ( $requested_path == $redirect_from );
