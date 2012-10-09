@@ -690,11 +690,14 @@ class SRM_Safe_Redirect_Manager {
             $matched_path = ( $requested_path == $redirect_from );
 			
 			// check if the redirect_from ends in a wildcard
-			if( (strrpos($redirect_from, '*') == strlen($redirect_from) - 1) ) {
-				$wildcard_base = substr($redirect_from, 0, strlen($redirect_from) - 1);
-				
+			if ( !$matched_path && (strrpos( $redirect_from, '*' ) == strlen( $redirect_from ) - 1) ) {
+				$wildcard_base = substr( $redirect_from, 0, strlen( $redirect_from ) - 1 );
+                
 				// mark as match if requested path matches the base of the redirect from
-				$matched_path = $matched_path || (substr($requested_path, 0, strlen($wildcard_base)) == $wildcard_base);
+				$matched_path = (substr( $requested_path, 0, strlen( $wildcard_base ) ) == $wildcard_base);
+				if ( (strrpos( $redirect_to, '*' ) == strlen( $redirect_to ) - 1 ) ) {
+					$redirect_to .= substr( $requested_path, strlen( $wildcard_base ) );
+				}
 			}
 			
 			if ( $matched_path ) {		
