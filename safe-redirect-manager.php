@@ -4,7 +4,7 @@ Plugin Name: Safe Redirect Manager
 Plugin URI: http://www.10up.com
 Description: Easily and safely manage HTTP redirects.
 Author: Taylor Lovett (10up LLC), VentureBeat
-Version: 1.4
+Version: 1.4-working
 Author URI: http://www.10up.com
 
 GNU General Public License, Free Software Foundation <http://creativecommons.org/licenses/GPL/2.0/>
@@ -42,7 +42,7 @@ class SRM_Safe_Redirect_Manager {
 	private $whitelist_hosts = array();
 	
 	public $default_max_redirects = 150;
-    
+	
 	/**
 	 * Sets up redirect manager
 	 *
@@ -59,7 +59,7 @@ class SRM_Safe_Redirect_Manager {
 		add_action( 'manage_' . $this->redirect_post_type . '_posts_custom_column' , array( $this, 'action_custom_redirect_columns' ), 10, 2 );
 		add_action( 'transition_post_status', array( $this, 'action_transition_post_status' ), 10, 3 );
 		add_filter( 'post_updated_messages', array( $this, 'filter_redirect_updated_messages' ) );
-		add_action( 'admin_notices', array( $this, 'action_redirect_chain_alert' ) );    
+		add_action( 'admin_notices', array( $this, 'action_redirect_chain_alert' ) );	
 		add_filter( 'the_title', array( $this, 'filter_admin_title' ), 100, 2 );
 		add_action( 'admin_init', array( $this, 'action_admin_init' ) );
 		add_filter( 'bulk_actions-' . 'edit-redirect_rule', array( $this, 'filter_bulk_actions' ) );
@@ -564,13 +564,13 @@ class SRM_Safe_Redirect_Manager {
 		<p>
 			<label for="srm<?php echo $this->meta_key_redirect_from; ?>"><?php _e( 'Redirect From:', 'safe-redirect-manager' ); ?></label><br />
 			<input class="widefat" type="text" name="srm<?php echo $this->meta_key_redirect_from; ?>" id="srm<?php echo $this->meta_key_redirect_from; ?>" value="<?php echo esc_attr( $redirect_from ); ?>" /><br />
-			<em><?php _e( 'This path should be relative to the root of this WordPress installation (or the sub-site, if you are running a multi-site).', 'safe-redirect-manager' ); ?></em>
+			<p class="description"><?php _e( "This path should be relative to the root of this WordPress installation (or the sub-site, if you are running a multi-site). Appending a (*) wildcard character will match all requests with the base.", 'safe-redirect-manager' ); ?></p>
 		</p>
 		
 		<p>
 			<label for="srm<?php echo $this->meta_key_redirect_to; ?>"><?php _e( 'Redirect To:', 'safe-redirect-manager' ); ?></label><br />
 			<input class="widefat" type="text" name="srm<?php echo $this->meta_key_redirect_to; ?>" id="srm<?php echo $this->meta_key_redirect_to; ?>" value="<?php echo esc_attr( $redirect_to ); ?>" /><br />
-			<em><?php _e( 'This can be a URL or a path relative to the root of your website (not your WordPress installation).', 'safe-redirect-manager'); ?></em>
+			<p class="description"><?php _e( "This can be a URL or a path relative to the root of your website (not your WordPress installation). Ending with a (*) wildcard character will append the request match to the redirect.", 'safe-redirect-manager'); ?></p>
 		</p>
 		
 		<p>
@@ -595,7 +595,7 @@ class SRM_Safe_Redirect_Manager {
 	public function action_admin_init() {
 		load_plugin_textdomain( 'safe-redirect-manager', false, dirname( plugin_basename( __FILE__ ) ) . '/localization/' );
 	}
-    
+	
 	/**
 	 * Apply whitelisted hosts to allowed_redirect_hosts filter
 	 *
@@ -604,7 +604,7 @@ class SRM_Safe_Redirect_Manager {
 	 * @return array
 	 */
 	public function filter_allowed_redirect_hosts( $content ) {
-        
+		
 		foreach ( $this->whitelist_hosts as $host ) {
 			$without_www = preg_replace( '/^www\./i', '', $host );
 			$with_www = 'www.' . $without_www;
@@ -615,7 +615,7 @@ class SRM_Safe_Redirect_Manager {
 		
 		return $content;
 	}
-    
+	
 	/**
 	 * Force update on the redirect cache and return cache
 	 *
@@ -658,7 +658,7 @@ class SRM_Safe_Redirect_Manager {
 		
 		return $redirect_cache;
 	}
-    
+	
 	/**
 	 * Check current url against redirects
 	 *
@@ -668,10 +668,10 @@ class SRM_Safe_Redirect_Manager {
 	 * @return void
 	 */
 	public function action_parse_request( $current_request ) {
-        
-        	// get requested path and add a / before it
+		
+			// get requested path and add a / before it
 		$requested_path = '/' . ltrim( trim( $current_request->request ), '/' );
-        
+		
 		// get redirects from cache or recreate it
 		if ( false === ( $redirects = get_transient( $this->cache_key_redirects ) ) ) {
 			$redirects = $this->update_redirect_cache();
@@ -687,14 +687,28 @@ class SRM_Safe_Redirect_Manager {
 			$status_code = $redirect['status_code'];
 			
 			// check if requested path is the same as the redirect from path
-			if ( $requested_path == $redirect_from ) {
-				
+			$matched_path = ( $requested_path == $redirect_from );
+			
+			// check if the redirect_from ends in a wildcard
+			if ( !$matched_path && (strrpos( $redirect_from, '*' ) == strlen( $redirect_from ) - 1) ) {
+				$wildcard_base = substr( $redirect_from, 0, strlen( $redirect_from ) - 1 );
+
+				// mark as match if requested path matches the base of the redirect from
+				$matched_path = (substr( $requested_path, 0, strlen( $wildcard_base ) ) == $wildcard_base);
+				if ( (strrpos( $redirect_to, '*' ) == strlen( $redirect_to ) - 1 ) ) {
+					$redirect_to = rtrim( $redirect_to, '*' ) . ltrim( substr( $requested_path, strlen( $wildcard_base ) ), '/' );
+				}
+			}
+
+			if ( $matched_path ) {		
 				// whitelist redirect to host if necessary
 				$parsed_redirect = parse_url( $redirect_to );
 				if ( is_array( $parsed_redirect ) && ! empty( $parsed_redirect['host'] ) ) {
 					$this->whitelist_hosts[] = $parsed_redirect['host'];
 					add_filter( 'allowed_redirect_hosts' , array( $this, 'filter_allowed_redirect_hosts' ) );
 				}
+				
+				header("X-Safe-Redirect-Manager: true");
 				
 				// if we have a valid status code, then redirect with it
 				if ( in_array( $status_code, $this->valid_status_codes ) )
@@ -705,7 +719,7 @@ class SRM_Safe_Redirect_Manager {
 			}
 		}
 	}
-    
+	
 	/**
 	 * Sanitize redirect to path
 	 *
@@ -719,17 +733,17 @@ class SRM_Safe_Redirect_Manager {
 	 */
 	public function sanitize_redirect_to( $path ) {
 		$path = trim( $path );
-        
+		
 		if (  preg_match( '/^www\./i', $path ) )
 			$path = 'http://' . $path;
-        
+		
 		if ( ! preg_match( '/^https?:\/\//i', $path ) )
 			if ( strpos( $path, '/' ) !== 0 )
 				$path = '/' . $path;
-        
+		
 		return esc_url_raw( $path );
 	}
-    
+	
 	/**
 	 * Sanitize redirect from path
 	 *
@@ -739,22 +753,22 @@ class SRM_Safe_Redirect_Manager {
 	 * @return string
 	 */
 	public function sanitize_redirect_from( $path ) {
-        
+		
 		$path = trim( $path );
 		
 		if ( empty( $path ) )
-            	return '';
-        
+				return '';
+		
 		// dont accept paths starting with a .
 		if ( strpos( $path, '.' ) === 0 )
 			return '';
-        
+		
 		// turn path in to absolute
 		if ( preg_match( '/https?:\/\//i', $path ) )
 			$path = preg_replace( '/^(http:\/\/|https:\/\/)(www\.)?[^\/?]+\/?(.*)/i', '/$3', $path );
 		elseif ( strpos( $path, '/' ) !== 0 )
 			$path = '/' . $path;
-        
+		
 		return esc_url_raw( $path );
 	}
 }
