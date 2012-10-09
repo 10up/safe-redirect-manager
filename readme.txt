@@ -5,7 +5,7 @@ Requires at least: 3.1
 Tested up to: 3.4.1
 Stable tag: 1.3
 
-Safely and easily manage your websites HTTP redirects.
+Safely and easily manage your website's HTTP redirects.
 
 == Description ==
 
