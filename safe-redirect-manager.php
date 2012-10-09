@@ -687,8 +687,17 @@ class SRM_Safe_Redirect_Manager {
 			$status_code = $redirect['status_code'];
 			
 			// check if requested path is the same as the redirect from path
-			if ( $requested_path == $redirect_from ) {
+            $matched_path = ( $requested_path == $redirect_from );
+			
+			// check if the redirect_from ends in a wildcard
+			if( (strrpos($redirect_from, '*') == strlen($redirect_from) - 1) ) {
+				$wildcard_base = substr($redirect_from, 0, strlen($redirect_from) - 1);
 				
+				// mark as match if requested path matches the base of the redirect from
+				$matched_path = $matched_path || (substr($requested_path, 0, strlen($wildcard_base)) == $wildcard_base);
+			}
+			
+			if ( $matched_path ) {		
 				// whitelist redirect to host if necessary
 				$parsed_redirect = parse_url( $redirect_to );
 				if ( is_array( $parsed_redirect ) && ! empty( $parsed_redirect['host'] ) ) {
