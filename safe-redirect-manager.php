@@ -663,14 +663,13 @@ class SRM_Safe_Redirect_Manager {
 	 * Check current url against redirects
 	 *
 	 * @since 1.0
-	 * @param object $current_request
 	 * @uses esc_url_raw, wp_safe_redirect, untrailingslashit, get_transient, add_filter
 	 * @return void
 	 */
-	public function action_parse_request( $current_request ) {
+	public function action_parse_request() {
 		
-			// get requested path and add a / before it
-		$requested_path = '/' . ltrim( trim( $current_request->request ), '/' );
+		// get requested path and add a / before it
+		$requested_path = sanitize_text_field( $_SERVER['REQUEST_URI'] );
 		
 		// get redirects from cache or recreate it
 		if ( false === ( $redirects = get_transient( $this->cache_key_redirects ) ) ) {
@@ -692,7 +691,7 @@ class SRM_Safe_Redirect_Manager {
 			}
 			
 			// check if requested path is the same as the redirect from path
-			$matched_path = ( $requested_path == $redirect_from );
+			$matched_path = ( untrailingslashit( $requested_path ) == $redirect_from );
 			
 			// check if the redirect_from ends in a wildcard
 			if ( !$matched_path && (strrpos( $redirect_from, '*' ) == strlen( $redirect_from ) - 1) ) {
