@@ -51,6 +51,7 @@ class SRM_Safe_Redirect_Manager {
 	 * @return object
 	 */
 	public function __construct() {
+		add_action( 'init', array( $this, 'action_init' ) );
 		add_action( 'init', array( $this, 'action_register_post_types' ) );
 		add_action( 'parse_request', array( $this, 'action_parse_request' ), 0 );
 		add_action( 'after_theme_setup', array( $this, 'action_load_texthost' ) );
@@ -61,7 +62,6 @@ class SRM_Safe_Redirect_Manager {
 		add_filter( 'post_updated_messages', array( $this, 'filter_redirect_updated_messages' ) );
 		add_action( 'admin_notices', array( $this, 'action_redirect_chain_alert' ) );	
 		add_filter( 'the_title', array( $this, 'filter_admin_title' ), 100, 2 );
-		add_action( 'admin_init', array( $this, 'action_admin_init' ) );
 		add_filter( 'bulk_actions-' . 'edit-redirect_rule', array( $this, 'filter_bulk_actions' ) );
 		add_action( 'admin_print_styles-edit.php', array( $this, 'action_print_logo_css' ), 10, 1 );
 		add_action( 'admin_print_styles-post.php', array( $this, 'action_print_logo_css' ), 10, 1 );
@@ -592,8 +592,8 @@ class SRM_Safe_Redirect_Manager {
 	 * @uses load_plugin_textdomain, plugin_basename
 	 * @return void
 	 */
-	public function action_admin_init() {
-		load_plugin_textdomain( 'safe-redirect-manager', false, dirname( plugin_basename( __FILE__ ) ) . '/localization/' );
+	public function action_init() {
+		load_plugin_textdomain( 'safe-redirect-manager', false, dirname( plugin_basename( __FILE__ ) ) . '/languages/' );
 	}
 	
 	/**
