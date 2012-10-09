@@ -696,6 +696,8 @@ class SRM_Safe_Redirect_Manager {
 					add_filter( 'allowed_redirect_hosts' , array( $this, 'filter_allowed_redirect_hosts' ) );
 				}
 				
+				header("X-Safe-Redirect-Manager: true");
+				
 				// if we have a valid status code, then redirect with it
 				if ( in_array( $status_code, $this->valid_status_codes ) )
 					wp_safe_redirect( esc_url_raw( $redirect_to ), $status_code );
