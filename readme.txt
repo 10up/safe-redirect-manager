@@ -3,7 +3,7 @@ Contributors: tlovett1, tollmanz, taylorde, 10up, jakemgold, danielbachhuber, Ve
 Tags: http redirects, redirect manager, url redirection, safe http redirection
 Requires at least: 3.1
 Tested up to: 3.4.1
-Stable tag: trunk
+Stable tag: 1.3
 
 Safely and easily manage your websites HTTP redirects.
 
