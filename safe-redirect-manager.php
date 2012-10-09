@@ -42,7 +42,7 @@ class SRM_Safe_Redirect_Manager {
 	private $whitelist_hosts = array();
 	
 	public $default_max_redirects = 150;
-    
+	
 	/**
 	 * Sets up redirect manager
 	 *
@@ -59,7 +59,7 @@ class SRM_Safe_Redirect_Manager {
 		add_action( 'manage_' . $this->redirect_post_type . '_posts_custom_column' , array( $this, 'action_custom_redirect_columns' ), 10, 2 );
 		add_action( 'transition_post_status', array( $this, 'action_transition_post_status' ), 10, 3 );
 		add_filter( 'post_updated_messages', array( $this, 'filter_redirect_updated_messages' ) );
-		add_action( 'admin_notices', array( $this, 'action_redirect_chain_alert' ) );    
+		add_action( 'admin_notices', array( $this, 'action_redirect_chain_alert' ) );	
 		add_filter( 'the_title', array( $this, 'filter_admin_title' ), 100, 2 );
 		add_action( 'admin_init', array( $this, 'action_admin_init' ) );
 		add_filter( 'bulk_actions-' . 'edit-redirect_rule', array( $this, 'filter_bulk_actions' ) );
@@ -595,7 +595,7 @@ class SRM_Safe_Redirect_Manager {
 	public function action_admin_init() {
 		load_plugin_textdomain( 'safe-redirect-manager', false, dirname( plugin_basename( __FILE__ ) ) . '/localization/' );
 	}
-    
+	
 	/**
 	 * Apply whitelisted hosts to allowed_redirect_hosts filter
 	 *
@@ -604,7 +604,7 @@ class SRM_Safe_Redirect_Manager {
 	 * @return array
 	 */
 	public function filter_allowed_redirect_hosts( $content ) {
-        
+		
 		foreach ( $this->whitelist_hosts as $host ) {
 			$without_www = preg_replace( '/^www\./i', '', $host );
 			$with_www = 'www.' . $without_www;
@@ -615,7 +615,7 @@ class SRM_Safe_Redirect_Manager {
 		
 		return $content;
 	}
-    
+	
 	/**
 	 * Force update on the redirect cache and return cache
 	 *
@@ -658,7 +658,7 @@ class SRM_Safe_Redirect_Manager {
 		
 		return $redirect_cache;
 	}
-    
+	
 	/**
 	 * Check current url against redirects
 	 *
@@ -668,10 +668,10 @@ class SRM_Safe_Redirect_Manager {
 	 * @return void
 	 */
 	public function action_parse_request( $current_request ) {
-        
-        	// get requested path and add a / before it
+		
+			// get requested path and add a / before it
 		$requested_path = '/' . ltrim( trim( $current_request->request ), '/' );
-        
+		
 		// get redirects from cache or recreate it
 		if ( false === ( $redirects = get_transient( $this->cache_key_redirects ) ) ) {
 			$redirects = $this->update_redirect_cache();
@@ -719,7 +719,7 @@ class SRM_Safe_Redirect_Manager {
 			}
 		}
 	}
-    
+	
 	/**
 	 * Sanitize redirect to path
 	 *
@@ -733,17 +733,17 @@ class SRM_Safe_Redirect_Manager {
 	 */
 	public function sanitize_redirect_to( $path ) {
 		$path = trim( $path );
-        
+		
 		if (  preg_match( '/^www\./i', $path ) )
 			$path = 'http://' . $path;
-        
+		
 		if ( ! preg_match( '/^https?:\/\//i', $path ) )
 			if ( strpos( $path, '/' ) !== 0 )
 				$path = '/' . $path;
-        
+		
 		return esc_url_raw( $path );
 	}
-    
+	
 	/**
 	 * Sanitize redirect from path
 	 *
@@ -753,22 +753,22 @@ class SRM_Safe_Redirect_Manager {
 	 * @return string
 	 */
 	public function sanitize_redirect_from( $path ) {
-        
+		
 		$path = trim( $path );
 		
 		if ( empty( $path ) )
-            	return '';
-        
+				return '';
+		
 		// dont accept paths starting with a .
 		if ( strpos( $path, '.' ) === 0 )
 			return '';
-        
+		
 		// turn path in to absolute
 		if ( preg_match( '/https?:\/\//i', $path ) )
 			$path = preg_replace( '/^(http:\/\/|https:\/\/)(www\.)?[^\/?]+\/?(.*)/i', '/$3', $path );
 		elseif ( strpos( $path, '/' ) !== 0 )
 			$path = '/' . $path;
-        
+		
 		return esc_url_raw( $path );
 	}
 }
