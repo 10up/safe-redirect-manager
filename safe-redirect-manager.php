@@ -678,12 +678,25 @@ class SRM_Safe_Redirect_Manager {
 	 */
 	public function action_parse_request() {
 		
-		// get requested path and add a / before it
-		$requested_path = sanitize_text_field( $_SERVER['REQUEST_URI'] );
-		
 		// get redirects from cache or recreate it
 		if ( false === ( $redirects = get_transient( $this->cache_key_redirects ) ) ) {
 			$redirects = $this->update_redirect_cache();
+		}
+		
+		// If we have no redirects, there is no need to continue
+		if ( empty( $redirects ) )
+			return;
+		
+		// get requested path and add a / before it
+		$requested_path = sanitize_text_field( $_SERVER['REQUEST_URI'] );
+		
+		/**
+		 * If WordPress resides in a directory that is not the public root, we have to chop
+		 * the pre-WP path off the requested path.
+		 */
+		$parsed_site_url = parse_url( site_url() );
+		if ( '/' != $parsed_site_url['path'] ) {
+			$requested_path = str_ireplace( $parsed_site_url['path'], '', $requested_path );
 		}
 		
 		foreach ( $redirects as $redirect ) {
