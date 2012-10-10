@@ -34,6 +34,7 @@ class SRM_Safe_Redirect_Manager {
 	public $meta_key_redirect_from = '_redirect_rule_from';
 	public $meta_key_redirect_to = '_redirect_rule_to';
 	public $meta_key_redirect_status_code = '_redirect_rule_status_code';
+	public $meta_key_enable_redirect_from_regex = '_redirect_rule_from_regex';
 	
 	public $cache_key_redirects = '_srm_redirects';
 	
@@ -177,6 +178,9 @@ class SRM_Safe_Redirect_Manager {
 				}
 				#visibility, .view-switch, .posts .inline-edit-col-left .inline-edit-group {
 					display: none;
+				}
+				#srm<?php echo $this->meta_key_redirect_from; ?> {
+					width: 60%;
 				}
 			</style>
 		<?php
@@ -480,6 +484,12 @@ class SRM_Safe_Redirect_Manager {
 				delete_post_meta( $post_id, $this->meta_key_redirect_status_code );
 			}
 			
+			if ( ! empty( $_POST['srm' . $this->meta_key_enable_redirect_from_regex] ) ) {
+				update_post_meta( $post_id, $this->meta_key_enable_redirect_from_regex, absint( $_POST['srm' . $this->meta_key_enable_redirect_from_regex] ) );
+			} else {
+				delete_post_meta( $post_id, $this->meta_key_enable_redirect_from_regex );
+			}
+			
 			/**
 			 * This fixes an important bug where the redirect cache was not up-to-date. Previously the cache was only being
 			 * updated on transition_post_status which gets called BEFORE save post. But since save_post is where all the important
@@ -567,14 +577,17 @@ class SRM_Safe_Redirect_Manager {
 		
 		$redirect_from = get_post_meta( $post->ID, $this->meta_key_redirect_from, true );
 		$redirect_to = get_post_meta( $post->ID, $this->meta_key_redirect_to, true );
+		$enable_regex = get_post_meta( $post->ID, $this->meta_key_enable_redirect_from_regex, true );
 		$status_code = get_post_meta( $post->ID, $this->meta_key_redirect_status_code, true );
 		if ( empty( $status_code ) )
 			$status_code = 302;
 	?>
 		<p>
 			<label for="srm<?php echo $this->meta_key_redirect_from; ?>"><?php _e( 'Redirect From:', 'safe-redirect-manager' ); ?></label><br />
-			<input class="widefat" type="text" name="srm<?php echo $this->meta_key_redirect_from; ?>" id="srm<?php echo $this->meta_key_redirect_from; ?>" value="<?php echo esc_attr( $redirect_from ); ?>" /><br />
-			<p class="description"><?php _e( "This path should be relative to the root of this WordPress installation (or the sub-site, if you are running a multi-site). Appending a (*) wildcard character will match all requests with the base.", 'safe-redirect-manager' ); ?></p>
+			<input type="text" name="srm<?php echo $this->meta_key_redirect_from; ?>" id="srm<?php echo $this->meta_key_redirect_from; ?>" value="<?php echo esc_attr( $redirect_from ); ?>" /> 
+			<input type="checkbox" name="srm<?php echo $this->meta_key_enable_redirect_from_regex; ?>" id="srm<?php echo $this->meta_key_enable_redirect_from_regex; ?>" <?php checked( 1, absint( $enable_regex ) ); ?> value="1" />
+			<label for="srm<?php echo $this->meta_key_enable_redirect_from_regex; ?>"><?php _e( 'Enable Regular Expressions (advanced)', 'safe-redirect-manager' ); ?></label><br />
+			<p class="description"><?php _e( "This path should be relative to the root of this WordPress installation (or the sub-site, if you are running a multi-site). Appending a (*) wildcard character will match all requests with the base. Warning: Enabling regular expressions will disable wildcards and completely change the way the * symbol is interpretted.", 'safe-redirect-manager' ); ?></p>
 		</p>
 		
 		<p>
@@ -653,12 +666,14 @@ class SRM_Safe_Redirect_Manager {
 				$redirect_from = get_post_meta( get_the_ID(), $this->meta_key_redirect_from, true );
 				$redirect_to = get_post_meta( get_the_ID(), $this->meta_key_redirect_to, true );
 				$status_code = get_post_meta( get_the_ID(), $this->meta_key_redirect_status_code, true );
+				$enable_regex = get_post_meta( get_the_ID(), $this->meta_key_enable_redirect_from_regex, true );
 				
 				if ( ! empty( $redirect_from ) && ! empty( $redirect_to ) ) {
 					$redirect_cache[] = array(
 						'redirect_from' => $redirect_from,
 						'redirect_to' => $redirect_to,
-						'status_code' => absint( $status_code )
+						'status_code' => absint( $status_code ),
+						'enable_regex' => (bool) $enable_regex
 					);
 				}
 			}
@@ -696,7 +711,7 @@ class SRM_Safe_Redirect_Manager {
 		 */
 		$parsed_site_url = parse_url( site_url() );
 		if ( '/' != $parsed_site_url['path'] ) {
-			$requested_path = preg_replace( '@' . $parsed_site_url['path'] . '@i', '', $requested_path, 1 );
+			$requested_path = $requested_path = preg_replace( '@' . $parsed_site_url['path'] . '@i', '', $requested_path, 1 );
 		}
 		
 		foreach ( $redirects as $redirect ) {
@@ -707,6 +722,7 @@ class SRM_Safe_Redirect_Manager {
 				
 			$redirect_to = $redirect['redirect_to'];
 			$status_code = $redirect['status_code'];
+			$enable_regex = ( isset( $redirect['enable_regex'] ) ) ? $redirect['enable_regex'] : false;
 
 			if ( apply_filters( 'srm_case_insensitive_redirects', true ) ) {
 				$requested_path = strtolower( $requested_path );
@@ -714,16 +730,20 @@ class SRM_Safe_Redirect_Manager {
 			}
 			
 			// check if requested path is the same as the redirect from path
-			$matched_path = ( untrailingslashit( $requested_path ) == $redirect_from );
-			
-			// check if the redirect_from ends in a wildcard
-			if ( !$matched_path && (strrpos( $redirect_from, '*' ) == strlen( $redirect_from ) - 1) ) {
-				$wildcard_base = substr( $redirect_from, 0, strlen( $redirect_from ) - 1 );
-
-				// mark as match if requested path matches the base of the redirect from
-				$matched_path = (substr( $requested_path, 0, strlen( $wildcard_base ) ) == $wildcard_base);
-				if ( (strrpos( $redirect_to, '*' ) == strlen( $redirect_to ) - 1 ) ) {
-					$redirect_to = rtrim( $redirect_to, '*' ) . ltrim( substr( $requested_path, strlen( $wildcard_base ) ), '/' );
+			if ( $enable_regex ) {
+				$matched_path = ( @preg_match( '@' . $redirect_from . '@', $requested_path ) );
+			} else {
+				$matched_path = ( untrailingslashit( $requested_path ) == $redirect_from );
+				
+				// check if the redirect_from ends in a wildcard
+				if ( !$matched_path && (strrpos( $redirect_from, '*' ) == strlen( $redirect_from ) - 1) ) {
+					$wildcard_base = substr( $redirect_from, 0, strlen( $redirect_from ) - 1 );
+	
+					// mark as match if requested path matches the base of the redirect from
+					$matched_path = (substr( $requested_path, 0, strlen( $wildcard_base ) ) == $wildcard_base);
+					if ( (strrpos( $redirect_to, '*' ) == strlen( $redirect_to ) - 1 ) ) {
+						$redirect_to = rtrim( $redirect_to, '*' ) . ltrim( substr( $requested_path, strlen( $wildcard_base ) ), '/' );
+					}
 				}
 			}
 
@@ -796,7 +816,10 @@ class SRM_Safe_Redirect_Manager {
 		elseif ( strpos( $path, '/' ) !== 0 )
 			$path = '/' . $path;
 		
-		return esc_url_raw( $path );
+		// the @ symbol will break our regex engine
+		$path = str_replace( '@', '', $path );
+		
+		return $path;
 	}
 }
 
