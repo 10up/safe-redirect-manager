@@ -229,6 +229,9 @@ class SRM_Safe_Redirect_Manager {
 		update_post_meta( $post_id, $this->meta_key_redirect_to, $sanitized_redirect_to );
 		update_post_meta( $post_id, $this->meta_key_redirect_status_code, $sanitized_status_code );
 		
+		// We need to update the cache after creating this redirect
+		$this->update_redirect_cache();
+		
 		return $post_id;
 	}
 	
