@@ -479,6 +479,13 @@ class SRM_Safe_Redirect_Manager {
 			} else {
 				delete_post_meta( $post_id, $this->meta_key_redirect_status_code );
 			}
+			
+			/**
+			 * This fixes an important bug where the redirect cache was not up-to-date. Previously the cache was only being
+			 * updated on transition_post_status which gets called BEFORE save post. But since save_post is where all the important
+			 * redirect info is saved, updating the cache before it is not sufficient.
+			 */
+			$this->update_redirect_cache();
 		}
 	}
 	
