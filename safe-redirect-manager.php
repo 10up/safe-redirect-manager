@@ -696,7 +696,7 @@ class SRM_Safe_Redirect_Manager {
 		 */
 		$parsed_site_url = parse_url( site_url() );
 		if ( '/' != $parsed_site_url['path'] ) {
-			$requested_path = str_ireplace( $parsed_site_url['path'], '', $requested_path );
+			$requested_path = preg_replace( '@' . $parsed_site_url['path'] . '@i', '', $requested_path, 1 );
 		}
 		
 		foreach ( $redirects as $redirect ) {
