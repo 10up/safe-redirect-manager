@@ -250,19 +250,26 @@ class SRM_Safe_Redirect_Manager {
 	 * Echoes admin message if redirect chains exist
 	 *
 	 * @since 1.0
-	 * @uses current_user_can
+	 * @uses apply_filters
 	 * @return void
 	 */
 	public function action_redirect_chain_alert() {
 		global $hook_suffix;
 		if ( $this->is_plugin_page() ) {
+		
+		/**
+		 * check_for_possible_redirect_loops() runs in best case Theta(n^2) so if you have 100 redirects, this method
+		 * will be running slow. Let's disable it by default.
+		 */
+		if ( apply_filters( 'srm_check_for_possible_redirect_loops', false ) ) {
 			if ( $this->check_for_possible_redirect_loops() ) {
-			?>
-				<div class="updated">
-					<p><?php _e( 'Safe Redirect Manager Warning: Possible redirect loops and/or chains have been created.', 'safe-redirect-manager' ); ?></p>
-				</div>
-			<?php
-			} if ( $this->max_redirects_reached() ) {
+				?>
+					<div class="updated">
+						<p><?php _e( 'Safe Redirect Manager Warning: Possible redirect loops and/or chains have been created.', 'safe-redirect-manager' ); ?></p>
+					</div>
+				<?php
+				}
+		} if ( $this->max_redirects_reached() ) {
 			?>
 				<?php if ( 'post-new.php' == $hook_suffix ) : ?><style type="text/css">#post { display: none; }</style><?php endif; ?>
 				<div class="error">
