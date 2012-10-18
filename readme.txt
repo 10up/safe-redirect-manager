@@ -3,7 +3,7 @@ Contributors: tlovett1, tollmanz, taylorde, 10up, jakemgold, danielbachhuber, Ve
 Tags: http redirects, redirect manager, url redirection, safe http redirection
 Requires at least: 3.1
 Tested up to: 3.4.2
-Stable tag: 1.4.1
+Stable tag: 1.4.2
 
 Safely and easily manage your website's HTTP redirects.
 
@@ -23,6 +23,10 @@ Extract the zip file and just drop the contents in the wp-content/plugins/ direc
 2. This is the edit redirect page. Specify a "from" path, "to" path/URL, and a status code. You can schedule redirects for later dates just like posts.
 
 == Changelog ==
+
+= 1.4.2 (Oct. 17, 2012) =
+* Disable redirect loop checking by default. You can filter srm_check_for_possible_redirect_loops to enable it.
+* Only return published redirects in update_redirect_cache. - bug fix
 
 = 1.4.1 (Oct. 11, 2012) =
 * Refresh cache after create_redirect call - bug fix

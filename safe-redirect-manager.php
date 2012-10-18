@@ -4,7 +4,7 @@ Plugin Name: Safe Redirect Manager
 Plugin URI: http://www.10up.com
 Description: Easily and safely manage HTTP redirects.
 Author: Taylor Lovett (10up LLC), VentureBeat
-Version: 1.4.1
+Version: 1.4.2
 Author URI: http://www.10up.com
 
 GNU General Public License, Free Software Foundation <http://creativecommons.org/licenses/GPL/2.0/>
@@ -649,6 +649,7 @@ class SRM_Safe_Redirect_Manager {
 			'post_type' => $this->redirect_post_type,
 			'no_found_rows' => true,
 			'update_term_cache' => false,
+			'post_status' => 'publish'
 		);
 		$redirect_query = new WP_Query( $args );
 		$redirect_cache = array();
