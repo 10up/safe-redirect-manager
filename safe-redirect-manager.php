@@ -703,7 +703,7 @@ class SRM_Safe_Redirect_Manager {
 		 * the pre-WP path off the requested path.
 		 */
 		$parsed_site_url = parse_url( site_url() );
-		if ( '/' != $parsed_site_url['path'] ) {
+		if ( isset( $parsed_site_url['path'] ) && '/' != $parsed_site_url['path'] ) {
 			$requested_path = preg_replace( '@' . $parsed_site_url['path'] . '@i', '', $requested_path, 1 );
 		}
 		
