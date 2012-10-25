@@ -708,10 +708,9 @@ class SRM_Safe_Redirect_Manager {
 		}
 
 		// Allow redirects to be filtered
-		if ( ! $redirects = apply_filters( 'srm_filter_redirects_before_running', $redirects, $requested_path ) )
-			return;
+		$redirects = apply_filters( 'srm_registered_redirects', $redirects, $requested_path );
 
-		foreach ( $redirects as $redirect ) {
+		foreach ( (array)$redirects as $redirect ) {
 
 			$redirect_from = untrailingslashit( $redirect['redirect_from'] );
 			if ( empty( $redirect_from ) )
