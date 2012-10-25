@@ -709,6 +709,10 @@ class SRM_Safe_Redirect_Manager {
 		
 		foreach ( $redirects as $redirect ) {
 			
+			// Allow redirects to be filtered
+			if ( ! $redirect = apply_filters( 'srm_filter_redirect_before_running', $redirect, $requested_path ) )
+				continue;
+
 			$redirect_from = untrailingslashit( $redirect['redirect_from'] );
 			if ( empty( $redirect_from ) )
 				$redirect_from = '/'; // this only happens in the case where there is a redirect on the root
