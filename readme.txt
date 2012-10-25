@@ -25,6 +25,7 @@ Extract the zip file and just drop the contents in the wp-content/plugins/ direc
 == Changelog ==
 
 = 1.4.3 (??? ?? 2012) =
+* New filter 'srm_registered_redirects' allows you to conditionally unset redirects based on context, user permissions, etc. Thanks [jtsternberg](https://github.com/jtsternberg) for the pull request.
 
 = 1.4.2 (Oct. 17, 2012) =
 * Disable redirect loop checking by default. You can filter srm_check_for_possible_redirect_loops to enable it.
