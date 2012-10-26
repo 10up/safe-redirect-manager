@@ -728,7 +728,7 @@ class SRM_Safe_Redirect_Manager {
 			$matched_path = ( untrailingslashit( $requested_path ) == $redirect_from );
 
 			// check if the redirect_from ends in a wildcard
-			if ( !$matched_path && (strrpos( $redirect_from, '*' ) == strlen( $redirect_from ) - 1) ) {
+			if ( !$matched_path && (strrpos( $redirect_from, '*' ) === strlen( $redirect_from ) - 1) ) {
 				$wildcard_base = substr( $redirect_from, 0, strlen( $redirect_from ) - 1 );
 
 				// mark as match if requested path matches the base of the redirect from
