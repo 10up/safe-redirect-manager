@@ -25,6 +25,9 @@ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 */
 
+if ( defined( 'WP_CLI' ) && WP_CLI )
+	require_once dirname( __FILE__ ) . '/inc/wp-cli.php';
+
 class SRM_Safe_Redirect_Manager {
 
 	public $redirect_post_type = 'redirect_rule';
@@ -208,6 +211,8 @@ class SRM_Safe_Redirect_Manager {
 	 * @return int
 	 */
 	public function create_redirect( $redirect_from, $redirect_to, $status_code ) {
+		global $wpdb;
+
 		$sanitized_redirect_from = $this->sanitize_redirect_from( $redirect_from );
 		$sanitized_redirect_to = $this->sanitize_redirect_to( $redirect_to );
 		$sanitized_status_code = absint( $status_code );
@@ -215,6 +220,10 @@ class SRM_Safe_Redirect_Manager {
 		// check and make sure no parameters are empty or invalid after sanitation
 		if ( empty( $sanitized_redirect_from ) || empty( $sanitized_redirect_to ) || ! in_array( $sanitized_status_code, $this->valid_status_codes ) )
 			return 0;
+
+		// Check to ensure this redirect doesn't already exist
+		if ( $wpdb->get_var( $wpdb->prepare( "SELECT post_id FROM $wpdb->postmeta WHERE meta_key=%s AND meta_value=%s", $this->meta_key_redirect_from, $sanitized_redirect_from ) ) )
+			return new WP_Error( 'duplicate-redirect', sprintf( __( 'Redirect already exists for %s', 'safe-redirect-manager' ), $sanitized_redirect_from ) );
 
 		// create the post
 		$post_args = array(
