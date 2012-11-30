@@ -27,16 +27,28 @@ class Safe_Redirect_Manager_CLI extends WP_CLI_Command {
 		$created = 0;
 		$skipped = 0;
 		foreach( $pieces as $piece ) {
-
+			
 			// Ignore if this line isn't a redirect
-			if ( 0 !== stripos( $piece, 'Redirect permanent' ) )
+			if ( ! preg_match( '/^Redirect( permanent)?/i', $piece ) )
 				continue;
 
 			// Parse the redirect
-			$redirect = str_ireplace( 'Redirect permanent ', '', $piece );
+			$redirect = preg_replace( '/\s{2,}/', ' ', $piece );
+			$redirect = preg_replace( '/^Redirect( permanent)? (.*)$/i', '$2', trim( $redirect ) );
 			$redirect = explode( ' ', $redirect );
-			$from = $redirect[0];
-			$to = $redirect[1];
+			
+			// if there are three parts to the redirect, we assume the first part is a status code
+			if ( 2 == count( $redirect ) ) {
+				$from = $redirect[0];
+				$to = $redirect[1];
+				$http_status = 301;
+			} elseif ( 3 == count( $redirect ) ) {
+				$http_status = $redirect[0];
+				$from = $redirect[1];
+				$to = $redirect[2];
+			} else {
+				continue;
+			}
 
 			// Validate
 			if ( ! $from || ! $to ) {
@@ -47,12 +59,12 @@ class Safe_Redirect_Manager_CLI extends WP_CLI_Command {
 			$sanitized_redirect_from = $safe_redirect_manager->sanitize_redirect_from( $from );
 			$sanitized_redirect_to = $safe_redirect_manager->sanitize_redirect_to( $to );
 
-			$id = $safe_redirect_manager->create_redirect( $sanitized_redirect_from, $sanitized_redirect_to, 301 );
+			$id = $safe_redirect_manager->create_redirect( $sanitized_redirect_from, $sanitized_redirect_to, $http_status );
 			if ( is_wp_error( $id ) ) {
 				WP_CLI::warning( "Error - " . $id->get_error_message() );
 				$skipped++;
 			} else {
-				WP_CLI::line( "Success - Created redirect from '{$sanitized_redirect_from}' to '{$sanitized_redirect_to}" );
+				WP_CLI::line( "Success - Created redirect from '{$sanitized_redirect_from}' to '{$sanitized_redirect_to}'" );
 				$created++;
 			}
 		}
