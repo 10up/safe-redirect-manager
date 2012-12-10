@@ -45,6 +45,75 @@ class Safe_Redirect_Manager_CLI extends WP_CLI_Command {
 	}
 
 	/**
+	 * Create a redirect
+	 *
+	 * @subcommand create
+	 * @synopsis <from> <to> [<status-code>] [<enable-regex>] [<post-status>]
+	 */
+	public function create( $args ) {
+		global $safe_redirect_manager;
+
+		$defaults = array(
+				'',
+				'',
+				302,
+				false,
+				'publish',
+			);
+		// array_merge() doesn't work here because our keys are numeric
+		foreach( $defaults as $key => $value ) {
+			if ( ! isset( $args[$key] ) )
+				$args[$key] = $defaults[$key];
+		}
+		list( $from, $to, $status_code, $enable_regex, $post_status ) = $args;
+
+		// User might've passed as string.
+		if ( 'false' == $enable_regex )
+			$enable_regex = false;
+
+		if ( empty( $from ) || empty( $to ) )
+			WP_CLI::error( "<from> and <to> are required arguments." );
+
+		$ret = $safe_redirect_manager->create_redirect( $from, $to, $status_code, $enable_regex, $post_status );
+		if ( is_wp_error( $ret ) )
+			WP_CLI::error( $ret->get_error_message() );
+		else
+			WP_CLI::success( "Created redirect as #{$ret}" );
+	}
+
+	/**
+	 * Delete a redirect
+	 *
+	 * @subcommand delete
+	 * @synopsis <id>
+	 */
+	public function delete( $args ) {
+		global $safe_redirect_manager;
+
+		$id = ( ! empty( $args[0] ) ) ? (int)$args[0] : 0;
+
+		$redirect = get_post( $id );
+		if ( ! $redirect || $safe_redirect_manager->redirect_post_type != $redirect->post_type )
+			WP_CLI::error( "{$id} isn't a valid redirect." );
+
+		wp_delete_post( $id );
+		$safe_redirect_manager->update_redirect_cache();
+		WP_CLI::success( "Redirect #{$id} has been deleted." );
+	}
+
+	/**
+	 * Update the redirect cache
+	 *
+	 * @subcommand update-cache
+	 */
+	public function update_cache() {
+		global $safe_redirect_manager;
+
+		$safe_redirect_manager->update_redirect_cache();
+		WP_CLI::success( "Redirect cache has been updated." );
+	}
+
+	/**
 	 * Import .htaccess file redirects
 	 *
 	 * @subcommand import-htaccess
