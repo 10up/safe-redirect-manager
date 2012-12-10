@@ -210,20 +210,27 @@ class SRM_Safe_Redirect_Manager {
 	 * @param string $redirect_from
 	 * @param string $redirect_to
 	 * @param int $status_code
+	 * @param bool $enable_regex
+	 * @param string $post_status
 	 * @since 1.3
 	 * @uses wp_insert_post, update_post_meta
-	 * @return int
+	 * @return int|WP_Error
 	 */
-	public function create_redirect( $redirect_from, $redirect_to, $status_code ) {
+	public function create_redirect( $redirect_from, $redirect_to, $status_code = 302, $enable_regex = false, $post_status = 'publish' ) {
 		global $wpdb;
 
 		$sanitized_redirect_from = $this->sanitize_redirect_from( $redirect_from );
 		$sanitized_redirect_to = $this->sanitize_redirect_to( $redirect_to );
 		$sanitized_status_code = absint( $status_code );
+		$sanitized_enable_regex = (bool)$enable_regex;
+		$sanitized_post_status = sanitize_key( $post_status );
 
 		// check and make sure no parameters are empty or invalid after sanitation
-		if ( empty( $sanitized_redirect_from ) || empty( $sanitized_redirect_to ) || ! in_array( $sanitized_status_code, $this->valid_status_codes ) )
-			return 0;
+		if ( empty( $sanitized_redirect_from ) || empty( $sanitized_redirect_to ) )
+			return new WP_Error( 'invalid-argument', __( 'Redirect from and/or redirect to arguments are invalid.', 'safe-redirect-manager' ) );
+
+		if ( ! in_array( $sanitized_status_code, $this->valid_status_codes ) )
+			return new WP_Error( 'invalid-argument', __( 'Invalid status code.', 'safe-redirect-manager' ) );
 
 		// Check to ensure this redirect doesn't already exist
 		if ( $wpdb->get_var( $wpdb->prepare( "SELECT post_id FROM $wpdb->postmeta WHERE meta_key=%s AND meta_value=%s", $this->meta_key_redirect_from, $sanitized_redirect_from ) ) )
@@ -232,19 +239,20 @@ class SRM_Safe_Redirect_Manager {
 		// create the post
 		$post_args = array(
 			'post_type' => $this->redirect_post_type,
-			'post_status' => 'publish',
+			'post_status' => $sanitized_post_status,
 			'post_author' => 1
 		);
 
-		$post_id = wp_insert_post(  $post_args );
+		$post_id = wp_insert_post( $post_args );
 
 		if ( 0 >= $post_id )
-			return 0;
+			return new WP_Error( 'error-creating', __( 'An error occurred creating the redirect.', 'safe-redirect-manager' ) );
 
 		// update the posts meta info
 		update_post_meta( $post_id, $this->meta_key_redirect_from, $sanitized_redirect_from );
 		update_post_meta( $post_id, $this->meta_key_redirect_to, $sanitized_redirect_to );
 		update_post_meta( $post_id, $this->meta_key_redirect_status_code, $sanitized_status_code );
+		update_post_meta( $post_id, $this->meta_key_enable_redirect_from_regex, $sanitized_enable_regex );
 
 		// We need to update the cache after creating this redirect
 		$this->update_redirect_cache();
