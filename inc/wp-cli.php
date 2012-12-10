@@ -9,6 +9,42 @@ class Safe_Redirect_Manager_CLI extends WP_CLI_Command {
 
 
 	/**
+	 * List all of the currently configured redirects
+	 *
+	 * @subcommand list
+	 */
+	public function _list() {
+		global $safe_redirect_manager;
+
+		$fields = array(
+				'ID',
+				'redirect_from',
+				'redirect_to',
+				'status_code',
+				'enable_regex',
+				'post_status',
+			);
+
+		$table = new \cli\Table();
+		$table->setHeaders( $fields );
+
+		$redirects = $safe_redirect_manager->get_redirects( array( 'post_status' => 'any' ) );
+		foreach( $redirects as $redirect ) {
+			$line = array();
+			foreach( $fields as $field ) {
+				if ( 'enable_regex' == $field )
+					$line[] = ( $redirect[$field] ) ? 'true' : 'false';
+				else
+					$line[] = $redirect[$field];
+			}
+			$table->addRow( $line );
+		}
+		$table->display();
+
+		WP_CLI::line( "Total of " . count( $redirects ) . " redirects" );
+	}
+
+	/**
 	 * Import .htaccess file redirects
 	 *
 	 * @subcommand import-htaccess
