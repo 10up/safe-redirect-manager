@@ -659,6 +659,46 @@ class SRM_Safe_Redirect_Manager {
 	}
 
 	/**
+	 * Get redirects from the database
+	 *
+	 * @since 1.6
+	 * @param array $args Any arguments to filter by
+	 * @return array $redirects An array of redirects
+	 */
+	public function get_redirects( $args = array() ) {
+
+		$defaults = array(
+				'posts_per_page'     => 1000,
+				'post_status'        => 'publish',
+			);
+
+		$query_args = array_merge( $defaults, $args );
+
+		// Some arguments that don't need to be configurable
+		$query_args['post_type'] = $this->redirect_post_type;
+		$query_args['no_found_rows'] = false;
+		$query_args['update_term_cache'] = false;
+
+		$redirect_query = new WP_Query( $query_args );
+
+		if ( empty( $redirect_query->posts ) )
+			return array();
+
+		$redirects = array();
+		foreach( $redirect_query->posts as $redirect ) {
+			$redirects[] = array(
+					'ID'                    => $redirect->ID,
+					'post_status'           => $redirect->post_status,
+					'redirect_from'         => get_post_meta( $redirect->ID, $this->meta_key_redirect_from, true ),
+					'redirect_to'           => get_post_meta( $redirect->ID, $this->meta_key_redirect_to, true ),
+					'status_code'           => (int)get_post_meta( $redirect->ID, $this->meta_key_redirect_status_code, true ),
+					'enable_regex'          => (bool)get_post_meta( $redirect->ID, $this->meta_key_enable_redirect_from_regex, true ),
+				);
+		}
+		return $redirects;
+	}
+
+	/**
 	 * Force update on the redirect cache and return cache
 	 *
 	 * @since 1.0
