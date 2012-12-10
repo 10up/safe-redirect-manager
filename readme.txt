@@ -26,6 +26,7 @@ Extract the zip file and just drop the contents in the wp-content/plugins/ direc
 
 = 1.6 (??? ??, 2012) =
 * Bulk delete redirects from the Manage Redirects screen
+* wp-cli coverage including subcommands for creating, deleting, and listing redirects, and importing .htaccess files
 
 = 1.5 (Nov. 7 2012) =
 * Regular expressions allowed in redirects
