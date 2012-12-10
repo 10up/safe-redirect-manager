@@ -66,7 +66,7 @@ class SRM_Safe_Redirect_Manager {
 		add_filter( 'post_updated_messages', array( $this, 'filter_redirect_updated_messages' ) );
 		add_action( 'admin_notices', array( $this, 'action_redirect_chain_alert' ) );
 		add_filter( 'the_title', array( $this, 'filter_admin_title' ), 100, 2 );
-		add_filter( 'bulk_actions-' . 'edit-redirect_rule', array( $this, 'filter_bulk_actions' ) );
+		add_filter( 'bulk_actions-edit-' . $this->redirect_post_type, array( $this, 'filter_bulk_actions' ) );
 		add_action( 'admin_print_styles-edit.php', array( $this, 'action_print_logo_css' ), 10, 1 );
 		add_action( 'admin_print_styles-post.php', array( $this, 'action_print_logo_css' ), 10, 1 );
 		add_action( 'admin_print_styles-post-new.php', array( $this, 'action_print_logo_css' ), 10, 1 );
@@ -191,13 +191,17 @@ class SRM_Safe_Redirect_Manager {
 	}
 
 	/**
-	 * Removes bulk actions from post manager
+	 * Limit the bulk actions available in the Manage Redirects view
 	 *
 	 * @since 1.0
 	 * @return array
 	 */
-	public function filter_bulk_actions() {
-		return array();
+	public function filter_bulk_actions( $actions ) {
+
+		// No bulk editing at this time
+		unset( $actions['edit'] );
+
+		return $actions;
 	}
 
 	/**
@@ -460,9 +464,6 @@ class SRM_Safe_Redirect_Manager {
 		// Move date column to the back
 		unset( $columns['date'] );
 		$columns['date'] = __( 'Date', 'safe-redirect-manager' );
-
-		// get rid of checkboxes
-		unset( $columns['cb'] );
 
 		return $columns;
 	}

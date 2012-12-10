@@ -24,6 +24,9 @@ Extract the zip file and just drop the contents in the wp-content/plugins/ direc
 
 == Changelog ==
 
+= 1.6 (??? ??, 2012) =
+* Bulk delete redirects from the Manage Redirects screen
+
 = 1.5 (Nov. 7 2012) =
 * Regular expressions allowed in redirects
 * New filter 'srm_registered_redirects' allows you to conditionally unset redirects based on context, user permissions, etc. Thanks [jtsternberg](https://github.com/jtsternberg) for the pull request.
