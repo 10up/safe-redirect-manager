@@ -714,39 +714,9 @@ class SRM_Safe_Redirect_Manager {
 	 * @return array
 	 */
 	public function update_redirect_cache() {
-		global $post;
-		$old_post = $post;
+	
+		$redirect_cache = $this->get_redirects();
 
-		$args = array(
-			'posts_per_page' => 1000,
-			'post_type' => $this->redirect_post_type,
-			'no_found_rows' => true,
-			'update_term_cache' => false,
-			'post_status' => 'publish'
-		);
-		$redirect_query = new WP_Query( $args );
-		$redirect_cache = array();
-
-		if ( $redirect_query->have_posts() ) {
-			while ( $redirect_query->have_posts() ) {
-				$redirect_query->the_post();
-
-				$redirect_from = get_post_meta( get_the_ID(), $this->meta_key_redirect_from, true );
-				$redirect_to = get_post_meta( get_the_ID(), $this->meta_key_redirect_to, true );
-				$status_code = get_post_meta( get_the_ID(), $this->meta_key_redirect_status_code, true );
-				$enable_regex = get_post_meta( get_the_ID(), $this->meta_key_enable_redirect_from_regex, true );
-
-				if ( ! empty( $redirect_from ) && ! empty( $redirect_to ) ) {
-					$redirect_cache[] = array(
-						'redirect_from' => $redirect_from,
-						'redirect_to' => $redirect_to,
-						'status_code' => absint( $status_code ),
-						'enable_regex' => (bool) $enable_regex
-					);
-				}
-			}
-		}
-		$post = $old_post;
 		set_transient( $this->cache_key_redirects, $redirect_cache );
 
 		return $redirect_cache;
