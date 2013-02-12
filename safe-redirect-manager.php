@@ -376,9 +376,16 @@ class SRM_Safe_Redirect_Manager {
 	 * @return string
 	 */
 	public function filter_admin_title( $title, $post_id = 0 ) {
-		if ( ! is_admin() || false === ( $redirect = get_post( $post_id ) ) || $redirect->post_type != $this->redirect_post_type )
+		if ( ! is_admin() )
 			return $title;
 
+		$redirect = get_post( $post_id );
+		if ( empty( $redirect ) )
+			return $title;
+		
+		if ( $redirect->post_type != $this->redirect_post_type )
+			return $title;
+		
 		$redirect_from = get_post_meta( $post_id, $this->meta_key_redirect_from, true );
 		if ( ! empty( $redirect_from ) )
 			return $redirect_from;
