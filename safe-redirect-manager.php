@@ -58,7 +58,6 @@ class SRM_Safe_Redirect_Manager {
 		add_action( 'init', array( $this, 'action_init' ) );
 		add_action( 'init', array( $this, 'action_register_post_types' ) );
 		add_action( 'parse_request', array( $this, 'action_parse_request' ), 0 );
-		add_action( 'after_theme_setup', array( $this, 'action_load_texthost' ) );
 		add_action( 'save_post', array( $this, 'action_save_post' ) );
 		add_filter( 'manage_' . $this->redirect_post_type . '_posts_columns' , array( $this, 'filter_redirect_columns' ) );
 		add_action( 'manage_' . $this->redirect_post_type . '_posts_custom_column' , array( $this, 'action_custom_redirect_columns' ), 10, 2 );
@@ -317,9 +316,7 @@ class SRM_Safe_Redirect_Manager {
 			$redirects = $this->update_redirect_cache();
 		}
 
-		$max_redirects = apply_filters( 'srm_max_redirects', $this->default_max_redirects );
-
-		return ( count( $redirects ) >= $max_redirects );
+		return ( count( $redirects ) >= $this->default_max_redirects );
 	}
 
 	/**
@@ -651,6 +648,8 @@ class SRM_Safe_Redirect_Manager {
 	 */
 	public function action_init() {
 		load_plugin_textdomain( 'safe-redirect-manager', false, dirname( plugin_basename( __FILE__ ) ) . '/languages/' );
+
+		$this->default_max_redirects = apply_filters( 'srm_max_redirects', $this->default_max_redirects );
 	}
 
 	/**
@@ -682,34 +681,52 @@ class SRM_Safe_Redirect_Manager {
 	 */
 	public function get_redirects( $args = array() ) {
 
-		$defaults = array(
-				'posts_per_page'     => 1000,
-				'post_status'        => 'publish',
-			);
-
-		$query_args = array_merge( $defaults, $args );
-
-		// Some arguments that don't need to be configurable
-		$query_args['post_type'] = $this->redirect_post_type;
-		$query_args['no_found_rows'] = false;
-		$query_args['update_term_cache'] = false;
-
-		$redirect_query = new WP_Query( $query_args );
-
-		if ( empty( $redirect_query->posts ) )
-			return array();
-
 		$redirects = array();
-		foreach( $redirect_query->posts as $redirect ) {
-			$redirects[] = array(
-					'ID'                    => $redirect->ID,
-					'post_status'           => $redirect->post_status,
-					'redirect_from'         => get_post_meta( $redirect->ID, $this->meta_key_redirect_from, true ),
-					'redirect_to'           => get_post_meta( $redirect->ID, $this->meta_key_redirect_to, true ),
-					'status_code'           => (int)get_post_meta( $redirect->ID, $this->meta_key_redirect_status_code, true ),
-					'enable_regex'          => (bool)get_post_meta( $redirect->ID, $this->meta_key_enable_redirect_from_regex, true ),
+
+		if ( $this->default_max_redirects > 50 )
+			$posts_per_page = 50;
+		else
+			$posts_per_page = $this->default_max_redirects;
+
+		$i = 1;
+		do {
+
+			$defaults = array(
+					'posts_per_page'     => $posts_per_page,
+					'post_status'        => 'publish',
+					'paged'              => $i,
 				);
-		}
+
+			$query_args = array_merge( $defaults, $args );
+
+			// Some arguments that don't need to be configurable
+			$query_args['post_type'] = $this->redirect_post_type;
+			$query_args['no_found_rows'] = false;
+			$query_args['update_term_cache'] = false;
+
+			$redirect_query = new WP_Query( $query_args );
+
+			foreach( $redirect_query->posts as $redirect ) {
+				$redirects[] = array(
+						'ID'                    => $redirect->ID,
+						'post_status'           => $redirect->post_status,
+						'redirect_from'         => get_post_meta( $redirect->ID, $this->meta_key_redirect_from, true ),
+						'redirect_to'           => get_post_meta( $redirect->ID, $this->meta_key_redirect_to, true ),
+						'status_code'           => (int)get_post_meta( $redirect->ID, $this->meta_key_redirect_status_code, true ),
+						'enable_regex'          => (bool)get_post_meta( $redirect->ID, $this->meta_key_enable_redirect_from_regex, true ),
+					);
+			}
+
+			if ( count( $redirects ) == $this->default_max_redirects 
+				|| count( $redirect_query->posts ) < $posts_per_page )
+				$build = false;
+			else
+				$build = true;
+
+			$i++;
+
+		} while ( $build );
+
 		return $redirects;
 	}
 
