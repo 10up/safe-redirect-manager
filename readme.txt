@@ -2,8 +2,8 @@
 Contributors: tlovett1, tollmanz, taylorde, 10up, jakemgold, danielbachhuber, VentureBeat
 Tags: http redirects, redirect manager, url redirection, safe http redirection
 Requires at least: 3.1
-Tested up to: 3.4.2
-Stable tag: 1.5
+Tested up to: 3.5
+Stable tag: 1.6
 
 Safely and easily manage your website's HTTP redirects.
 
@@ -23,6 +23,10 @@ Extract the zip file and just drop the contents in the wp-content/plugins/ direc
 2. This is the edit redirect page. Specify a "from" path, "to" path/URL, and a status code. You can schedule redirects for later dates just like posts.
 
 == Changelog ==
+
+= 1.6 (Dec. 11, 2012) =
+* Bulk delete redirects from the Manage Redirects screen
+* wp-cli coverage including subcommands for creating, deleting, and listing redirects, and importing .htaccess files
 
 = 1.5 (Nov. 7 2012) =
 * Regular expressions allowed in redirects
