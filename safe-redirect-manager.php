@@ -765,8 +765,7 @@ class SRM_Safe_Redirect_Manager {
 			return;
 
 		// get requested path and add a / before it
-		$requested_path = esc_url_raw( $_SERVER['REQUEST_URI'] );
-		$requested_path = stripslashes( $requested_path );
+		$requested_path = sanitize_text_field( $_SERVER['REQUEST_URI'] );
 
 		/**
 		 * If WordPress resides in a directory that is not the public root, we have to chop
