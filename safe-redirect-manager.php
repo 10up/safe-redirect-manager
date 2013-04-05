@@ -823,6 +823,11 @@ class SRM_Safe_Redirect_Manager {
 
 				header("X-Safe-Redirect-Manager: true");
 
+				// Allow for regex replacement in $redirect_to
+				if ( $enable_regex ) {
+					$redirect_to = preg_replace( '@' . $redirect_from . '@', $redirect_to, $requested_path );
+				}
+
 				// if we have a valid status code, then redirect with it
 				if ( in_array( $status_code, $this->valid_status_codes ) )
 					wp_safe_redirect( esc_url_raw( $redirect_to ), $status_code );
