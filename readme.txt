@@ -2,14 +2,14 @@
 Contributors: tlovett1, tollmanz, taylorde, 10up, jakemgold, danielbachhuber, VentureBeat
 Tags: http redirects, redirect manager, url redirection, safe http redirection
 Requires at least: 3.1
-Tested up to: 3.5
-Stable tag: 1.6
+Tested up to: 3.5.1
+Stable tag: 1.7
 
 Safely and easily manage your website's HTTP redirects.
 
 == Description ==
 
-Safe Redirect Manager is a HTTP redirect manager for WordPress. An easy-to-use UI allows you to redirect locations to new URL's with the HTTP status codes of your chosing. The plugin uses the wp_safe_redirect function which only allows redirects to whitelisted hosts for security purposes. The plugin automatically handles whitelisting hosts for you.
+Safe Redirect Manager is a HTTP redirect manager for WordPress. An easy-to-use UI allows you to redirect locations to new URL's with the HTTP status codes of your choosing. The plugin uses the wp_safe_redirect function which only allows redirects to whitelisted hosts for security purposes. The plugin automatically handles whitelisting hosts for you.
 
 [Fork the plugin on GitHub.](https://github.com/tlovett1/Safe-Redirect-Manager)
 
@@ -23,6 +23,12 @@ Extract the zip file and just drop the contents in the wp-content/plugins/ direc
 2. This is the edit redirect page. Specify a "from" path, "to" path/URL, and a status code. You can schedule redirects for later dates just like posts.
 
 == Changelog ==
+
+= 1.7 (Apr. 6, 2013) =
+* Return redirect_from on get_permalink. Thanks [simonwheatley](https://github.com/simonwheatley)
+* Allow for regex replacement in from/to redirects
+* Add Slovak translation. Thanks [Branco Radenovich](http://webhostinggeeks.com/blog)
+* Notice fixed in filter_admin_title
 
 = 1.6 (Dec. 11, 2012) =
 * Bulk delete redirects from the Manage Redirects screen
