@@ -899,19 +899,26 @@ class SRM_Safe_Redirect_Manager {
 	 * Return a permalink for a redirect post, which is the "redirect from"
 	 * URL for that redirect.
 	 * 
+	 * @since 1.7
 	 * @param string $permalink The permalink
 	 * @param object $post A Post object
+	 * @uses home_url, get_post_meta
 	 * @return string The permalink
 	 */
 	public function filter_post_type_link( $permalink, $post ) {
-		if ( 'redirect_rule' != $post->post_type )
+		if ( $this->redirect_post_type != $post->post_type )
 			return $permalink;
+		
 		// We can't do anything to provide a permalink 
 		// for regex enabled redirects.
 		if ( get_post_meta( $post->ID, $this->meta_key_enable_redirect_from_regex, true ) )
 			return $permalink;
-		// Provide a permalink for the simple redirects
+
+		// We can't do anything if there is a wildcard in the redirect from
 		$redirect_from = get_post_meta( $post->ID, $this->meta_key_redirect_from, true );
+		if ( false !== strpos( $redirect_from, '*' ) )
+			return $permalink;
+
 		return home_url( $redirect_from );
 	}
 }
