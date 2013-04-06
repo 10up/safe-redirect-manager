@@ -69,6 +69,7 @@ class SRM_Safe_Redirect_Manager {
 		add_action( 'admin_print_styles-edit.php', array( $this, 'action_print_logo_css' ), 10, 1 );
 		add_action( 'admin_print_styles-post.php', array( $this, 'action_print_logo_css' ), 10, 1 );
 		add_action( 'admin_print_styles-post-new.php', array( $this, 'action_print_logo_css' ), 10, 1 );
+		add_filter( 'post_type_link', array( $this, 'filter_post_type_link' ), 10, 2  );
 
 		// Search filters
 		add_filter( 'posts_join', array( $this, 'filter_search_join' ) );
@@ -892,6 +893,26 @@ class SRM_Safe_Redirect_Manager {
 		$path = str_replace( '@', '', $path );
 
 		return $path;
+	}
+	
+	/**
+	 * Return a permalink for a redirect post, which is the "redirect from"
+	 * URL for that redirect.
+	 * 
+	 * @param string $permalink The permalink
+	 * @param object $post A Post object
+	 * @return string The permalink
+	 */
+	public function filter_post_type_link( $permalink, $post ) {
+		if ( 'redirect_rule' != $post->post_type )
+			return $permalink;
+		// We can't do anything to provide a permalink 
+		// for regex enabled redirects.
+		if ( get_post_meta( $post->ID, $this->meta_key_enable_redirect_from_regex, true ) )
+			return $permalink;
+		// Provide a permalink for the simple redirects
+		$redirect_from = get_post_meta( $post->ID, $this->meta_key_redirect_from, true );
+		return home_url( $redirect_from );
 	}
 }
 
