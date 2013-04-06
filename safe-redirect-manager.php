@@ -70,11 +70,23 @@ class SRM_Safe_Redirect_Manager {
 		add_action( 'admin_print_styles-post.php', array( $this, 'action_print_logo_css' ), 10, 1 );
 		add_action( 'admin_print_styles-post-new.php', array( $this, 'action_print_logo_css' ), 10, 1 );
 		add_filter( 'post_type_link', array( $this, 'filter_post_type_link' ), 10, 2  );
+		add_action( 'plugins_loaded', array( $this, 'action_plugins_loaded' ) );
 
 		// Search filters
 		add_filter( 'posts_join', array( $this, 'filter_search_join' ) );
 		add_filter( 'posts_where', array( $this, 'filter_search_where' ) );
 		add_filter( 'posts_distinct', array( $this, 'filter_search_distinct' ) );
+	}
+
+	/**
+	* Localize plugin
+	*
+	* @since 1.7
+	* @uses load_plugin_textdomain
+	* @return void
+	*/
+	public function action_plugins_loaded() {
+		load_plugin_textdomain( 'safe-redirect-manager', false, basename( dirname( __FILE__ ) ) . '/languages' );
 	}
 
 	/**
@@ -908,7 +920,7 @@ class SRM_Safe_Redirect_Manager {
 	public function filter_post_type_link( $permalink, $post ) {
 		if ( $this->redirect_post_type != $post->post_type )
 			return $permalink;
-		
+
 		// We can't do anything to provide a permalink 
 		// for regex enabled redirects.
 		if ( get_post_meta( $post->ID, $this->meta_key_enable_redirect_from_regex, true ) )
