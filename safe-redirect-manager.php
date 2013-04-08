@@ -55,6 +55,7 @@ class SRM_Safe_Redirect_Manager {
 	 * @return object
 	 */
 	public function __construct() {
+		add_action( 'init', array( $this, 'action_init_load_textdomain' ), 9 );
 		add_action( 'init', array( $this, 'action_init' ) );
 		add_action( 'init', array( $this, 'action_register_post_types' ) );
 		add_action( 'parse_request', array( $this, 'action_parse_request' ), 0 );
@@ -70,7 +71,6 @@ class SRM_Safe_Redirect_Manager {
 		add_action( 'admin_print_styles-post.php', array( $this, 'action_print_logo_css' ), 10, 1 );
 		add_action( 'admin_print_styles-post-new.php', array( $this, 'action_print_logo_css' ), 10, 1 );
 		add_filter( 'post_type_link', array( $this, 'filter_post_type_link' ), 10, 2  );
-		add_action( 'plugins_loaded', array( $this, 'action_plugins_loaded' ) );
 
 		// Search filters
 		add_filter( 'posts_join', array( $this, 'filter_search_join' ) );
@@ -85,7 +85,7 @@ class SRM_Safe_Redirect_Manager {
 	* @uses load_plugin_textdomain
 	* @return void
 	*/
-	public function action_plugins_loaded() {
+	public function action_init_load_textdomain() {
 		load_plugin_textdomain( 'safe-redirect-manager', false, basename( dirname( __FILE__ ) ) . '/languages' );
 	}
 
