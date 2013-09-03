@@ -71,6 +71,7 @@ class SRM_Safe_Redirect_Manager {
 		add_action( 'admin_print_styles-post.php', array( $this, 'action_print_logo_css' ), 10, 1 );
 		add_action( 'admin_print_styles-post-new.php', array( $this, 'action_print_logo_css' ), 10, 1 );
 		add_filter( 'post_type_link', array( $this, 'filter_post_type_link' ), 10, 2  );
+		add_action( 'admin_notices', array( $this, 'maybe_show_error_messages' ) );
 
 		// Search filters
 		add_filter( 'posts_join', array( $this, 'filter_search_join' ) );
@@ -502,45 +503,60 @@ class SRM_Safe_Redirect_Manager {
 	 * @return void
 	 */
 	public function action_save_post( $post_id ) {
+		if ( empty( $_POST[$this->redirect_nonce_name] ) || ! wp_verify_nonce( $_POST[$this->redirect_nonce_name], $this->redirect_nonce_action ) )
+			return;
+
 		if ( ( defined( 'DOING_AUTOSAVE' ) && DOING_AUTOSAVE ) || ! current_user_can( 'edit_post', $post_id ) || 'revision' == get_post_type( $post_id ) )
 			return;
 
-		// Update post meta for redirect rules
-		if ( ! empty( $_POST[$this->redirect_nonce_name] ) && wp_verify_nonce( $_POST[$this->redirect_nonce_name], $this->redirect_nonce_action ) ) {
+		$allow_regex   = ! empty( $_POST['srm' . $this->meta_key_enable_redirect_from_regex] );
+		$redirect_from = ! empty( $_POST['srm' . $this->meta_key_redirect_from] ) ? $_POST['srm' . $this->meta_key_redirect_from] : '';
+		$redirect_from = $this->sanitize_redirect_from( $redirect_from, $allow_regex );
+		$redirect_to   = ! empty( $_POST['srm' . $this->meta_key_redirect_to] ) ? $_POST['srm' . $this->meta_key_redirect_to] : '';
+		$redirect_to   = $this->sanitize_redirect_to( $redirect_to );
+		$status_code   = ! empty( $_POST['srm' . $this->meta_key_redirect_status_code] ) ? absint( $_POST['srm' . $this->meta_key_redirect_status_code] ) : 0;
+		$status_code   = in_array( $status_code, $this->valid_status_codes ) ? $status_code : 0;
 
-			if ( ! empty( $_POST['srm' . $this->meta_key_enable_redirect_from_regex] ) ) {
-				$allow_regex = (bool) $_POST['srm' . $this->meta_key_enable_redirect_from_regex];
-				update_post_meta( $post_id, $this->meta_key_enable_redirect_from_regex, $allow_regex );
-			} else {
-				$allow_regex = false;
-				delete_post_meta( $post_id, $this->meta_key_enable_redirect_from_regex );
-			}
-		
-			if ( ! empty( $_POST['srm' . $this->meta_key_redirect_from] ) ) {
-				update_post_meta( $post_id, $this->meta_key_redirect_from, $this->sanitize_redirect_from( $_POST['srm' . $this->meta_key_redirect_from], $allow_regex ) );
-			} else {
-				delete_post_meta( $post_id, $this->meta_key_redirect_from );
-			}
+		// Allow "redirect from" to be a regex?
+		if ( $allow_regex )
+			update_post_meta( $post_id, $this->meta_key_enable_redirect_from_regex, $allow_regex );
+		else
+			delete_post_meta( $post_id, $this->meta_key_enable_redirect_from_regex );
 
-			if ( ! empty( $_POST['srm' . $this->meta_key_redirect_to] ) ) {
-				update_post_meta( $post_id, $this->meta_key_redirect_to, $this->sanitize_redirect_to( $_POST['srm' . $this->meta_key_redirect_to] ) );
-			} else {
-				delete_post_meta( $post_id, $this->meta_key_redirect_to );
-			}
+		// Redirect from
+		if ( ! empty( $redirect_from ) ) {
+			update_post_meta( $post_id, $this->meta_key_redirect_from, $redirect_from );
 
-			if ( ! empty( $_POST['srm' . $this->meta_key_redirect_status_code] ) ) {
-				update_post_meta( $post_id, $this->meta_key_redirect_status_code, absint( $_POST['srm' . $this->meta_key_redirect_status_code] ) );
-			} else {
-				delete_post_meta( $post_id, $this->meta_key_redirect_status_code );
-			}
-
-			/**
-			 * This fixes an important bug where the redirect cache was not up-to-date. Previously the cache was only being
-			 * updated on transition_post_status which gets called BEFORE save post. But since save_post is where all the important
-			 * redirect info is saved, updating the cache before it is not sufficient.
-			 */
-			$this->update_redirect_cache();
+		} else {
+			delete_post_meta( $post_id, $this->meta_key_redirect_from );
+			$this->add_message( $post_id, 'srm-invalid-argument-from', __( 'Redirect from argument is invalid.', 'safe-redirect-manager' ) );
 		}
+
+		// Redirect to
+		if ( ! empty( $redirect_to ) ) {
+				update_post_meta( $post_id, $this->meta_key_redirect_to, $redirect_to );
+
+		} else {
+			delete_post_meta( $post_id, $this->meta_key_redirect_to );
+			$this->add_message( $post_id, 'srm-invalid-argument-from', __( 'Redirect to argument is invalid.', 'safe-redirect-manager' ) );
+		}
+
+		// HTTP status code
+		if ( $status_code ) {
+			update_post_meta( $post_id, $this->meta_key_redirect_status_code, $status_code );
+
+		} else {
+			delete_post_meta( $post_id, $this->meta_key_redirect_status_code );
+			$this->add_message( $post_id, 'srm-invalid-argument-from', __( 'Invalid HTTP status code', 'safe-redirect-manager' ) );
+		}
+
+
+		/**
+		 * This fixes an important bug where the redirect cache was not up-to-date. Previously the cache was only being
+		 * updated on transition_post_status which gets called BEFORE save post. But since save_post is where all the important
+		 * redirect info is saved, updating the cache before it is not sufficient.
+		 */
+		$this->update_redirect_cache();		
 	}
 
 	/**
@@ -891,8 +907,8 @@ class SRM_Safe_Redirect_Manager {
 		if ( empty( $path ) )
 				return '';
 
-		// dont accept paths starting with a .
-		if ( ! $allow_regex && strpos( $path, '.' ) === 0 )
+		// dont accept paths starting with a . or *
+		if ( ! $allow_regex && ( strpos( $path, '.' ) === 0 || strpos( $path, '*' ) === 0 ) )
 			return '';
 
 		// turn path in to absolute
@@ -932,6 +948,56 @@ class SRM_Safe_Redirect_Manager {
 			return $permalink;
 
 		return home_url( $redirect_from );
+	}
+
+	/**
+	 * Add a message to be shown at the top of the edit page once this post is published
+	 *
+	 * We store the message in post meta to allow for per-post messages and because wp-admin does a redirect after wp_write_post().
+	 *
+	 * @param int $post_id The post that's being saved
+	 * @param string $css_class CSS class used when message is rendered
+	 * @param string $message Message to show to user
+	 * @param string $type Optional; the type of message. Valid options: error*, updated.
+	 * @since 1.8
+	 */
+	protected function add_message( $post_id, $css_class, $message, $type = 'error' ) {
+		if ( ! $message )
+			return;
+
+		if ( ! in_array( $type, array( 'error', 'updated' ) ) )
+			$type = 'error';
+
+		// Get any existing messages in case there are multiple validation problems
+		$messages             = get_post_meta( $post_id, '_srm_msgs', true );
+		$messages[$css_class] = array( $message, $type );
+
+		update_post_meta( $post_id, '_srm_msgs', $messages );
+	}
+
+	/**
+	 * If we caught any errors when trying to save a redirect, show the messages here.
+	 *
+	 * @since 1.8
+	 */
+	public function maybe_show_error_messages() {
+		if ( get_current_screen()->post_type != $this->redirect_post_type || get_current_screen()->id != $this->redirect_post_type )
+			return;
+
+		$messages = get_post_meta( $GLOBALS['post']->ID, '_srm_msgs', true );
+		if ( empty( $messages ) )
+			return;
+
+		foreach ( $messages as $id => $message ) :
+		?>
+			<div id="message" class="<?php echo esc_attr( $message[1] ); ?> fade">
+				<p class="<?php echo esc_attr( $id ); ?>"><?php echo $message[0]; ?></p>
+			</div>
+		<?php
+		endforeach;
+
+		// Tidy up old messages
+		delete_post_meta( $GLOBALS['post']->ID, '_srm_msgs' );
 	}
 }
 
