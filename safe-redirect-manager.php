@@ -41,7 +41,7 @@ class SRM_Safe_Redirect_Manager {
 
 	public $cache_key_redirects = '_srm_redirects';
 
-	public $valid_status_codes = array( 301, 302, 303, 403, 404 );
+	public $valid_status_codes = array( 301, 302, 303, 307, 403, 404 );
 
 	private $whitelist_hosts = array();
 
