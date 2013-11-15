@@ -991,7 +991,7 @@ class SRM_Safe_Redirect_Manager {
 		foreach ( $messages as $id => $message ) :
 		?>
 			<div id="message" class="<?php echo esc_attr( $message[1] ); ?> fade">
-				<p class="<?php echo esc_attr( $id ); ?>"><?php echo $message[0]; ?></p>
+				<p class="<?php echo esc_attr( $id ); ?>"><?php echo esc_html( $message[0] ); ?></p>
 			</div>
 		<?php
 		endforeach;
