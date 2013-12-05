@@ -1,15 +1,15 @@
 === Safe Redirect Manager ===
 Contributors: tlovett1, tollmanz, taylorde, 10up, jakemgold, danielbachhuber, VentureBeat
-Tags: http redirects, redirect manager, url redirection, safe http redirection
+Tags: http redirects, redirect manager, url redirection, safe http redirection, multisite redirects
 Requires at least: 3.1
-Tested up to: 3.5.1
-Stable tag: 1.7
+Tested up to: 3.8
+Stable tag: 1.7.1
 
 Safely and easily manage your website's HTTP redirects.
 
 == Description ==
 
-Safe Redirect Manager is a HTTP redirect manager for WordPress. An easy-to-use UI allows you to redirect locations to new URL's with the HTTP status codes of your choosing. The plugin uses the wp_safe_redirect function which only allows redirects to whitelisted hosts for security purposes. The plugin automatically handles whitelisting hosts for you.
+Safe Redirect Manager is a HTTP redirect manager for WordPress. An easy-to-use UI allows you to redirect locations to new URL's with the HTTP status codes of your choosing. The plugin uses the wp_safe_redirect function which only allows redirects to whitelisted hosts for security purposes. The plugin automatically handles whitelisting hosts for you. This plugin works great with Multisite.
 
 [Fork the plugin on GitHub.](https://github.com/tlovett1/Safe-Redirect-Manager)
 
@@ -23,6 +23,11 @@ Extract the zip file and just drop the contents in the wp-content/plugins/ direc
 2. This is the edit redirect page. Specify a "from" path, "to" path/URL, and a status code. You can schedule redirects for later dates just like posts.
 
 == Changelog ==
+
+= 1.7.1 (Dec. 12, 2013) =
+* Add 307 redirect status code. Thanks [lgedeon](https://github.com/lgedeon)
+* Plugin textdomain should be loaded on init
+* Add status code labels to creation dropdown. Thanks Chancey Mathews
 
 = 1.7 (Apr. 6, 2013) =
 * Return redirect_from on get_permalink. Thanks [simonwheatley](https://github.com/simonwheatley)
