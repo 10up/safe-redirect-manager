@@ -42,6 +42,15 @@ class SRM_Safe_Redirect_Manager {
 	public $cache_key_redirects = '_srm_redirects';
 
 	public $valid_status_codes = array( 301, 302, 303, 307, 403, 404 );
+	
+	public $status_code_labels = array(
+		301 => 'Moved Permanently',
+		302 => 'Found',
+		303 => 'See Other',
+		307 => 'Temporary Redirect',
+		403 => 'Forbidden',
+		404 => 'Not Found',		
+	);
 
 	private $whitelist_hosts = array();
 
@@ -644,7 +653,7 @@ class SRM_Safe_Redirect_Manager {
 			<label for="srm<?php echo $this->meta_key_redirect_status_code; ?>"><?php _e( 'HTTP Status Code:', 'safe-redirect-manager' ); ?></label>
 			<select name="srm<?php echo $this->meta_key_redirect_status_code; ?>" id="srm<?php echo $this->meta_key_redirect_status_code; ?>">
 				<?php foreach ( $this->valid_status_codes as $code ) : ?>
-					<option <?php selected( $status_code, $code ); ?>><?php echo $code; ?></option>
+					<option value="<?php echo esc_attr( $code ); ?>" <?php selected( $status_code, $code ); ?>><?php echo esc_html( $code . ' ' . $this->status_code_labels[$code] ); ?></option>
 				<?php endforeach; ?>
 			</select>
 			<em><?php _e( "If you don't know what this is, leave it as is.", 'safe-redirect-manager' ); ?></em>
