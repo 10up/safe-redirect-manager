@@ -939,8 +939,13 @@ class SRM_Safe_Redirect_Manager {
 		if ( get_post_meta( $post->ID, $this->meta_key_enable_redirect_from_regex, true ) )
 			return $permalink;
 
-		// We can't do anything if there is a wildcard in the redirect from
 		$redirect_from = get_post_meta( $post->ID, $this->meta_key_redirect_from, true );
+
+    // Use default permalink if no $redirect_from exists - this prevents duplicate GUIDs
+    if ( empty($redirect_from) )
+      return $permalink;
+
+		// We can't do anything if there is a wildcard in the redirect from
 		if ( false !== strpos( $redirect_from, '*' ) )
 			return $permalink;
 
