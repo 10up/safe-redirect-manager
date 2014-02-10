@@ -944,6 +944,11 @@ class SRM_Safe_Redirect_Manager {
 		if ( false !== strpos( $redirect_from, '*' ) )
 			return $permalink;
 
+		// Use default permalink if no $redirect_from exists - this prevents duplicate GUIDs
+		if ( empty( $redirect_from ) ) {
+			return $permalink;
+		}
+
 		return home_url( $redirect_from );
 	}
 }
