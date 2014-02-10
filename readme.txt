@@ -24,6 +24,8 @@ Extract the zip file and just drop the contents in the wp-content/plugins/ direc
 
 == Changelog ==
 
+= 1.7.2 (??? ?? ????) =
+
 = 1.7.1 (Dec. 12, 2013) =
 * Add 307 redirect status code. Thanks [lgedeon](https://github.com/lgedeon)
 * Plugin textdomain should be loaded on init
