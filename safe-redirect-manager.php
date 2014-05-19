@@ -561,9 +561,9 @@ class SRM_Safe_Redirect_Manager {
 	 */
 	public function action_register_post_types() {
 		$redirect_labels = array(
-			'name' => _x( 'Safe Redirect Manager', 'post type general name' ),
-			'singular_name' => _x( 'Redirect', 'post type singular name' ),
-			'add_new' => _x( 'Create Redirect Rule', $this->redirect_post_type ),
+			'name' => _x( 'Safe Redirect Manager', 'post type general name', 'safe-redirect-manager' ),
+			'singular_name' => _x( 'Redirect', 'post type singular name', 'safe-redirect-manager' ),
+			'add_new' => _x( 'Create Redirect Rule', $this->redirect_post_type, 'safe-redirect-manager' ),
 			'add_new_item' => __( 'Safe Redirect Manager', 'safe-redirect-manager' ),
 			'edit_item' => __( 'Edit Redirect Rule', 'safe-redirect-manager' ),
 			'new_item' => __( 'New Redirect Rule', 'safe-redirect-manager' ),
