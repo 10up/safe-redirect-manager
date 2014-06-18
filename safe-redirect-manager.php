@@ -107,7 +107,9 @@ class SRM_Safe_Redirect_Manager {
 	 * @return string
 	 */
 	public function filter_search_join( $join ) {
-		if ( $this->redirect_post_type != get_query_var( 'post_type' ) )
+		global $wp_query;
+
+		if ( is_null( $wp_query ) || $this->redirect_post_type != get_query_var( 'post_type' ) )
 			return $join;
 
 		global $wpdb;
@@ -128,7 +130,9 @@ class SRM_Safe_Redirect_Manager {
 	 * @return string
 	 */
 	public function filter_search_distinct( $distinct ) {
-		if ( $this->redirect_post_type != get_query_var( 'post_type' ) )
+		global $wp_query;
+
+		if ( is_null( $wp_query ) || $this->redirect_post_type != get_query_var( 'post_type' ) )
 			return $distinct;
 
 		return 'DISTINCT';
@@ -143,7 +147,9 @@ class SRM_Safe_Redirect_Manager {
 	 * @return string
 	 */
 	public function filter_search_where( $where ) {
-		if ( $this->redirect_post_type != get_query_var( 'post_type' ) || ! is_search() || empty( $where ) )
+		global $wp_query;
+
+		if ( is_null( $wp_query ) || $this->redirect_post_type != get_query_var( 'post_type' ) || ! is_search() || empty( $where ) )
 			return $where;
 
 		$exact = get_query_var( 'exact' );
