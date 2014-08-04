@@ -800,6 +800,11 @@ class SRM_Safe_Redirect_Manager {
 		$requested_path = esc_url_raw( $_SERVER['REQUEST_URI'] );
 		$requested_path = stripslashes( $requested_path );
 
+		$unslashed_requested_path = untrailingslashit( $requested_path );
+		if ( empty( $unslashed_requested_path ) ){
+			$unslashed_requested_path = '/';
+		}
+
 		/**
 		 * If WordPress resides in a directory that is not the public root, we have to chop
 		 * the pre-WP path off the requested path.
@@ -831,7 +836,7 @@ class SRM_Safe_Redirect_Manager {
 			if ( $enable_regex ) {
 				$matched_path = preg_match( '@' . $redirect_from . '@', $requested_path );
 			} else {
-				$matched_path = ( untrailingslashit( $requested_path ) == $redirect_from );
+				$matched_path = ( $unslashed_requested_path == $redirect_from );
 
 				// check if the redirect_from ends in a wildcard
 				if ( !$matched_path && (strrpos( $redirect_from, '*' ) === strlen( $redirect_from ) - 1) ) {
