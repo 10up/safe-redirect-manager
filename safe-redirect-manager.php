@@ -853,18 +853,27 @@ class SRM_Safe_Redirect_Manager {
 					add_filter( 'allowed_redirect_hosts' , array( $this, 'filter_allowed_redirect_hosts' ) );
 				}
 
-				header("X-Safe-Redirect-Manager: true");
-
 				// Allow for regex replacement in $redirect_to
 				if ( $enable_regex ) {
 					$redirect_to = preg_replace( '@' . $redirect_from . '@', $redirect_to, $requested_path );
 				}
 
+				$sanitized_redirect_to = esc_url_raw( $redirect_to );
+
+				do_action( 'srm_do_redirect', $requested_path, $sanitized_redirect_to, $status_code );
+
+				if ( defined( 'PHPUNIT_SRM_TESTSUITE' ) && PHPUNIT_SRM_TESTSUITE ) {
+					// Don't actually redirect if we are testing
+					return;
+				}
+
+				header( 'X-Safe-Redirect-Manager: true' );
+
 				// if we have a valid status code, then redirect with it
 				if ( in_array( $status_code, $this->valid_status_codes ) )
-					wp_safe_redirect( esc_url_raw( $redirect_to ), $status_code );
+					wp_safe_redirect( $sanitized_redirect_to, $status_code );
 				else
-					wp_safe_redirect( esc_url_raw( $redirect_to ) );
+					wp_safe_redirect( $sanitized_redirect_to );
 				exit;
 			}
 		}
