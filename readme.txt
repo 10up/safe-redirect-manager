@@ -3,7 +3,7 @@ Contributors: tlovett1, tollmanz, taylorde, 10up, jakemgold, danielbachhuber, Ve
 Tags: http redirects, redirect manager, url redirection, safe http redirection, multisite redirects
 Requires at least: 3.1
 Tested up to: 3.8
-Stable tag: 1.7.2
+Stable tag: 1.7.3
 
 Safely and easily manage your website's HTTP redirects.
 
@@ -23,6 +23,11 @@ Extract the zip file and just drop the contents in the wp-content/plugins/ direc
 2. This is the edit redirect page. Specify a "from" path, "to" path/URL, and a status code. You can schedule redirects for later dates just like posts.
 
 == Changelog ==
+
+= 1.7.3 (Aug. 26, 2014) =
+* Check if the global $wp_query is null before using get_query_var. Props [cmmarslender](https://github.com/cmmarslender)
+* Unit tests
+* Making _x translatable text work. Props [lucspe](https://github.com/lucspe)
 
 = 1.7.2 (Feb. 10, 2014) =
 * Added French translation. Props [jcbrebion](https://github.com/jcbrebion).
