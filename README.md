@@ -37,8 +37,7 @@ You can also use wildcards in your "Redirect From" paths. By adding an ```*``` a
 match any request that starts with your "Redirect From". Wildcards support replacements. This means if you have a
 wildcard in your from path that matches a string, you can have that string replace a wildcard character in your
 "Redirect To" path. For example, if your "Redirect From" is ```/test/*```, your "Redirect To" is
-````http://google.com/*```, and the requested path is ```/test/string```, the user would be redirect to
-```http://google.com/string```.
+```http://google.com/*```, and the requested path is ```/test/string```, the user would be redirect to ```http://google.com/string```.
 
 #### "Redirect To"
 This should be a path i.e. ```/test``` or a URL i.e. ```http://example.com/wp/test```. If a requested path matches
