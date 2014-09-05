@@ -5,7 +5,7 @@ class SRMTestCore extends WP_UnitTestCase {
 	/**
 	 * Test root redirect
 	 *
-	 * @since 1.8
+	 * @since 1.7.3
 	 */
 	public function testRootRedirect() {
 		global $safe_redirect_manager;
@@ -27,9 +27,148 @@ class SRMTestCore extends WP_UnitTestCase {
 	}
 
 	/**
+	 * Test redirect with cases
+	 *
+	 * @since 1.7.4
+	 */
+	public function testCaseInsensitiveRedirect() {
+		global $safe_redirect_manager;
+
+		$_SERVER['REQUEST_URI'] = '/ONE';
+		$redirected = false;
+		$redirect_to = '/gohere';
+		$safe_redirect_manager->create_redirect( '/one/', $redirect_to );
+
+		add_action( 'srm_do_redirect', function( $requested_path, $redirected_to, $status_code ) use ( &$redirect_to, &$redirected ) {
+			if ( $redirected_to === $redirect_to ) {
+				$redirected = true;
+			}
+		}, 10, 3 );
+
+		$safe_redirect_manager->action_parse_request();
+
+		$this->assertTrue( $redirected );
+
+		$_SERVER['REQUEST_URI'] = '/one';
+		$redirected = false;
+		$redirect_to = '/gohere';
+		$safe_redirect_manager->create_redirect( '/ONE/', $redirect_to );
+
+		add_action( 'srm_do_redirect', function( $requested_path, $redirected_to, $status_code ) use ( &$redirect_to, &$redirected ) {
+			if ( $redirected_to === $redirect_to ) {
+				$redirected = true;
+			}
+		}, 10, 3 );
+
+		$safe_redirect_manager->action_parse_request();
+
+		$this->assertTrue( $redirected );
+	}
+
+	/**
+	 * Try a redirect after filtering case sensitivity
+	 *
+	 * @since 1.7.4
+	 */
+	public function testCaseSensitiveRedirect() {
+		global $safe_redirect_manager;
+
+		$_SERVER['REQUEST_URI'] = '/ONE';
+		$redirected = false;
+		$redirect_to = '/gohere';
+		$safe_redirect_manager->create_redirect( '/one/', $redirect_to );
+
+		add_filter( 'srm_case_insensitive_redirects', function( $value ) {
+			return false;
+		}, 10, 1 );
+
+		add_action( 'srm_do_redirect', function( $requested_path, $redirected_to, $status_code ) use ( &$redirect_to, &$redirected ) {
+			if ( $redirected_to === $redirect_to ) {
+				$redirected = true;
+			}
+		}, 10, 3 );
+
+		$safe_redirect_manager->action_parse_request();
+
+		$this->assertFalse( $redirected );
+	}
+
+	/**
+	 * Test case sensitive redirect to
+	 *
+	 * @since 1.7.4
+	 */
+	public function testCaseSensitiveRedirectTo() {
+		global $safe_redirect_manager;
+
+		$_SERVER['REQUEST_URI'] = '/ONE';
+		$redirected = false;
+		$redirect_to = '/goHERE';
+		$safe_redirect_manager->create_redirect( '/one/', $redirect_to );
+
+		add_action( 'srm_do_redirect', function( $requested_path, $redirected_to, $status_code ) use ( &$redirect_to, &$redirected ) {
+			if ( $redirected_to === $redirect_to ) {
+				$redirected = true;
+			}
+		}, 10, 3 );
+
+		$safe_redirect_manager->action_parse_request();
+
+		$this->assertTrue( $redirected );
+	}
+
+	/**
+	 * Test basic wildcards
+	 *
+	 * @since 1.7.4
+	 */
+	public function testBasicWildcard() {
+		global $safe_redirect_manager;
+
+		$_SERVER['REQUEST_URI'] = '/one/dfsdf';
+		$redirected = false;
+		$redirect_to = '/gohere';
+		$safe_redirect_manager->create_redirect( '/one*', $redirect_to );
+
+		add_action( 'srm_do_redirect', function( $requested_path, $redirected_to, $status_code ) use ( &$redirect_to, &$redirected ) {
+			if ( $redirected_to === $redirect_to ) {
+				$redirected = true;
+			}
+		}, 10, 3 );
+
+		$safe_redirect_manager->action_parse_request();
+
+		$this->assertTrue( $redirected );
+	}
+
+	/**
+	 * Test replace wildcards
+	 *
+	 * @since 1.7.4
+	 */
+	public function testReplaceWildcard() {
+		global $safe_redirect_manager;
+
+		$_SERVER['REQUEST_URI'] = '/one/two';
+		$redirected = false;
+		$redirect_to = '/gohere/*';
+		$safe_redirect_manager->create_redirect( '/one/*', $redirect_to );
+
+		add_action( 'srm_do_redirect', function( $requested_path, $redirected_to, $status_code ) use ( &$redirect_to, &$redirected ) {
+			if ( $redirected_to === '/gohere/two' ) {
+				$redirected = true;
+			}
+		}, 10, 3 );
+
+		$safe_redirect_manager->action_parse_request();
+
+		$this->assertTrue( $redirected );
+	}
+
+	/**
 	 * Test lots of permutations of URL trailing slashes with and without regex
 	 *
-	 * @since 1.8
+	 * @since 1.7.3
 	 */
 	public function testTrailingSlashes() {
 		/**
@@ -136,7 +275,7 @@ class SRMTestCore extends WP_UnitTestCase {
 	/**
 	 * Test some simple redirections
 	 *
-	 * @since 1.8
+	 * @since 1.7.3
 	 */
 	public function testSimplePath() {
 		global $safe_redirect_manager;
@@ -198,7 +337,7 @@ class SRMTestCore extends WP_UnitTestCase {
 	/**
 	 * Test regex redirections
 	 *
-	 * @since 1.8
+	 * @since 1.7.3
 	 */
 	public function testSimplePathRegex() {
 		global $safe_redirect_manager;
