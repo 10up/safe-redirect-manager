@@ -14,9 +14,13 @@ WordPress mantra decisions not options. Actions in filters make the plugin very 
 
 ## Installation
 
-Install the plugin in WordPress, you can download a
+Install the plugin in WordPress. You can download a
 [zip via Github](https://github.com/tlovett1/safe-redirect-manager/archive/master.zip) and upload it using the WP
 plugin uploader.
+
+## Non-English Usage
+Safe Redirect Manager is available in English, French, and Slovak. Instructions for translating the plugin into other
+languages are below.
 
 ## Configuration
 
@@ -48,11 +52,24 @@ This should be a path i.e. ```/test``` or a URL i.e. ```http://example.com/wp/te
 a request i.e. whether it was successful, unauthorized, not found, etc. You should almost always use either 302,
 temporarily moved, or 301, permanently moved.
 
+*Note:*
+
+* Redirects are cached using the Transients API. Cache busts occur when redirects are added, updated, and deleted
+so you shouldn't be serving stale redirects.
+* By default the plugin only allows at most 150 redirects to prevent performance issues. There is a filter
+```srm_max_redirects``` that you can utilize to up this number.
+* "Redirect From" and requested paths are case insensitive by default.
+
 ## Development
 
 #### Setup
 Follow the configuration instructions above to setup the plugin. I recommend developing the plugin locally in an
 environment such as [Varying Vagrant Vagrants](https://github.com/Varying-Vagrant-Vagrants/VVV).
+
+#### Translation
+Safe Redirect Manager has a [.pot file](https://github.com/tlovett1/Safe-Redirect-Manager/blob/master/languages/safe-redirect-manager.pot)
+containing strings ready for translation. You can use a program like [POedit](http://poedit.net) to generate .po/.mo
+files for your language.
 
 #### Testing
 Within the terminal change directories to the plugin folder. Initialize your unit testing environment by running the
