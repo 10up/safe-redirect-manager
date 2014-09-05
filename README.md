@@ -9,7 +9,7 @@ Easily and safely manage your site's redirects the WordPress way. There are many
 them store redirects in the options table or in custom tables. Most of them provide tons of unnecessary options. Some
 of them have serious performance implications (404 error logging). Safe Redirect Manager stores redirects as Custom
 Post Types. This makes your data portable and your website scalable. Safe Redirect Manager is built to handle enterprise
-level traffic and is used on manager publishing websites. The plugin comes with only what you need following the
+level traffic and is used on major publishing websites. The plugin comes with only what you need following the
 WordPress mantra decisions not options. Actions in filters make the plugin very extensible.
 
 ## Installation
@@ -21,27 +21,28 @@ plugin uploader.
 ## Configuration
 
 There are no overarching settings for this plugin. To manager redirects navigate to the administration panel. Within
-the main menu, click Tools > Safe Redirect Manager.
+the main menu, click "Tools" > "Safe Redirect Manager".
 
 Each redirect contains a few fields that you can utilize:
 
 #### "Redirect From"
 This should be a path relative to the root of your WordPress installation. When someone visits your site with a path
-that matches this one, a redirect will occur. If your site is located at http://example.com/wp/ and you wanted to
-redirect http://example.com/wp/about to http://example.com, your "Redirect From" would be "/about"
+that matches this one, a redirect will occur. If your site is located at ```http://example.com/wp/``` and you wanted to
+redirect ```http://example.com/wp/about``` to ```http://example.com```, your "Redirect From" would be ```/about```.
 
 Clicking the "Enable Regex" checkbox allows you to use regular expressions in your path. There are many
 [great tutorials](http://www.regular-expressions.info) on regular expressions.
 
-You can also use wildcards in your "Redirect From" paths. By adding an '*' at the end of a URL, your redirect will
+You can also use wildcards in your "Redirect From" paths. By adding an ```*``` at the end of a URL, your redirect will
 match any request that starts with your "Redirect From". Wildcards support replacements. This means if you have a
 wildcard in your from path that matches a string, you can have that string replace a wildcard character in your
-"Redirect To" path. For example, if your "Redirect From" is "/test/*", your "Redirect To" is "http://google.com/*", and
-the requested path is "/test/string", the user would be redirect to "http://google.com/string".
+"Redirect To" path. For example, if your "Redirect From" is ```/test/*```, your "Redirect To" is
+````http://google.com/*```, and the requested path is ```/test/string```, the user would be redirect to
+```http://google.com/string```.
 
 #### "Redirect To"
-This should be a path (/test) or a URL (http://example.com/wp/test). If a requested path matches "Redirect From", they
-will be redirected here. "Redirect To" supports wildcard and regular expression replacements.
+This should be a path i.e. ```/test``` or a URL i.e. ```http://example.com/wp/test```. If a requested path matches
+"Redirect From", they will be redirected here. "Redirect To" supports wildcard and regular expression replacements.
 
 #### "HTTP Status Code"
 [HTTP status codes](http://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html) are numbers that contain information about
