@@ -811,11 +811,11 @@ class SRM_Safe_Redirect_Manager {
          */
         $parsed_site_url = parse_url( site_url() );
         if ( isset( $parsed_site_url['path'] ) && '/' != $parsed_site_url['path'] ) {
-            $requested_path = preg_replace( '@' . $parsed_site_url['path'] . '@i', '', $requested_path, 1 );
+            $unslashed_requested_path = preg_replace( '@' . $parsed_site_url['path'] . '@i', '', $unslashed_requested_path, 1 );
         }
 
         // Allow redirects to be filtered
-        $redirects = apply_filters( 'srm_registered_redirects', $redirects, $requested_path );
+        $redirects = apply_filters( 'srm_registered_redirects', $redirects, $unslashed_requested_path );
 
         foreach ( (array)$redirects as $redirect ) {
 
@@ -828,13 +828,13 @@ class SRM_Safe_Redirect_Manager {
             $enable_regex = ( isset( $redirect['enable_regex'] ) ) ? $redirect['enable_regex'] : false;
 
             if ( apply_filters( 'srm_case_insensitive_redirects', true ) ) {
-                $requested_path = strtolower( $requested_path );
+                $unslashed_requested_path = strtolower( $unslashed_requested_path );
                 $redirect_from = strtolower( $redirect_from );
             }
 
             // check if requested path is the same as the redirect from path
             if ( $enable_regex ) {
-                $matched_path = preg_match( '@' . $redirect_from . '@', $requested_path );
+                $matched_path = preg_match( '@' . $redirect_from . '@', $unslashed_requested_path );
             } else {
                 $matched_path = ( $unslashed_requested_path == $redirect_from );
 
@@ -843,9 +843,9 @@ class SRM_Safe_Redirect_Manager {
                     $wildcard_base = substr( $redirect_from, 0, strlen( $redirect_from ) - 1 );
 
                     // mark as match if requested path matches the base of the redirect from
-                    $matched_path = (substr( $requested_path, 0, strlen( $wildcard_base ) ) == $wildcard_base);
+                    $matched_path = (substr( $unslashed_requested_path, 0, strlen( $wildcard_base ) ) == $wildcard_base);
                     if ( (strrpos( $redirect_to, '*' ) == strlen( $redirect_to ) - 1 ) ) {
-                        $redirect_to = rtrim( $redirect_to, '*' ) . ltrim( substr( $requested_path, strlen( $wildcard_base ) ), '/' );
+                        $redirect_to = rtrim( $redirect_to, '*' ) . ltrim( substr( $unslashed_requested_path, strlen( $wildcard_base ) ), '/' );
                     }
                 }
             }
@@ -860,12 +860,12 @@ class SRM_Safe_Redirect_Manager {
 
                 // Allow for regex replacement in $redirect_to
                 if ( $enable_regex ) {
-                    $redirect_to = preg_replace( '@' . $redirect_from . '@', $redirect_to, $requested_path );
+                    $redirect_to = preg_replace( '@' . $redirect_from . '@', $redirect_to, $unslashed_requested_path );
                 }
 
                 $sanitized_redirect_to = esc_url_raw( $redirect_to );
 
-                do_action( 'srm_do_redirect', $requested_path, $sanitized_redirect_to, $status_code );
+                do_action( 'srm_do_redirect', $unslashed_requested_path, $sanitized_redirect_to, $status_code );
 
                 if ( defined( 'PHPUNIT_SRM_TESTSUITE' ) && PHPUNIT_SRM_TESTSUITE ) {
                     // Don't actually redirect if we are testing
