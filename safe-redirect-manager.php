@@ -817,6 +817,17 @@ class SRM_Safe_Redirect_Manager {
         // Allow redirects to be filtered
         $redirects = apply_filters( 'srm_registered_redirects', $redirects, $unslashed_requested_path );
 
+
+        $case_insensitive = apply_filters( 'srm_case_insensitive_redirects', true );
+
+        $regex_flag = '';
+        $original_unslashed_request_path = $requested_path;
+        if ( $case_insensitive ) {
+            $regex_flag = 'i';
+            $unslashed_requested_path = strtolower( $unslashed_requested_path );
+        }
+
+
         foreach ( (array)$redirects as $redirect ) {
 
             $redirect_from = untrailingslashit( $redirect['redirect_from'] );
@@ -827,15 +838,14 @@ class SRM_Safe_Redirect_Manager {
             $status_code = $redirect['status_code'];
             $enable_regex = ( isset( $redirect['enable_regex'] ) ) ? $redirect['enable_regex'] : false;
 
-            if ( apply_filters( 'srm_case_insensitive_redirects', true ) ) {
-                $unslashed_requested_path = strtolower( $unslashed_requested_path );
-                $redirect_from = strtolower( $redirect_from );
-            }
-
             // check if requested path is the same as the redirect from path
             if ( $enable_regex ) {
-                $matched_path = preg_match( '@' . $redirect_from . '@', $unslashed_requested_path );
+                $matched_path = preg_match( '@' . $redirect_from . '@' . $regex_flag, $original_unslashed_request_path );
             } else {
+                if ( $case_insensitive ) {
+                    $redirect_from = strtolower( $redirect_from );
+                }
+
                 $matched_path = ( $unslashed_requested_path == $redirect_from );
 
                 // check if the redirect_from ends in a wildcard
@@ -845,7 +855,7 @@ class SRM_Safe_Redirect_Manager {
                     // mark as match if requested path matches the base of the redirect from
                     $matched_path = (substr( $unslashed_requested_path, 0, strlen( $wildcard_base ) ) == $wildcard_base);
                     if ( (strrpos( $redirect_to, '*' ) == strlen( $redirect_to ) - 1 ) ) {
-                        $redirect_to = rtrim( $redirect_to, '*' ) . ltrim( substr( $unslashed_requested_path, strlen( $wildcard_base ) ), '/' );
+                        $redirect_to = rtrim( $redirect_to, '*' ) . ltrim( substr( $original_unslashed_request_path, strlen( $wildcard_base ) ), '/' );
                     }
                 }
             }
@@ -860,7 +870,7 @@ class SRM_Safe_Redirect_Manager {
 
                 // Allow for regex replacement in $redirect_to
                 if ( $enable_regex ) {
-                    $redirect_to = preg_replace( '@' . $redirect_from . '@', $redirect_to, $unslashed_requested_path );
+                    $redirect_to = preg_replace( '@' . $redirect_from . '@' . $regex_flag, $redirect_to, $original_unslashed_request_path );
                 }
 
                 $sanitized_redirect_to = esc_url_raw( $redirect_to );
