@@ -3,7 +3,7 @@ Contributors: tlovett1, tollmanz, taylorde, 10up, jakemgold, danielbachhuber, Ve
 Tags: http redirects, redirect manager, url redirection, safe http redirection, multisite redirects
 Requires at least: 3.1
 Tested up to: 4.0
-Stable tag: 1.7.4
+Stable tag: 1.7.5
 
 Safely and easily manage your website's HTTP redirects.
 
@@ -23,6 +23,10 @@ Extract the zip file and just drop the contents in the wp-content/plugins/ direc
 2. This is the edit redirect page. Specify a "from" path, "to" path/URL, and a status code. You can schedule redirects for later dates just like posts.
 
 == Changelog ==
+
+= 1.7.5 (Sept. 9, 2014) =
+* Don't always lowercase matched parts in redirect to replace. Props[francescolaffi](https://github.com/francescolaffi)
+* Plugin icon/banner
 
 = 1.7.4 (Sept. 5, 2014) =
 * Fix case sensitivity redirection bug.
