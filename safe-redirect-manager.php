@@ -202,10 +202,6 @@ class SRM_Safe_Redirect_Manager {
         if ( $this->is_plugin_page() ) {
             ?>
             <style type="text/css">
-                #icon-tools {
-                    background: url("<?php echo plugins_url( 'images/icon32x32.png', __FILE__ ); ?>") no-repeat top left !important;
-                    margin-right: 0;
-                }
                 #visibility, .view-switch, .posts .inline-edit-col-left .inline-edit-group {
                     display: none;
                 }
