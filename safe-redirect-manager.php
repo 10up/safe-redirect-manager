@@ -67,7 +67,7 @@ class SRM_Safe_Redirect_Manager {
 		add_action( 'init', array( $this, 'action_init_load_textdomain' ), 9 );
 		add_action( 'init', array( $this, 'action_init' ) );
 		add_action( 'init', array( $this, 'action_register_post_types' ) );
-		add_action( 'parse_request', array( $this, 'action_parse_request' ), 0 );
+		add_action( 'template_redirect', array( $this, 'action_template_redirect' ), 0 );
 		add_action( 'save_post', array( $this, 'action_save_post' ) );
 		add_filter( 'manage_' . $this->redirect_post_type . '_posts_columns' , array( $this, 'filter_redirect_columns' ) );
 		add_action( 'manage_' . $this->redirect_post_type . '_posts_custom_column' , array( $this, 'action_custom_redirect_columns' ), 10, 2 );
@@ -775,10 +775,10 @@ class SRM_Safe_Redirect_Manager {
 	 * @uses esc_url_raw, wp_safe_redirect, untrailingslashit, get_transient, add_filter
 	 * @return void
 	 */
-	public function action_parse_request() {
+	public function action_template_redirect() {
 		
-		// Don't redirect from wp-admin
-		if ( is_admin() )
+		// Don't redirect unless query is a 404
+		if ( ! is_404() )
 			return;
 
 		// get redirects from cache or recreate it
