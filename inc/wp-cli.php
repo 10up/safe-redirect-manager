@@ -132,7 +132,7 @@ class Safe_Redirect_Manager_CLI extends WP_CLI_Command {
 		$created = 0;
 		$skipped = 0;
 		foreach( $pieces as $piece ) {
-			
+
 			// Ignore if this line isn't a redirect
 			if ( ! preg_match( '/^Redirect( permanent)?/i', $piece ) )
 				continue;
@@ -141,7 +141,7 @@ class Safe_Redirect_Manager_CLI extends WP_CLI_Command {
 			$redirect = preg_replace( '/\s{2,}/', ' ', $piece );
 			$redirect = preg_replace( '/^Redirect( permanent)? (.*)$/i', '$2', trim( $redirect ) );
 			$redirect = explode( ' ', $redirect );
-			
+
 			// if there are three parts to the redirect, we assume the first part is a status code
 			if ( 2 == count( $redirect ) ) {
 				$from = $redirect[0];
@@ -176,5 +176,59 @@ class Safe_Redirect_Manager_CLI extends WP_CLI_Command {
 		WP_CLI::success( "All done! {$created} redirects were created, {$skipped} were skipped" );
 	}
 
+	/**
+	 * Imports redirects from "Redirection" plugin.
+	 *
+	 * ## OPTIONS
+	 *
+	 * <file>
+	 * : CSV file with all redirects which you can download at http://yoursite/wp-admin/tools.php?page=redirection.php&sub=modules page.
+	 *
+	 * ## EXAMPLE
+	 *
+	 *     wp safe-redirect-manager import-redirection redirections.csv
+	 *
+	 * @subcommand import-redirection
+	 * @synopsis <file>
+	 */
+	public function import_redirection( $args, $assoc_args ) {
+		global $safe_redirect_manager;
+
+		list( $file ) = $args;
+
+		$handle = fopen( $file, 'r' );
+		if ( ! $handle ) {
+			WP_CLI::error( "Error retrieving .csv file" );
+			return;
+		}
+
+		$headers = fgetcsv( $handle );
+		$created = $skipped = 0;
+		while( ( $row = fgetcsv( $handle ) ) ) {
+			// Validate
+			$rule = array_combine( $headers, $row );
+			if ( empty( $rule['source'] ) || empty( $rule['target'] ) ) {
+				WP_CLI::warning( "Skipping - redirection rule is formatted improperly." );
+				continue;
+			}
+
+			$sanitized_redirect_from = $safe_redirect_manager->sanitize_redirect_from( $rule['source'] );
+			$sanitized_redirect_to = $safe_redirect_manager->sanitize_redirect_to( $rule['target'] );
+
+			$status_code = ! empty( $rule['code'] ) ? $rule['code'] : 302;
+			$regex = ! empty( $rule['regex'] ) ? filter_var( $rule['regex'], FILTER_VALIDATE_BOOLEAN ) : false;
+
+			$id = $safe_redirect_manager->create_redirect( $sanitized_redirect_from, $sanitized_redirect_to, $status_code, $regex );
+			if ( is_wp_error( $id ) ) {
+				WP_CLI::error( $id );
+				$skipped++;
+			} else {
+				WP_CLI::line( "Success - Created redirect from '{$sanitized_redirect_from}' to '{$sanitized_redirect_to}'" );
+				$created++;
+			}
+		}
+
+		WP_CLI::success( "All done! {$created} redirects were imported, {$skipped} were skipped" );
+	}
 
 }
