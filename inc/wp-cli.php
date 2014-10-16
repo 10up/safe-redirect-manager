@@ -132,7 +132,7 @@ class Safe_Redirect_Manager_CLI extends WP_CLI_Command {
 		$created = 0;
 		$skipped = 0;
 		foreach( $pieces as $piece ) {
-			
+
 			// Ignore if this line isn't a redirect
 			if ( ! preg_match( '/^Redirect( permanent)?/i', $piece ) )
 				continue;
@@ -141,7 +141,7 @@ class Safe_Redirect_Manager_CLI extends WP_CLI_Command {
 			$redirect = preg_replace( '/\s{2,}/', ' ', $piece );
 			$redirect = preg_replace( '/^Redirect( permanent)? (.*)$/i', '$2', trim( $redirect ) );
 			$redirect = explode( ' ', $redirect );
-			
+
 			// if there are three parts to the redirect, we assume the first part is a status code
 			if ( 2 == count( $redirect ) ) {
 				$from = $redirect[0];
@@ -176,5 +176,73 @@ class Safe_Redirect_Manager_CLI extends WP_CLI_Command {
 		WP_CLI::success( "All done! {$created} redirects were created, {$skipped} were skipped" );
 	}
 
+	/**
+	 * Imports redirects from CSV file.
+	 *
+	 * ## OPTIONS
+	 *
+	 * <file>
+	 * : Path to one or more valid CSV file for import. This file should contain 
+	 * redirection from and to URLs, regex flag and HTTP redirection code. Here
+	 * is example table:
+	 *   
+	 * | source                     | target             | regex | code |
+	 * |----------------------------|--------------------|-------|------|
+	 * | /legacy-url                | /new-url           | 0     | 301  |
+	 * | /category-1                | /new-category-slug | 0     | 302  |
+	 * | /tes?t/[0-9]+/path/[^/]+/? | /go/here           | 1     | 302  |
+	 * | ...                        | ...                | ...   | ...  |
+	 *
+	 * You can also use exported redirects from "Redirection" plugin, which you
+	 * can download here: /wp-admin/tools.php?page=redirection.php&sub=modules
+	 *
+	 * <source-column>
+	 * : Header title for sources column mapping.
+	 *
+	 * <target-column>
+	 * : Header title for target column mapping.
+	 *
+	 * <regex-column>
+	 * : Header title for regex column mapping.
+	 *
+	 * <code-column>
+	 * : Header title for code column mapping.
+	 *
+	 * ## EXAMPLE
+	 *
+	 *     wp safe-redirect-manager import redirections.csv
+	 *
+	 * @synopsis <file> [--source=<source-column>] [--target=<target-column>] [--regex=<regex-column>] [--code=<code-column>]
+	 *
+	 * @since 1.7.6
+	 * 
+	 * @access public
+	 * @global SRM_Safe_Redirect_Manager $safe_redirect_manager The plugin instance.
+	 * @param array $args The array of input files.
+	 * @param array $assoc_args The array of column mappings.
+	 */
+	public function import( $args, $assoc_args ) {
+		global $safe_redirect_manager;
+
+		$mapping = wp_parse_args( $assoc_args, array(
+			'source' => 'source',
+			'target' => 'target',
+			'regex'  => 'regex',
+			'code'   => 'code',
+		) );
+
+		$created = $skipped = 0;
+		foreach ( $args as $file ) {
+			$processed = $safe_redirect_manager->import_file( $file, $mapping );
+			if ( ! empty( $processed ) ) {
+				$created += $processed['created'];
+				$skipped += $processed['skipped'];
+				
+				WP_CLI::success( basename( $file ) . ' file processed successfully.' );
+			}
+		}
+
+		WP_CLI::success( "All done! {$created} redirects were imported, {$skipped} were skipped" );
+	}
 
 }

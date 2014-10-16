@@ -436,4 +436,49 @@ class SRMTestCore extends WP_UnitTestCase {
 
         $this->assertTrue( $redirected );
     }
+
+	/**
+	 * Tests import redirects from file.
+	 *
+	 * @since 1.7.6
+	 *
+	 * @access public
+	 * @global SRM_Safe_Redirect_Manager $safe_redirect_manager The plugin instance.
+	 */
+	public function testFileImport() {
+		global $safe_redirect_manager;
+
+		// create temp file and fill up it with redirects
+		$tmp_file = tmpfile();
+
+		$redirects = array(
+			// headers
+			array( 'http code', 'legacy url', 'new url', 'is_regex' ),
+			// redirects
+			array( 302, '/some-url', '/new-url', 0 ),
+			array( 301, '/broken-url', '/fixed-url', 0 ),
+			array( 301, '/reg?ex/\d+/path', '/go/here', 1 ),
+		);
+
+		foreach ( $redirects as $row ) {
+			fputcsv( $tmp_file, $row );
+		}
+
+		// let's import it
+		fseek( $tmp_file, 0 );
+		$processed = $safe_redirect_manager->import_file( $tmp_file, array(
+			'source' => 'legacy url',
+			'target' => 'new url',
+			'regex'  => 'is_regex',
+			'code'   => 'http code',
+		) );
+
+		// assert results
+		$this->assertTrue( is_array( $processed ) && ! empty( $processed['created'] ) );
+		$this->assertEquals( count( $redirects ) - 1, $processed['created'] );
+
+		// close temp file
+		fclose( $tmp_file );
+	}
+
 }
