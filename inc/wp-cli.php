@@ -177,55 +177,89 @@ class Safe_Redirect_Manager_CLI extends WP_CLI_Command {
 	}
 
 	/**
-	 * Imports redirects from "Redirection" plugin.
+	 * Imports redirects from CSV file.
 	 *
 	 * ## OPTIONS
 	 *
 	 * <file>
-	 * : CSV file with all redirects which you can download at http://yoursite/wp-admin/tools.php?page=redirection.php&sub=modules page.
+	 * : Path to one or more valid CSV file for import. This file should contain 
+	 * redirection from and to URLs, regex flag and HTTP redirection code. Here
+	 * is example table:
+	 *   
+	 * | source           | target             | regex | code |
+	 * |------------------|--------------------|-------|------|
+	 * | /legacy-url      | /new-url           | 0     | 301  |
+	 * | /category-1      | /new-category-slug | 0     | 302  |
+	 * | /(\d+)/post-slug | /$1/new-post-slug  | 1     | 302  |
+	 * | ...              | ...                | ...   | ...  |
+	 *
+	 * You can also use exported redirects from "Redirection" plugin, which you
+	 * can download here: /wp-admin/tools.php?page=redirection.php&sub=modules
+	 *
+	 * <source-column>
+	 * : Header title for sources column mapping.
+	 *
+	 * <target-column>
+	 * : Header title for target column mapping.
+	 *
+	 * <regex-column>
+	 * : Header title for regex column mapping.
+	 *
+	 * <code-column>
+	 * : Header title for code column mapping.
 	 *
 	 * ## EXAMPLE
 	 *
-	 *     wp safe-redirect-manager import-redirection redirections.csv
+	 *     wp safe-redirect-manager import redirections.csv
 	 *
-	 * @subcommand import-redirection
-	 * @synopsis <file>
+	 * @synopsis <file> [--source=<source-column>] [--target=<target-column>] [--regex=<regex-column>] [--code=<code-column>]
 	 */
-	public function import_redirection( $args, $assoc_args ) {
+	public function import( $args, $assoc_args ) {
 		global $safe_redirect_manager;
 
-		list( $file ) = $args;
+		$mapping = wp_parse_args( $assoc_args, array(
+			'source' => 'source',
+			'target' => 'target',
+			'regex'  => 'regex',
+			'code'   => 'code',
+		) );
 
-		$handle = fopen( $file, 'r' );
-		if ( ! $handle ) {
-			WP_CLI::error( "Error retrieving .csv file" );
-			return;
-		}
-
-		$headers = fgetcsv( $handle );
-		$created = $skipped = 0;
-		while( ( $row = fgetcsv( $handle ) ) ) {
-			// Validate
-			$rule = array_combine( $headers, $row );
-			if ( empty( $rule['source'] ) || empty( $rule['target'] ) ) {
-				WP_CLI::warning( "Skipping - redirection rule is formatted improperly." );
+		foreach ( $args as $file ) {
+			$basename = basename( $file );
+			$handle = fopen( $file, 'r' );
+			if ( ! $handle ) {
+				WP_CLI::error( "Error retrieving {$basename} file" );
 				continue;
 			}
 
-			$sanitized_redirect_from = $safe_redirect_manager->sanitize_redirect_from( $rule['source'] );
-			$sanitized_redirect_to = $safe_redirect_manager->sanitize_redirect_to( $rule['target'] );
+			$headers = fgetcsv( $handle );
+			$created = $skipped = 0;
+			while( ( $row = fgetcsv( $handle ) ) ) {
+				// Validate
+				$rule = array_combine( $headers, $row );
+				if ( empty( $rule[$mapping['source']] ) || empty( $rule[$mapping['target']] ) ) {
+					WP_CLI::warning( "Skipping - redirection rule is formatted improperly." );
+					continue;
+				}
 
-			$status_code = ! empty( $rule['code'] ) ? $rule['code'] : 302;
-			$regex = ! empty( $rule['regex'] ) ? filter_var( $rule['regex'], FILTER_VALIDATE_BOOLEAN ) : false;
+				$sanitized_redirect_from = $safe_redirect_manager->sanitize_redirect_from( $rule[$mapping['source']] );
+				$sanitized_redirect_to = $safe_redirect_manager->sanitize_redirect_to( $rule[$mapping['target']] );
 
-			$id = $safe_redirect_manager->create_redirect( $sanitized_redirect_from, $sanitized_redirect_to, $status_code, $regex );
-			if ( is_wp_error( $id ) ) {
-				WP_CLI::error( $id );
-				$skipped++;
-			} else {
-				WP_CLI::line( "Success - Created redirect from '{$sanitized_redirect_from}' to '{$sanitized_redirect_to}'" );
-				$created++;
+				$status_code = ! empty( $rule[$mapping['code']] ) ? $rule[$mapping['code']] : 302;
+				$regex = ! empty( $rule[$mapping['regex']] ) ? filter_var( $rule[$mapping['regex']], FILTER_VALIDATE_BOOLEAN ) : false;
+
+				$id = $safe_redirect_manager->create_redirect( $sanitized_redirect_from, $sanitized_redirect_to, $status_code, $regex );
+				if ( is_wp_error( $id ) ) {
+					WP_CLI::error( $id );
+					$skipped++;
+				} else {
+					WP_CLI::line( "Success - Created redirect from '{$sanitized_redirect_from}' to '{$sanitized_redirect_to}'" );
+					$created++;
+				}
 			}
+
+			WP_CLI::success( "{$basename} file processed successfully." );
+			fclose( $handle );
 		}
 
 		WP_CLI::success( "All done! {$created} redirects were imported, {$skipped} were skipped" );
