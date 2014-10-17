@@ -998,8 +998,6 @@ class SRM_Safe_Redirect_Manager {
 
 		// enable line endings auto detection
 		@ini_set( 'auto_detect_line_endings', true );
-		// set maximum memory limit
-		@ini_set( 'memory_limit', apply_filters( 'admin_memory_limit', WP_MAX_MEMORY_LIMIT ) );
 
 		// open file pointer if $file is not a resource
 		if ( ! is_resource( $file ) ) {
