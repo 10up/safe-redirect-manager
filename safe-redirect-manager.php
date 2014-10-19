@@ -1023,10 +1023,10 @@ class SRM_Safe_Redirect_Manager {
 			}
 
 			// sanitize
-			$redirect_from = $this->sanitize_redirect_from( $rule[$args['source']] );
-			$redirect_to = $this->sanitize_redirect_to( $rule[$args['target']] );
-			$status_code = ! empty( $rule[$args['code']] ) ? $rule[$args['code']] : 302;
 			$regex = ! empty( $rule[$args['regex']] ) ? filter_var( $rule[$args['regex']], FILTER_VALIDATE_BOOLEAN ) : false;
+			$redirect_from = $this->sanitize_redirect_from( $rule[$args['source']], $regex );
+			$redirect_to = $this->sanitize_redirect_to( $rule[$args['target']] );
+			$status_code = ! empty( $rule[$args['code']] ) && in_array( $rule[$args['code']], $this->valid_status_codes ) ? $rule[$args['code']] : 302;
 
 			// import
 			$id = $this->create_redirect( $redirect_from, $redirect_to, $status_code, $regex );
