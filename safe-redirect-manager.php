@@ -805,9 +805,9 @@ class SRM_Safe_Redirect_Manager {
          * If WordPress resides in a directory that is not the public root, we have to chop
          * the pre-WP path off the requested path.
          */
-        $parsed_site_url = parse_url( site_url() );
-        if ( isset( $parsed_site_url['path'] ) && '/' != $parsed_site_url['path'] ) {
-            $requested_path = preg_replace( '@' . $parsed_site_url['path'] . '@i', '', $requested_path, 1 );
+        $parsed_home_url = parse_url( home_url() );
+        if ( isset( $parsed_home_url['path'] ) && '/' != $parsed_home_url['path'] ) {
+            $requested_path = preg_replace( '@' . $parsed_home_url['path'] . '@i', '', $requested_path, 1 );
         }
 
         // Allow redirects to be filtered
