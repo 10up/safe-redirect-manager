@@ -31,20 +31,19 @@ Each redirect contains a few fields that you can utilize:
 
 #### "Redirect From"
 This should be a path relative to the root of your WordPress installation. When someone visits your site with a path
-that matches this one, a redirect will occur. If your site is located at ```http://example.com/wp/``` and you wanted to
-redirect ```http://example.com/wp/about``` to ```http://example.com```, your "Redirect From" would be ```/about```.
+that matches this one, a redirect will occur. If your site is located at ```http://example.com/wp/``` and you wanted to redirect `http://example.com/wp/about` to `http://example.com`, your "Redirect From" would be `/about`.
 
 Clicking the "Enable Regex" checkbox allows you to use regular expressions in your path. There are many
 [great tutorials](http://www.regular-expressions.info) on regular expressions.
 
-You can also use wildcards in your "Redirect From" paths. By adding an ```*``` at the end of a URL, your redirect will
+You can also use wildcards in your "Redirect From" paths. By adding an `*` at the end of a URL, your redirect will
 match any request that starts with your "Redirect From". Wildcards support replacements. This means if you have a
 wildcard in your from path that matches a string, you can have that string replace a wildcard character in your
-"Redirect To" path. For example, if your "Redirect From" is ```/test/*```, your "Redirect To" is
-```http://google.com/*```, and the requested path is ```/test/string```, the user would be redirect to ```http://google.com/string```.
+"Redirect To" path. For example, if your "Redirect From" is `/test/*`, your "Redirect To" is
+`http://google.com/*`, and the requested path is `/test/string`, the user would be redirect to `http://google.com/string`.
 
 #### "Redirect To"
-This should be a path i.e. ```/test``` or a URL i.e. ```http://example.com/wp/test```. If a requested path matches
+This should be a path i.e. `/test` or a URL i.e. `http://example.com/wp/test`. If a requested path matches
 "Redirect From", they will be redirected here. "Redirect To" supports wildcard and regular expression replacements.
 
 #### "HTTP Status Code"
@@ -57,8 +56,16 @@ temporarily moved, or 301, permanently moved.
 * Redirects are cached using the Transients API. Cache busts occur when redirects are added, updated, and deleted
 so you shouldn't be serving stale redirects.
 * By default the plugin only allows at most 150 redirects to prevent performance issues. There is a filter
-```srm_max_redirects``` that you can utilize to up this number.
+`srm_max_redirects` that you can utilize to up this number.
 * "Redirect From" and requested paths are case insensitive by default.
+
+## Redirect loops
+
+By default redirect loop detection is disabled. To prevent redirect loops you can filter `srm_check_for_possible_redirect_loops`.
+
+```php
+add_filter( 'my_srm_redirect_loop_filter', '__return_true' );
+```
 
 ## Development
 
@@ -76,12 +83,12 @@ Within the terminal change directories to the plugin folder. Initialize your uni
 following command:
 
 For VVV users:
-```
+```bash
 bash bin/install-wp-tests.sh wordpress_test root root localhost latest
 ```
 
 For VIP Quickstart users:
-```
+```bash
 bash bin/install-wp-tests.sh wordpress_test root '' localhost latest
 ```
 
@@ -94,7 +101,7 @@ where:
 * latest is the WordPress version; could also be 3.7, 3.6.2 etc.
 
 Run the plugin tests:
-```
+```bash
 phpunit
 ```
 
