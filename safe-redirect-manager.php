@@ -834,6 +834,10 @@ class SRM_Safe_Redirect_Manager {
             $status_code = $redirect['status_code'];
             $enable_regex = ( isset( $redirect['enable_regex'] ) ) ? $redirect['enable_regex'] : false;
 
+			// check if the redirection destination is valid, otherwise just skip it
+	    if ( empty( $redirect_to ) )
+		continue;
+
             // check if requested path is the same as the redirect from path
             if ( $enable_regex ) {
                 $matched_path = preg_match( '@' . $redirect_from . '@' . $regex_flag, $requested_path );
