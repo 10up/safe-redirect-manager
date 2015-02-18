@@ -1,0 +1,20 @@
+{
+	"containers": [
+		{
+			"prettyName": "PHP-FPM 5.2",
+			"image": "tlovett1/php-5.2-phpunit-3.5",
+			"beforeScripts": [
+				"bash bin/install-wp-tests.sh wordpress_test234234 external external 192.168.50.4 4.1"
+			],
+			"testCommand": "phpunit"
+		},
+		{
+			"prettyName": "PHP-FPM 5.5",
+			"image": "tlovett1/php-fpm-phpunit-wp",
+			"beforeScripts": [
+				"bash bin/install-wp-tests.sh wordpress_testhey external external 192.168.50.4 4.1"
+			],
+			"testCommand": "phpunit"
+		}
+	]
+}
