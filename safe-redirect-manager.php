@@ -583,7 +583,6 @@ class SRM_Safe_Redirect_Manager {
             'edit_post' => $redirect_capability,
             'read_post' => $redirect_capability,
             'delete_post' => $redirect_capability,
-            'delete_posts' => $redirect_capability,
             'edit_posts' => $redirect_capability,
             'edit_others_posts' => $redirect_capability,
             'publish_posts' => $redirect_capability,
