@@ -635,7 +635,7 @@ class SRM_Safe_Redirect_Manager {
         $status_code = get_post_meta( $post->ID, $this->meta_key_redirect_status_code, true );
         $enable_regex = get_post_meta( $post->ID, $this->meta_key_enable_redirect_from_regex, true );
         if ( empty( $status_code ) )
-            $status_code = 302;
+            $status_code = apply_filters( 'srm_default_direct_status', 302 );
         ?>
         <p>
             <label for="srm<?php echo $this->meta_key_redirect_from; ?>"><?php _e( 'Redirect From:', 'safe-redirect-manager' ); ?></label><br />
