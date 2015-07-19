@@ -37,6 +37,7 @@ class SRM_Safe_Redirect_Manager {
     public $meta_key_redirect_from = '_redirect_rule_from';
     public $meta_key_redirect_to = '_redirect_rule_to';
     public $meta_key_redirect_status_code = '_redirect_rule_status_code';
+    public $meta_key_redirect_comments = '_redirect_rule_comments';
     public $meta_key_enable_redirect_from_regex = '_redirect_rule_from_regex';
 
     public $cache_key_redirects = '_srm_redirects';
@@ -233,18 +234,20 @@ class SRM_Safe_Redirect_Manager {
      * @param string $redirect_from
      * @param string $redirect_to
      * @param int $status_code
+     * @param string $redirect_comments
      * @param bool $enable_regex
      * @param string $post_status
      * @since 1.3
      * @uses wp_insert_post, update_post_meta
      * @return int|WP_Error
      */
-    public function create_redirect( $redirect_from, $redirect_to, $status_code = 302, $enable_regex = false, $post_status = 'publish' ) {
+    public function create_redirect( $redirect_from, $redirect_to, $status_code = 302, $redirect_comments, $enable_regex = false, $post_status = 'publish' ) {
         global $wpdb;
 
         $sanitized_redirect_from = $this->sanitize_redirect_from( $redirect_from );
         $sanitized_redirect_to = $this->sanitize_redirect_to( $redirect_to );
         $sanitized_status_code = absint( $status_code );
+        $sanitized_redirect_comments = $this->sanitize_redirect_comments( $redirect_comments );
         $sanitized_enable_regex = (bool)$enable_regex;
         $sanitized_post_status = sanitize_key( $post_status );
 
@@ -275,6 +278,7 @@ class SRM_Safe_Redirect_Manager {
         update_post_meta( $post_id, $this->meta_key_redirect_from, $sanitized_redirect_from );
         update_post_meta( $post_id, $this->meta_key_redirect_to, $sanitized_redirect_to );
         update_post_meta( $post_id, $this->meta_key_redirect_status_code, $sanitized_status_code );
+        update_post_meta( $post_id, $this->meta_key_redirect_comments, $sanitized_redirect_comments );
         update_post_meta( $post_id, $this->meta_key_enable_redirect_from_regex, $sanitized_enable_regex );
 
         // We need to update the cache after creating this redirect
@@ -475,11 +479,14 @@ class SRM_Safe_Redirect_Manager {
      * @uses get_post_meta, esc_html, admin_url
      * @return void
      */
-    public function action_custom_redirect_columns( $column, $post_id ) {
+    
+     public function action_custom_redirect_columns( $column, $post_id ) {
         if ( 'srm' . $this->meta_key_redirect_to == $column ) {
             echo esc_html( get_post_meta( $post_id, $this->meta_key_redirect_to, true ) );
         } elseif ( 'srm' . $this->meta_key_redirect_status_code == $column ) {
             echo absint( get_post_meta( $post_id, $this->meta_key_redirect_status_code, true ) );
+        } elseif ( 'srm' . $this->meta_key_redirect_comments == $column ) {
+	        echo esc_html( get_post_meta( $post_id, $this->meta_key_redirect_comments, true ) );
         }
     }
 
@@ -493,6 +500,7 @@ class SRM_Safe_Redirect_Manager {
     public function filter_redirect_columns( $columns ) {
         $columns['srm' . $this->meta_key_redirect_to] = __( 'Redirect To', 'safe-redirect-manager' );
         $columns['srm'. $this->meta_key_redirect_status_code] = __( 'HTTP Status Code', 'safe-redirect-manager' );
+        $columns['srm'. $this->meta_key_redirect_comments] = __( 'Comments', 'safe-redirect-manager' );
 
         // Change the title column
         $columns['title'] = __( 'Redirect From', 'safe-redirect-manager' );
@@ -543,6 +551,12 @@ class SRM_Safe_Redirect_Manager {
                 update_post_meta( $post_id, $this->meta_key_redirect_status_code, absint( $_POST['srm' . $this->meta_key_redirect_status_code] ) );
             } else {
                 delete_post_meta( $post_id, $this->meta_key_redirect_status_code );
+            }
+            
+			if ( ! empty( $_POST['srm' . $this->meta_key_redirect_comments] ) ) {
+                update_post_meta( $post_id, $this->meta_key_redirect_comments, esc_html( $_POST['srm' . $this->meta_key_redirect_comments] ) );
+            } else {
+                delete_post_meta( $post_id, $this->meta_key_redirect_comments );
             }
 
             /**
@@ -634,6 +648,7 @@ class SRM_Safe_Redirect_Manager {
         $redirect_from = get_post_meta( $post->ID, $this->meta_key_redirect_from, true );
         $redirect_to = get_post_meta( $post->ID, $this->meta_key_redirect_to, true );
         $status_code = get_post_meta( $post->ID, $this->meta_key_redirect_status_code, true );
+        $redirect_comments = get_post_meta( $post->ID, $this->meta_key_redirect_comments, true );
         $enable_regex = get_post_meta( $post->ID, $this->meta_key_enable_redirect_from_regex, true );
         if ( empty( $status_code ) )
             $status_code = apply_filters( 'srm_default_direct_status', 302 );
@@ -661,6 +676,13 @@ class SRM_Safe_Redirect_Manager {
             </select>
             <em><?php _e( "If you don't know what this is, leave it as is.", 'safe-redirect-manager' ); ?></em>
         </p>
+        
+        <p>
+        	<label for="srm<?php echo $this->meta_key_redirect_comments; ?>"><?php _e( 'Comments:', 'safe-redirect-manager' ); ?></label><br />
+        	<textarea name="srm<?php echo $this->meta_key_redirect_comments; ?>" id="srm<?php echo $this->meta_key_redirect_comments; ?>" rows="5" cols="50" style="width: 97%;"><?php echo esc_textarea( $redirect_comments ); ?></textarea>
+        <p class="description"><?php _e( "Add comments to help explain this rule for future reference.", 'safe-redirect-manager'); ?></p>
+        </p>
+        
     <?php
     }
 
@@ -738,6 +760,8 @@ class SRM_Safe_Redirect_Manager {
                     'redirect_from'         => get_post_meta( $redirect->ID, $this->meta_key_redirect_from, true ),
                     'redirect_to'           => get_post_meta( $redirect->ID, $this->meta_key_redirect_to, true ),
                     'status_code'           => (int)get_post_meta( $redirect->ID, $this->meta_key_redirect_status_code, true ),
+                    'redirect_comments'     => get_post_meta( $redirect->ID, $this->meta_key_redirect_comments, true ),
+
                     'enable_regex'          => (bool)get_post_meta( $redirect->ID, $this->meta_key_enable_redirect_from_regex, true ),
                 );
             }
@@ -1031,10 +1055,11 @@ class SRM_Safe_Redirect_Manager {
 			$redirect_from = $this->sanitize_redirect_from( $rule[$args['source']] );
 			$redirect_to = $this->sanitize_redirect_to( $rule[$args['target']] );
 			$status_code = ! empty( $rule[$args['code']] ) ? $rule[$args['code']] : 302;
+			$redirect_comments = $this->sanitize_redirect_comments( $rule[$args['comments']] );
 			$regex = ! empty( $rule[$args['regex']] ) ? filter_var( $rule[$args['regex']], FILTER_VALIDATE_BOOLEAN ) : false;
 
 			// import
-			$id = $this->create_redirect( $redirect_from, $redirect_to, $status_code, $regex );
+			$id = $this->create_redirect( $redirect_from, $redirect_to, $status_code, $redirect_comments, $regex );
 			if ( is_wp_error( $id ) ) {
 				$doing_wp_cli && WP_CLI::error( $id );
 				$skipped++;
