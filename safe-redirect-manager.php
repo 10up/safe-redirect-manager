@@ -1036,7 +1036,7 @@ class SRM_Safe_Redirect_Manager {
 			// import
 			$id = $this->create_redirect( $redirect_from, $redirect_to, $status_code, $regex );
 			if ( is_wp_error( $id ) ) {
-				$doing_wp_cli && WP_CLI::error( $id );
+				$doing_wp_cli && WP_CLI::warning( $id );
 				$skipped++;
 			} else {
 				$doing_wp_cli && WP_CLI::line( "Success - Created redirect from '{$redirect_from}' to '{$redirect_to}'" );
