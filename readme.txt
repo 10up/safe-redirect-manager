@@ -3,7 +3,7 @@ Contributors: tlovett1, tollmanz, taylorde, 10up, jakemgold, danielbachhuber, Ve
 Tags: http redirects, redirect manager, url redirection, safe http redirection, multisite redirects
 Requires at least: 3.1
 Tested up to: 4.2
-Stable tag: 1.7.6
+Stable tag: 1.7.7
 
 Safely and easily manage your website's HTTP redirects.
 
@@ -23,6 +23,11 @@ Extract the zip file and just drop the contents in the wp-content/plugins/ direc
 2. This is the edit redirect page. Specify a "from" path, "to" path/URL, and a status code. You can schedule redirects for later dates just like posts.
 
 == Changelog ==
+
+= 1.7.7 (Jun. 18, 2015) =
+* Make default redirect status filterable
+* Add composer.json
+* Fix delete capability on redirect post type
 
 = 1.7.6 (Feb. 13, 2015) =
 * Use home_url() instead of site_url(). Props [swalkinshaw](https://github.com/swalkinshaw)
