@@ -1,0 +1,11 @@
+{
+    "name": "tlovett1/safe-redirect-manager",
+    "type": "wordpress-plugin",
+    "description": "Easily and safely manage HTTP redirects.",
+    "authors": [
+        {
+            "name": "Taylor Lovett",
+            "email": "taylorl@10up.com"
+        }
+    ]
+}

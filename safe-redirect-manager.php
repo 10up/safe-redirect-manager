@@ -4,7 +4,7 @@ Plugin Name: Safe Redirect Manager
 Plugin URI: http://www.10up.com
 Description: Easily and safely manage HTTP redirects.
 Author: Taylor Lovett (10up)
-Version: 1.7.6
+Version: 1.7.7
 Author URI: http://www.10up.com
 
 GNU General Public License, Free Software Foundation <http://creativecommons.org/licenses/GPL/2.0/>
@@ -583,6 +583,7 @@ class SRM_Safe_Redirect_Manager {
             'edit_post' => $redirect_capability,
             'read_post' => $redirect_capability,
             'delete_post' => $redirect_capability,
+            'delete_posts' => $redirect_capability,
             'edit_posts' => $redirect_capability,
             'edit_others_posts' => $redirect_capability,
             'publish_posts' => $redirect_capability,
@@ -635,7 +636,7 @@ class SRM_Safe_Redirect_Manager {
         $status_code = get_post_meta( $post->ID, $this->meta_key_redirect_status_code, true );
         $enable_regex = get_post_meta( $post->ID, $this->meta_key_enable_redirect_from_regex, true );
         if ( empty( $status_code ) )
-            $status_code = 302;
+            $status_code = apply_filters( 'srm_default_direct_status', 302 );
         ?>
         <p>
             <label for="srm<?php echo $this->meta_key_redirect_from; ?>"><?php _e( 'Redirect From:', 'safe-redirect-manager' ); ?></label><br />
