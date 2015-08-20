@@ -1,4 +1,4 @@
-Safe Redirect Manager [![Build Status](https://travis-ci.org/tlovett1/Safe-Redirect-Manager.svg?branch=master)](https://travis-ci.org/tlovett1/Safe-Redirect-Manager)
+Safe Redirect Manager [![Build Status](https://travis-ci.org/tlovett1/Safe-Redirect-Manager.svg?branch=master)](https://travis-ci.org/tlovett1/Safe-Redirect-Manager) [![Dockunit Status](https://dockunit.io/svg/tlovett1/Safe-Redirect-Manager?master)](https://dockunit.io/projects/tlovett1/Safe-Redirect-Manager#master)
 ==============
 
 A WordPress plugin to safely and easily manage your website's HTTP redirects.
