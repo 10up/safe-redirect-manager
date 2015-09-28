@@ -1,8 +1,8 @@
 {
 	"containers": [
 		{
-			"prettyName": "PHP-FPM 5.5",
-			"image": "tlovett1/php-fpm-phpunit-wp",
+			"prettyName": "PHP-FPM 5.6",
+			"image": "dockunit/prebuilt-images:php-mysql-phpunit-5.6-fpm",
 			"beforeScripts": [
 				"service mysql start",
 				"bash bin/install-wp-tests.sh wordpress_test root '' localhost 4.1"
