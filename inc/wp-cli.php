@@ -1,15 +1,17 @@
 <?php
 /**
- * wp-cli integration
+ * WP-CLI integration.
  */
 
 WP_CLI::add_command( 'safe-redirect-manager', 'Safe_Redirect_Manager_CLI' );
 
+/**
+ * Manage redirects via Safe Redirect Manager.
+ */
 class Safe_Redirect_Manager_CLI extends WP_CLI_Command {
 
-
 	/**
-	 * List all of the currently configured redirects
+	 * List the current redirect rules.
 	 *
 	 * @subcommand list
 	 */
@@ -46,72 +48,121 @@ class Safe_Redirect_Manager_CLI extends WP_CLI_Command {
 	}
 
 	/**
-	 * Create a redirect
+	 * Create a new redirect rule.
+	 *
+	 * ## OPTIONS
+	 *
+	 * <from>
+	 * : The path, relative to the WordPress root (or the sub-site, if you are
+	 * using WordPress Multisite).
+	 *
+	 * <to>
+	 * : The absolute URL or relative path that requests should be safely
+	 * redirected to.
+	 *
+	 * [--status-code=<code>]
+	 * : The HTTP status code that should be returned when a visitor arrives
+	 * at the <from> URL. Default is 302 (Found).
+	 *
+	 * [--post-status=<status>]
+	 * : The WordPress post status for the new redirect. Default is "publish".
+	 *
+	 * [--regex]
+	 * : Enable regular expressions for this redirect rule?
+	 *
+	 * ## EXAMPLES
+	 *
+	 *   wp safe-redirect-manager create old-url new-url
+	 *   wp safe-redirect-manager create old-url http://example.com
+	 *   wp safe-redirect-manager create old-section/* new-section/* --status-code=301
+	 *   wp safe-redirect-manager create "about-(me|us)" about --regex
+	 *   wp safe-redirect-manager create old-url a-draft --post-status=draft
 	 *
 	 * @subcommand create
-	 * @synopsis <from> <to> [<status-code>] [<enable-regex>] [<post-status>]
+	 * @synopsis <from> <to> [--status-code=<code>] [--post-status=<status>] [--regex]
 	 */
-	public function create( $args ) {
+	public function create( $args, $assoc_args ) {
 		global $safe_redirect_manager;
 
-		$defaults = array(
-				'',
-				'',
-				302,
-				false,
-				'publish',
-			);
-		// array_merge() doesn't work here because our keys are numeric
-		foreach( $defaults as $key => $value ) {
-			if ( ! isset( $args[$key] ) )
-				$args[$key] = $defaults[$key];
+		$assoc_args = wp_parse_args( $assoc_args, array(
+			'status-code' => 302,
+			'post-status' => 'publish',
+			'regex'       => false,
+		) );
+
+		$redirect   = $safe_redirect_manager->create_redirect(
+			$args['0'],
+			$args['1'],
+			$assoc_args['status-code'],
+			(bool) $assoc_args['regex'],
+			$assoc_args['post-status']
+		);
+
+		if ( is_wp_error( $redirect ) ) {
+			return WP_CLI::error( $redirect->get_error_message() );
+		} else {
+			return WP_CLI::success( sprintf(
+				/** translators: %$1d is the post ID, %$2s is the "from" path, %$3s is the destination. */
+				__( 'Created redirect #%1$d (%2$s => %3$s)', 'safe-redirect-manager' ),
+				$redirect,
+				$args['0'],
+				$args['1']
+			) );
 		}
-		list( $from, $to, $status_code, $enable_regex, $post_status ) = $args;
-
-		// User might've passed as string.
-		if ( 'false' == $enable_regex )
-			$enable_regex = false;
-
-		if ( empty( $from ) || empty( $to ) )
-			WP_CLI::error( "<from> and <to> are required arguments." );
-
-		$ret = $safe_redirect_manager->create_redirect( $from, $to, $status_code, $enable_regex, $post_status );
-		if ( is_wp_error( $ret ) )
-			WP_CLI::error( $ret->get_error_message() );
-		else
-			WP_CLI::success( "Created redirect as #{$ret}" );
 	}
 
 	/**
-	 * Delete a redirect
+	 * Delete a redirect rule by its ID.
+	 *
+	 * ## OPTIONS
+	 *
+	 * <id>
+	 * : The post ID for the redirect you wish to remove.
+	 *
+	 * ## EXAMPLES
+	 *
+	 *   wp safe-redirect-manager delete 1
 	 *
 	 * @subcommand delete
 	 * @synopsis <id>
+	 *
+	 * @global $safe_redirect_manager
 	 */
 	public function delete( $args ) {
 		global $safe_redirect_manager;
 
-		$id = ( ! empty( $args[0] ) ) ? (int)$args[0] : 0;
+		$id = isset( $args['0'] ) ? (int) $args['0'] : 0;
 
-		$redirect = get_post( $id );
-		if ( ! $redirect || $safe_redirect_manager->redirect_post_type != $redirect->post_type )
-			WP_CLI::error( "{$id} isn't a valid redirect." );
+		// Verify that the post exists and is a redirect.
+		if ( $safe_redirect_manager->redirect_post_type !== get_post_type( $id ) ) {
+			return WP_CLI::error( sprintf(
+				__( 'Post ID #%d is not a valid redirect.', 'safe-redirect-manager' ),
+				$id
+			) );
+		}
 
+		// Remove the redirect and update the cache.
 		wp_delete_post( $id );
 		$safe_redirect_manager->update_redirect_cache();
-		WP_CLI::success( "Redirect #{$id} has been deleted." );
+
+		return WP_CLI::success( sprintf(
+			__( 'Redirect #%d has been deleted.', 'safe-redirect-manager' ),
+			$id
+		) );
 	}
 
 	/**
-	 * Update the redirect cache
+	 * Update the redirect cache.
 	 *
 	 * @subcommand update-cache
+	 *
+	 * @global $safe_redirect_manager
 	 */
 	public function update_cache() {
 		global $safe_redirect_manager;
 
 		$safe_redirect_manager->update_redirect_cache();
-		WP_CLI::success( "Redirect cache has been updated." );
+		WP_CLI::success( __( 'Redirect cache has been updated.', 'safe-redirect-manager' ) );
 	}
 
 	/**
