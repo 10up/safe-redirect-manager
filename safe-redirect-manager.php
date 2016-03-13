@@ -600,7 +600,7 @@ class SRM_Safe_Redirect_Manager {
         $redirect_args = array(
             'labels' => $redirect_labels,
             'public' => false,
-            'publicly_queryable' => true,
+            'publicly_queryable' => false,
             'show_ui' => true,
             'show_in_menu' => 'tools.php',
             'query_var' => false,
