@@ -1,15 +1,17 @@
 <?php
 /**
- * wp-cli integration
+ * WP-CLI integration.
  */
 
 WP_CLI::add_command( 'safe-redirect-manager', 'Safe_Redirect_Manager_CLI' );
 
+/**
+ * Manage redirects via Safe Redirect Manager.
+ */
 class Safe_Redirect_Manager_CLI extends WP_CLI_Command {
 
-
 	/**
-	 * List all of the currently configured redirects
+	 * List the current redirect rules.
 	 *
 	 * @subcommand list
 	 */
