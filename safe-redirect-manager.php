@@ -794,6 +794,7 @@ class SRM_Safe_Redirect_Manager {
                     'redirect_to'           => get_post_meta( $redirect->ID, $this->meta_key_redirect_to, true ),
                     'status_code'           => (int)get_post_meta( $redirect->ID, $this->meta_key_redirect_status_code, true ),
                     'enable_regex'          => (bool)get_post_meta( $redirect->ID, $this->meta_key_enable_redirect_from_regex, true ),
+                    'post_excerpt'          => $redirect->post_excerpt,
                 );
             }
 
