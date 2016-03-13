@@ -57,6 +57,13 @@ class SRM_Safe_Redirect_Manager {
     public $default_max_redirects = 150;
 
     /**
+     * The default capability a user must possess in order to manage redirects.
+     *
+     * This value can be overridden via the 'srm_restrict_to_capability' filter.
+     */
+    const MANAGE_REDIRECT_CAPABILITY = 'manage_options';
+
+    /**
      * Sets up redirect manager
      *
      * @since 1.0
@@ -170,7 +177,7 @@ class SRM_Safe_Redirect_Manager {
             $search .= $seperator;
             // Used esc_sql instead of wpdb->prepare since wpdb->prepare wraps things in quotes
             $search .= sprintf( "( ( m.meta_value LIKE '%s%s%s' AND m.meta_key = '%s') OR ( m.meta_value LIKE '%s%s%s' AND m.meta_key = '%s') )", $n, esc_sql( $term ), $n, esc_sql( $this->meta_key_redirect_from ), $n, esc_sql( $term ), $n, esc_sql( $this->meta_key_redirect_to ) );
-            
+
             $seperator = ' OR ';
         }
 
@@ -584,8 +591,14 @@ class SRM_Safe_Redirect_Manager {
             'parent_item_colon' => '',
             'menu_name' => __( 'Safe Redirect Manager', 'safe-redirect-manager' )
         );
-        $redirect_capability = 'manage_options';
-        $redirect_capability = apply_filters( 'srm_restrict_to_capability', $redirect_capability );
+
+        /**
+         * Adjust the capability required in order for a user to manage redirect rules.
+         *
+         * @param string $capability The capability that a user must possess in order to make
+         *                           changes to Safe Redirect Manager.
+         */
+        $redirect_capability = apply_filters( 'srm_restrict_to_capability', self::MANAGE_REDIRECT_CAPABILITY );
         $capabilities = array(
             'edit_post' => $redirect_capability,
             'read_post' => $redirect_capability,
