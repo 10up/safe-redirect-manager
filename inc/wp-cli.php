@@ -111,35 +111,57 @@ class Safe_Redirect_Manager_CLI extends WP_CLI_Command {
 	}
 
 	/**
-	 * Delete a redirect
+	 * Delete a redirect rule by its ID.
+	 *
+	 * ## OPTIONS
+	 *
+	 * <id>
+	 * : The post ID for the redirect you wish to remove.
+	 *
+	 * ## EXAMPLES
+	 *
+	 *   wp safe-redirect-manager delete 1
 	 *
 	 * @subcommand delete
 	 * @synopsis <id>
+	 *
+	 * @global $safe_redirect_manager
 	 */
 	public function delete( $args ) {
 		global $safe_redirect_manager;
 
-		$id = ( ! empty( $args[0] ) ) ? (int)$args[0] : 0;
+		$id = isset( $args['0'] ) ? (int) $args['0'] : 0;
 
-		$redirect = get_post( $id );
-		if ( ! $redirect || $safe_redirect_manager->redirect_post_type != $redirect->post_type )
-			WP_CLI::error( "{$id} isn't a valid redirect." );
+		// Verify that the post exists and is a redirect.
+		if ( $safe_redirect_manager->redirect_post_type !== get_post_type( $id ) ) {
+			return WP_CLI::error( sprintf(
+				__( 'Post ID #%d is not a valid redirect.', 'safe-redirect-manager' ),
+				$id
+			) );
+		}
 
+		// Remove the redirect and update the cache.
 		wp_delete_post( $id );
 		$safe_redirect_manager->update_redirect_cache();
-		WP_CLI::success( "Redirect #{$id} has been deleted." );
+
+		return WP_CLI::success( sprintf(
+			__( 'Redirect #%d has been deleted.', 'safe-redirect-manager' ),
+			$id
+		) );
 	}
 
 	/**
-	 * Update the redirect cache
+	 * Update the redirect cache.
 	 *
 	 * @subcommand update-cache
+	 *
+	 * @global $safe_redirect_manager
 	 */
 	public function update_cache() {
 		global $safe_redirect_manager;
 
 		$safe_redirect_manager->update_redirect_cache();
-		WP_CLI::success( "Redirect cache has been updated." );
+		WP_CLI::success( __( 'Redirect cache has been updated.', 'safe-redirect-manager' ) );
 	}
 
 	/**
