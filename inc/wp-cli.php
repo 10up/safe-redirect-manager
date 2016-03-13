@@ -23,6 +23,7 @@ class Safe_Redirect_Manager_CLI extends WP_CLI_Command {
 				'status_code',
 				'enable_regex',
 				'post_status',
+				'post_excerpt',
 			);
 
 		$table = new \cli\Table();

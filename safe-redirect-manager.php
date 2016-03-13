@@ -212,9 +212,6 @@ class SRM_Safe_Redirect_Manager {
                 #visibility, .view-switch, .posts .inline-edit-col-left .inline-edit-group {
                     display: none;
                 }
-                #srm<?php echo $this->meta_key_redirect_from; ?> {
-                    width: 60%;
-                }
             </style>
         <?php
         }
@@ -611,7 +608,7 @@ class SRM_Safe_Redirect_Manager {
             'hierarchical' => false,
             'register_meta_box_cb' => array( $this, 'action_redirect_rule_metabox' ),
             'menu_position' => 80,
-            'supports' => array( '' )
+            'supports' => false,
         );
         register_post_type( $this->redirect_post_type, $redirect_args );
     }
@@ -627,48 +624,99 @@ class SRM_Safe_Redirect_Manager {
         add_meta_box( 'redirect_settings', __( 'Redirect Settings', 'safe-redirect-manager' ), array( $this, 'redirect_rule_metabox' ), $this->redirect_post_type, 'normal', 'core' );
     }
 
-    /**
-     * Echoes HTML for redirect rule meta box
-     *
-     * @since 1.0
-     * @param object $post
-     * @uses wp_nonce_field, get_post_meta, esc_attr, selected
-     * @return void
-     */
-    public function redirect_rule_metabox( $post ) {
-        wp_nonce_field( $this->redirect_nonce_action, $this->redirect_nonce_name );
+	/**
+	 * Echoes HTML for the "Redirect Settings" meta box.
+	 *
+	 * @since 1.0
+	 *
+	 * @param WP_Post $post The current WP_Post object.
+	 */
+	public function redirect_rule_metabox( $post ) {
+		$redirect_from = get_post_meta( $post->ID, $this->meta_key_redirect_from, true );
+		$redirect_to   = get_post_meta( $post->ID, $this->meta_key_redirect_to, true );
+		$status_code   = get_post_meta( $post->ID, $this->meta_key_redirect_status_code, true );
+		$enable_regex  = get_post_meta( $post->ID, $this->meta_key_enable_redirect_from_regex, true );
 
-        $redirect_from = get_post_meta( $post->ID, $this->meta_key_redirect_from, true );
-        $redirect_to = get_post_meta( $post->ID, $this->meta_key_redirect_to, true );
-        $status_code = get_post_meta( $post->ID, $this->meta_key_redirect_status_code, true );
-        $enable_regex = get_post_meta( $post->ID, $this->meta_key_enable_redirect_from_regex, true );
-        if ( empty( $status_code ) )
-            $status_code = apply_filters( 'srm_default_direct_status', 302 );
-        ?>
-        <p>
-            <label for="srm<?php echo $this->meta_key_redirect_from; ?>"><?php _e( 'Redirect From:', 'safe-redirect-manager' ); ?></label><br />
-            <input type="text" name="srm<?php echo $this->meta_key_redirect_from; ?>" id="srm<?php echo $this->meta_key_redirect_from; ?>" value="<?php echo esc_attr( $redirect_from ); ?>" />
-            <input type="checkbox" name="srm<?php echo $this->meta_key_enable_redirect_from_regex; ?>" id="srm<?php echo $this->meta_key_enable_redirect_from_regex; ?>" <?php checked( true, (bool) $enable_regex ); ?> value="1" />
-            <label for="srm<?php echo $this->meta_key_enable_redirect_from_regex; ?>"><?php _e( 'Enable Regular Expressions (advanced)', 'safe-redirect-manager' ); ?></label><br />
-        <p class="description"><?php _e( "This path should be relative to the root of this WordPress installation (or the sub-site, if you are running a multi-site). Appending a (*) wildcard character will match all requests with the base. Warning: Enabling regular expressions will disable wildcards and completely change the way the * symbol is interpretted.", 'safe-redirect-manager' ); ?></p>
-        </p>
+		if ( empty( $status_code ) ) {
+			/**
+			 * Set the default status code for Safe Redirect Manager redirect rules.
+			 *
+			 * @param string $status_code The default HTTP status code for redirect rules.
+			 */
+			$status_code = apply_filters( 'srm_default_direct_status', 302 );
+		}
 
-        <p>
-            <label for="srm<?php echo $this->meta_key_redirect_to; ?>"><?php _e( 'Redirect To:', 'safe-redirect-manager' ); ?></label><br />
-            <input class="widefat" type="text" name="srm<?php echo $this->meta_key_redirect_to; ?>" id="srm<?php echo $this->meta_key_redirect_to; ?>" value="<?php echo esc_attr( $redirect_to ); ?>" /><br />
-        <p class="description"><?php _e( "This can be a URL or a path relative to the root of your website (not your WordPress installation). Ending with a (*) wildcard character will append the request match to the redirect.", 'safe-redirect-manager'); ?></p>
-        </p>
+		wp_nonce_field( $this->redirect_nonce_action, $this->redirect_nonce_name );
+?>
 
-        <p>
-            <label for="srm<?php echo $this->meta_key_redirect_status_code; ?>"><?php _e( 'HTTP Status Code:', 'safe-redirect-manager' ); ?></label>
-            <select name="srm<?php echo $this->meta_key_redirect_status_code; ?>" id="srm<?php echo $this->meta_key_redirect_status_code; ?>">
-                <?php foreach ( $this->valid_status_codes as $code ) : ?>
-                    <option value="<?php echo esc_attr( $code ); ?>" <?php selected( $status_code, $code ); ?>><?php echo esc_html( $code . ' ' . $this->status_code_labels[$code] ); ?></option>
-                <?php endforeach; ?>
-            </select>
-            <em><?php _e( "If you don't know what this is, leave it as is.", 'safe-redirect-manager' ); ?></em>
-        </p>
-    <?php
+	<table class="form-table">
+		<tbody>
+			<tr>
+				<th scope="row">
+					<label for="srm<?php echo esc_attr( $this->meta_key_redirect_from ); ?>">
+						<?php esc_html_e( 'Redirect From', 'safe-redirect-manager' ); ?>
+					</label>
+				</th>
+				<td>
+					<input type="text" name="srm<?php echo esc_attr( $this->meta_key_redirect_from ); ?>" id="srm<?php echo esc_attr( $this->meta_key_redirect_from ); ?>" value="<?php echo esc_attr( $redirect_from ); ?>" class="large-text code" />
+					<p class="description"><?php esc_html_e( 'This path should be relative to the root of this WordPress installation (or the sub-site, if you are running a multi-site). Appending a (*) wildcard character will match all requests with the base.', 'safe-redirect-manager' ); ?></p>
+				</td>
+			</tr>
+			<tr>
+				<th scope="row">
+					<label for="srm<?php echo esc_attr( $this->meta_key_enable_redirect_from_regex ); ?>">
+						<?php esc_html_e( 'Regular Expressions', 'safe-redirect-manager' ); ?>
+					</label>
+				</th>
+				<td>
+					<p><label for="srm<?php echo esc_attr( $this->meta_key_enable_redirect_from_regex ); ?>">
+						<input type="checkbox" name="srm<?php echo esc_attr( $this->meta_key_enable_redirect_from_regex ); ?>" id="srm<?php echo esc_attr( $this->meta_key_enable_redirect_from_regex ); ?>" <?php checked( true, (bool) $enable_regex ); ?> value="1" />
+						<?php esc_html_e( 'Enable Regular Expressions (advanced)', 'safe-redirect-manager' ); ?>
+						</label></p>
+					<p class="description"><?php esc_html_e( 'Warning: Enabling regular expressions will disable wildcards and completely change the way the "*" symbol is interpreted.', 'safe-redirect-manager' ); ?></p>
+				</td>
+			</tr>
+			<tr>
+				<th scope="row">
+					<label for="srm<?php echo esc_attr( $this->meta_key_redirect_to ); ?>">
+						<?php esc_html_e( 'Redirect To', 'safe-redirect-manager' ); ?>
+					</label>
+				</th>
+				<td>
+					<input type="text" name="srm<?php echo esc_attr( $this->meta_key_redirect_to ); ?>" id="srm<?php echo esc_attr( $this->meta_key_redirect_to ); ?>" value="<?php echo esc_attr( $redirect_to ); ?>" class="large-text code" />
+					<p class="description"><?php esc_html_e( 'This can be a URL or a path relative to the root of your website (not your WordPress installation). Ending with a (*) wildcard character will append the request match to the redirect.', 'safe-redirect-manager' ); ?></p>
+				</td>
+			</tr>
+			<tr>
+				<th scope="row">
+					<label for="srm<?php echo esc_attr( $this->meta_key_redirect_status_code ); ?>">
+						<?php esc_html_e( 'HTTP Status Code', 'safe-redirect-manager' ); ?>
+					</label>
+				</th>
+				<td>
+					<select name="srm<?php echo $this->meta_key_redirect_status_code; ?>" id="srm<?php echo $this->meta_key_redirect_status_code; ?>">
+						<?php foreach ( $this->valid_status_codes as $code ) : ?>
+							<option value="<?php echo esc_attr( $code ); ?>" <?php selected( $status_code, $code ); ?>><?php echo esc_html( $code . ' ' . $this->status_code_labels[ $code ] ); ?></option>
+						<?php endforeach; ?>
+					</select>
+					<p class="description"><?php esc_html_e( "If you don't know what this is, leave it as is.", 'safe-redirect-manager' ); ?></p>
+				</td>
+			</tr>
+			<tr>
+				<th scope="row">
+					<label for="srm-excerpt">
+						<?php echo esc_html( _x( 'Notes', 'label for excerpt on redirects', 'safe-redirect-manager' ) ); ?>
+					</label>
+				</th>
+				<td>
+					<textarea name="excerpt" id="srm-excerpt" rows="5" class="large-text"><?php echo esc_html( $post->post_excerpt ); ?></textarea>
+					<p class="description"><?php esc_html_e( 'Optional notes regarding this redirect.', 'safe-redirect-manager' ); ?></p>
+				</td>
+			</tr>
+		</tbody>
+	</table>
+
+<?php
     }
 
     /**
@@ -746,6 +794,7 @@ class SRM_Safe_Redirect_Manager {
                     'redirect_to'           => get_post_meta( $redirect->ID, $this->meta_key_redirect_to, true ),
                     'status_code'           => (int)get_post_meta( $redirect->ID, $this->meta_key_redirect_status_code, true ),
                     'enable_regex'          => (bool)get_post_meta( $redirect->ID, $this->meta_key_enable_redirect_from_regex, true ),
+                    'post_excerpt'          => $redirect->post_excerpt,
                 );
             }
 
