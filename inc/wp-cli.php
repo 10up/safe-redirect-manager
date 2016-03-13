@@ -47,40 +47,67 @@ class Safe_Redirect_Manager_CLI extends WP_CLI_Command {
 	}
 
 	/**
-	 * Create a redirect
+	 * Create a new redirect rule.
+	 *
+	 * ## OPTIONS
+	 *
+	 * <from>
+	 * : The path, relative to the WordPress root (or the sub-site, if you are
+	 * using WordPress Multisite).
+	 *
+	 * <to>
+	 * : The absolute URL or relative path that requests should be safely
+	 * redirected to.
+	 *
+	 * [--status-code=<code>]
+	 * : The HTTP status code that should be returned when a visitor arrives
+	 * at the <from> URL. Default is 302 (Found).
+	 *
+	 * [--post-status=<status>]
+	 * : The WordPress post status for the new redirect. Default is "publish".
+	 *
+	 * [--regex]
+	 * : Enable regular expressions for this redirect rule?
+	 *
+	 * ## EXAMPLES
+	 *
+	 *   wp safe-redirect-manager create old-url new-url
+	 *   wp safe-redirect-manager create old-url http://example.com
+	 *   wp safe-redirect-manager create old-section/* new-section/* --status-code=301
+	 *   wp safe-redirect-manager create "about-(me|us)" about --regex
+	 *   wp safe-redirect-manager create old-url a-draft --post-status=draft
 	 *
 	 * @subcommand create
-	 * @synopsis <from> <to> [<status-code>] [<enable-regex>] [<post-status>]
+	 * @synopsis <from> <to> [--status-code=<code>] [--post-status=<status>] [--regex]
 	 */
-	public function create( $args ) {
+	public function create( $args, $assoc_args ) {
 		global $safe_redirect_manager;
 
-		$defaults = array(
-				'',
-				'',
-				302,
-				false,
-				'publish',
-			);
-		// array_merge() doesn't work here because our keys are numeric
-		foreach( $defaults as $key => $value ) {
-			if ( ! isset( $args[$key] ) )
-				$args[$key] = $defaults[$key];
+		$assoc_args = wp_parse_args( $assoc_args, array(
+			'status-code' => 302,
+			'post-status' => 'publish',
+			'regex'       => false,
+		) );
+
+		$redirect   = $safe_redirect_manager->create_redirect(
+			$args['0'],
+			$args['1'],
+			$assoc_args['status-code'],
+			(bool) $assoc_args['regex'],
+			$assoc_args['post-status']
+		);
+
+		if ( is_wp_error( $redirect ) ) {
+			return WP_CLI::error( $redirect->get_error_message() );
+		} else {
+			return WP_CLI::success( sprintf(
+				/** translators: %$1d is the post ID, %$2s is the "from" path, %$3s is the destination. */
+				__( 'Created redirect #%1$d (%2$s => %3$s)', 'safe-redirect-manager' ),
+				$redirect,
+				$args['0'],
+				$args['1']
+			) );
 		}
-		list( $from, $to, $status_code, $enable_regex, $post_status ) = $args;
-
-		// User might've passed as string.
-		if ( 'false' == $enable_regex )
-			$enable_regex = false;
-
-		if ( empty( $from ) || empty( $to ) )
-			WP_CLI::error( "<from> and <to> are required arguments." );
-
-		$ret = $safe_redirect_manager->create_redirect( $from, $to, $status_code, $enable_regex, $post_status );
-		if ( is_wp_error( $ret ) )
-			WP_CLI::error( $ret->get_error_message() );
-		else
-			WP_CLI::success( "Created redirect as #{$ret}" );
 	}
 
 	/**
