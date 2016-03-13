@@ -74,6 +74,7 @@ class SRM_Safe_Redirect_Manager {
         add_action( 'init', array( $this, 'action_init_load_textdomain' ), 9 );
         add_action( 'init', array( $this, 'action_init' ) );
         add_action( 'init', array( $this, 'action_register_post_types' ) );
+        add_action( 'init', array( $this, 'register_redirect_category_taxonomy' ) );
         add_action( 'parse_request', array( $this, 'action_parse_request' ), 0 );
         add_action( 'save_post', array( $this, 'action_save_post' ) );
         add_filter( 'manage_' . $this->redirect_post_type . '_posts_columns' , array( $this, 'filter_redirect_columns' ) );
@@ -623,6 +624,7 @@ class SRM_Safe_Redirect_Manager {
             'has_archive' => false,
             'hierarchical' => false,
             'register_meta_box_cb' => array( $this, 'action_redirect_rule_metabox' ),
+            'taxonomies' => array( 'redirect_category' ),
             'menu_position' => 80,
             'supports' => array( '' )
         );
@@ -683,6 +685,41 @@ class SRM_Safe_Redirect_Manager {
         </p>
     <?php
     }
+
+    /**
+	 * Register the Redirect Category taxonomy.
+	 *
+	 * @since <version>
+	 */
+	function register_redirect_category_taxonomy() {
+
+		/** This filter is defined in safe-redirect-manager.php. */
+		$capability = apply_filters( 'srm_restrict_to_capability', self::MANAGE_REDIRECT_CAPABILITY );
+		$args       = array(
+			'labels'             => array(
+				'name'          => _x( 'Redirect Categories', 'taxonomy general name', 'safe-redirect-manager' ),
+				'singular_name' => _x( 'Redirect Categories', 'taxonomy singular name', 'safe-redirect-manager' ),
+				'all_items'     => __( 'All Redirect Categories', 'safe-redirect-manager' ),
+				'edit_item'     => __( 'Edit Redirect Category', 'safe-redirect-manager' ),
+				'add_new_item'  => __( 'Add New Redirect Category', 'safe-redirect-manager' ),
+			),
+			'public'             => false,
+			'show_ui'            => true,
+			'show_in_quick_edit' => false,
+			'show_admin_column'  => true,
+			'description'        => __( 'Groups of redirect rules for easier organization.', 'safe-redirect-manager' ),
+			'hierarchical'       => true,
+			'rewrite'            => false,
+			'capabilities'       => array(
+				'manage_terms' => $capability,
+				'edit_terms'   => $capability,
+				'delete_terms' => $capability,
+				'assign_terms' => $capability,
+			),
+		);
+
+		register_taxonomy( 'redirect_category', $this->redirect_post_type, $args );
+	}
 
     /**
      * Localize plugin

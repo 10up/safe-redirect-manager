@@ -481,4 +481,25 @@ class SRMTestCore extends WP_UnitTestCase {
 		fclose( $tmp_file );
 	}
 
+	/**
+	 * Test that the custom taxonomy is being registered with appropriate arguments.
+	 *
+	 * @since <version>
+	 *
+	 * @global SRM_Safe_Redirect_Manager $safe_redirect_manager The plugin instance.
+	 */
+	public function testTaxonomyRegistration() {
+		global $safe_redirect_manager;
+
+		$taxonomy = get_taxonomy( 'redirect_category' );
+
+		$this->assertEquals(
+			$taxonomy->object_type,
+			array( $safe_redirect_manager->redirect_post_type ),
+			'Redirect categories should be connected to the Redirect Rule post type.'
+		);
+		$this->assertTrue( $taxonomy->hierarchical, 'Redirect categories should be hierarchical.' );
+		$this->assertFalse( $taxonomy->public, 'Redirect categories should *not* be public.' );
+	}
+
 }
