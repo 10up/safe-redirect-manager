@@ -608,7 +608,7 @@ class SRM_Safe_Redirect_Manager {
             'hierarchical' => false,
             'register_meta_box_cb' => array( $this, 'action_redirect_rule_metabox' ),
             'menu_position' => 80,
-            'supports' => array( '' )
+            'supports' => false,
         );
         register_post_type( $this->redirect_post_type, $redirect_args );
     }
