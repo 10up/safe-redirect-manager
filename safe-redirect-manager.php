@@ -624,23 +624,29 @@ class SRM_Safe_Redirect_Manager {
         add_meta_box( 'redirect_settings', __( 'Redirect Settings', 'safe-redirect-manager' ), array( $this, 'redirect_rule_metabox' ), $this->redirect_post_type, 'normal', 'core' );
     }
 
-    /**
-     * Echoes HTML for redirect rule meta box
-     *
-     * @since 1.0
-     * @param object $post
-     * @uses wp_nonce_field, get_post_meta, esc_attr, selected
-     * @return void
-     */
-    public function redirect_rule_metabox( $post ) {
-        wp_nonce_field( $this->redirect_nonce_action, $this->redirect_nonce_name );
+	/**
+	 * Echoes HTML for the "Redirect Settings" meta box.
+	 *
+	 * @since 1.0
+	 *
+	 * @param WP_Post $post The current WP_Post object.
+	 */
+	public function redirect_rule_metabox( $post ) {
+		$redirect_from = get_post_meta( $post->ID, $this->meta_key_redirect_from, true );
+		$redirect_to   = get_post_meta( $post->ID, $this->meta_key_redirect_to, true );
+		$status_code   = get_post_meta( $post->ID, $this->meta_key_redirect_status_code, true );
+		$enable_regex  = get_post_meta( $post->ID, $this->meta_key_enable_redirect_from_regex, true );
 
-        $redirect_from = get_post_meta( $post->ID, $this->meta_key_redirect_from, true );
-        $redirect_to = get_post_meta( $post->ID, $this->meta_key_redirect_to, true );
-        $status_code = get_post_meta( $post->ID, $this->meta_key_redirect_status_code, true );
-        $enable_regex = get_post_meta( $post->ID, $this->meta_key_enable_redirect_from_regex, true );
-        if ( empty( $status_code ) )
-            $status_code = apply_filters( 'srm_default_direct_status', 302 );
+		if ( empty( $status_code ) ) {
+			/**
+			 * Set the default status code for Safe Redirect Manager redirect rules.
+			 *
+			 * @param string $status_code The default HTTP status code for redirect rules.
+			 */
+			$status_code = apply_filters( 'srm_default_direct_status', 302 );
+		}
+
+		wp_nonce_field( $this->redirect_nonce_action, $this->redirect_nonce_name );
 ?>
 
 	<table class="form-table">
