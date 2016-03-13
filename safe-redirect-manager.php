@@ -702,6 +702,17 @@ class SRM_Safe_Redirect_Manager {
 					<p class="description"><?php esc_html_e( "If you don't know what this is, leave it as is.", 'safe-redirect-manager' ); ?></p>
 				</td>
 			</tr>
+			<tr>
+				<th scope="row">
+					<label for="srm-excerpt">
+						<?php echo esc_html( _x( 'Notes', 'label for excerpt on redirects', 'safe-redirect-manager' ) ); ?>
+					</label>
+				</th>
+				<td>
+					<textarea name="excerpt" id="srm-excerpt" rows="5" class="large-text"><?php echo esc_html( $post->post_excerpt ); ?></textarea>
+					<p class="description"><?php esc_html_e( 'Optional notes regarding this redirect.', 'safe-redirect-manager' ); ?></p>
+				</td>
+			</tr>
 		</tbody>
 	</table>
 
