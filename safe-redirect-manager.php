@@ -643,7 +643,7 @@ class SRM_Safe_Redirect_Manager {
             <input type="text" name="srm<?php echo $this->meta_key_redirect_from; ?>" id="srm<?php echo $this->meta_key_redirect_from; ?>" value="<?php echo esc_attr( $redirect_from ); ?>" />
             <input type="checkbox" name="srm<?php echo $this->meta_key_enable_redirect_from_regex; ?>" id="srm<?php echo $this->meta_key_enable_redirect_from_regex; ?>" <?php checked( true, (bool) $enable_regex ); ?> value="1" />
             <label for="srm<?php echo $this->meta_key_enable_redirect_from_regex; ?>"><?php _e( 'Enable Regular Expressions (advanced)', 'safe-redirect-manager' ); ?></label><br />
-        <p class="description"><?php _e( "This path should be relative to the root of this WordPress installation (or the sub-site, if you are running a multi-site). Appending a (*) wildcard character will match all requests with the base. Warning: Enabling regular expressions will disable wildcards and completely change the way the * symbol is interpretted.", 'safe-redirect-manager' ); ?></p>
+        <p class="description"><?php _e( "This path should be relative to the root of this WordPress installation (or the sub-site, if you are running a multi-site). Appending a (*) wildcard character will match all requests with the base. Warning: Enabling regular expressions will disable wildcards and completely change the way the * symbol is interpreted.", 'safe-redirect-manager' ); ?></p>
         </p>
 
         <p>
