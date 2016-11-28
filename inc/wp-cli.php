@@ -21,6 +21,7 @@ class Safe_Redirect_Manager_CLI extends WP_CLI_Command {
 				'redirect_from',
 				'redirect_to',
 				'status_code',
+				'redirect_comments',
 				'enable_regex',
 				'post_status',
 			);
@@ -65,7 +66,7 @@ class Safe_Redirect_Manager_CLI extends WP_CLI_Command {
 			if ( ! isset( $args[$key] ) )
 				$args[$key] = $defaults[$key];
 		}
-		list( $from, $to, $status_code, $enable_regex, $post_status ) = $args;
+		list( $from, $to, $status_code, $comments, $enable_regex, $post_status ) = $args;
 
 		// User might've passed as string.
 		if ( 'false' == $enable_regex )
@@ -74,7 +75,7 @@ class Safe_Redirect_Manager_CLI extends WP_CLI_Command {
 		if ( empty( $from ) || empty( $to ) )
 			WP_CLI::error( "<from> and <to> are required arguments." );
 
-		$ret = $safe_redirect_manager->create_redirect( $from, $to, $status_code, $enable_regex, $post_status );
+		$ret = $safe_redirect_manager->create_redirect( $from, $to, $status_code, $comments, $enable_regex, $post_status );
 		if ( is_wp_error( $ret ) )
 			WP_CLI::error( $ret->get_error_message() );
 		else
@@ -186,12 +187,12 @@ class Safe_Redirect_Manager_CLI extends WP_CLI_Command {
 	 * redirection from and to URLs, regex flag and HTTP redirection code. Here
 	 * is example table:
 	 *   
-	 * | source                     | target             | regex | code |
-	 * |----------------------------|--------------------|-------|------|
-	 * | /legacy-url                | /new-url           | 0     | 301  |
-	 * | /category-1                | /new-category-slug | 0     | 302  |
-	 * | /tes?t/[0-9]+/path/[^/]+/? | /go/here           | 1     | 302  |
-	 * | ...                        | ...                | ...   | ...  |
+	 * | source                     | target             | regex | code | comments 							   	|
+	 * |----------------------------|--------------------|-------|------|---------------------------------------|
+	 * | /legacy-url                | /new-url           | 0     | 301  |Old URL posted to site we don't control|
+	 * | /category-1                | /new-category-slug | 0     | 302  |URL from former site					|
+	 * | /tes?t/[0-9]+/path/[^/]+/? | /go/here           | 1     | 302  |Other sample content					|
+	 * | ...                        | ...                | ...   | ...  |...									|
 	 *
 	 * You can also use exported redirects from "Redirection" plugin, which you
 	 * can download here: /wp-admin/tools.php?page=redirection.php&sub=modules
@@ -208,11 +209,14 @@ class Safe_Redirect_Manager_CLI extends WP_CLI_Command {
 	 * <code-column>
 	 * : Header title for code column mapping.
 	 *
+	 * <comments-column>
+	 * : Header title for comments column mapping.
+	 *
 	 * ## EXAMPLE
 	 *
 	 *     wp safe-redirect-manager import redirections.csv
 	 *
-	 * @synopsis <file> [--source=<source-column>] [--target=<target-column>] [--regex=<regex-column>] [--code=<code-column>]
+	 * @synopsis <file> [--source=<source-column>] [--target=<target-column>] [--regex=<regex-column>] [--code=<code-column>] [--comments=<comments-column>]
 	 *
 	 * @since 1.7.6
 	 * 
@@ -229,6 +233,7 @@ class Safe_Redirect_Manager_CLI extends WP_CLI_Command {
 			'target' => 'target',
 			'regex'  => 'regex',
 			'code'   => 'code',
+			'comments' => 'comments'
 		) );
 
 		$created = $skipped = 0;

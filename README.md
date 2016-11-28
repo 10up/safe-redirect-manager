@@ -51,6 +51,9 @@ This should be a path i.e. `/test` or a URL i.e. `http://example.com/wp/test`. I
 a request i.e. whether it was successful, unauthorized, not found, etc. You should almost always use either 302,
 temporarily moved, or 301, permanently moved.
 
+#### "Comments"
+Add any comments to help you and/or other team members or site editors remember why you setup this redirect in the first place.
+
 *Note:*
 
 * Redirects are cached using the Transients API. Cache busts occur when redirects are added, updated, and deleted
