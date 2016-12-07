@@ -208,11 +208,17 @@ class Safe_Redirect_Manager_CLI extends WP_CLI_Command {
 	 * <code-column>
 	 * : Header title for code column mapping.
 	 *
+	 * <delimiter>
+	 * : Delimiter character.
+	 *
+	 * <enclosure>
+	 * : Enclosure character.
+	 *
 	 * ## EXAMPLE
 	 *
 	 *     wp safe-redirect-manager import redirections.csv
 	 *
-	 * @synopsis <file> [--source=<source-column>] [--target=<target-column>] [--regex=<regex-column>] [--code=<code-column>]
+	 * @synopsis <file> [--source=<source-column>] [--target=<target-column>] [--regex=<regex-column>] [--code=<code-column>] [--delimiter=<delimiter>] [--enclosure=<enclosure>]
 	 *
 	 * @since 1.7.6
 	 * 
@@ -225,10 +231,12 @@ class Safe_Redirect_Manager_CLI extends WP_CLI_Command {
 		global $safe_redirect_manager;
 
 		$mapping = wp_parse_args( $assoc_args, array(
-			'source' => 'source',
-			'target' => 'target',
-			'regex'  => 'regex',
-			'code'   => 'code',
+			'source'    => 'source',
+			'target'    => 'target',
+			'regex'     => 'regex',
+			'code'      => 'code',
+			'delimiter' => ',',
+			'enclosure' => '"',
 		) );
 
 		$created = $skipped = 0;

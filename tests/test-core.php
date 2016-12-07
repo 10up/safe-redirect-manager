@@ -451,6 +451,8 @@ class SRMTestCore extends WP_UnitTestCase {
 		// create temp file and fill up it with redirects
 		$tmp_file = tmpfile();
 
+		$delimiter = ':';
+		$enclosure = '|';
 		$redirects = array(
 			// headers
 			array( 'http code', 'legacy url', 'new url', 'is_regex' ),
@@ -461,16 +463,18 @@ class SRMTestCore extends WP_UnitTestCase {
 		);
 
 		foreach ( $redirects as $row ) {
-			fputcsv( $tmp_file, $row );
+			fputcsv( $tmp_file, $row, $delimiter, $enclosure );
 		}
 
 		// let's import it
 		fseek( $tmp_file, 0 );
 		$processed = $safe_redirect_manager->import_file( $tmp_file, array(
-			'source' => 'legacy url',
-			'target' => 'new url',
-			'regex'  => 'is_regex',
-			'code'   => 'http code',
+			'source'    => 'legacy url',
+			'target'    => 'new url',
+			'regex'     => 'is_regex',
+			'code'      => 'http code',
+			'delimiter' => $delimiter,
+			'enclosure' => $enclosure,
 		) );
 
 		// assert results

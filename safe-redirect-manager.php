@@ -80,12 +80,40 @@ class SRM_Safe_Redirect_Manager {
         add_action( 'admin_print_styles-post.php', array( $this, 'action_print_logo_css' ), 10, 1 );
         add_action( 'admin_print_styles-post-new.php', array( $this, 'action_print_logo_css' ), 10, 1 );
         add_filter( 'post_type_link', array( $this, 'filter_post_type_link' ), 10, 2  );
+		add_action( 'init', array( $this, 'action_register_importer' ) );
 
         // Search filters
         add_filter( 'posts_join', array( $this, 'filter_search_join' ) );
         add_filter( 'posts_where', array( $this, 'filter_search_where' ) );
         add_filter( 'posts_distinct', array( $this, 'filter_search_distinct' ) );
     }
+
+	/**
+	 * Registers importer.
+	 *
+	 * @since 1.7.6
+	 *
+	 * @access public
+	 */
+	public function action_register_importer() {
+		if ( function_exists( 'register_importer' ) ) {
+			register_importer( 'safe-redirect-manager', 'Safe Redirect Manager (CSV)', 'Imports redirect rules from CSV file.', array( $this, 'process_importer_page' ) );
+		}
+	}
+
+	/**
+	 * Processes importer page.
+	 *
+	 * @since 1.7.6
+	 *
+	 * @access public
+	 */
+	public function process_importer_page() {
+		require_once 'inc/class-srm-importer.php';
+
+		$importer = new SRM_Importer();
+		$importer->process();
+	}
 
     /**
      * Localize plugin
@@ -1016,9 +1044,11 @@ class SRM_Safe_Redirect_Manager {
 		}
 
 		// process all rows of the file
+		$delimiter = isset( $args['delimiter'] ) ? $args['delimiter'] : ',';
+		$enclosure = isset( $args['enclosure'] ) ? $args['enclosure'] : '"';
 		$created = $skipped = 0;
-		$headers = fgetcsv( $handle );
-		while( ( $row = fgetcsv( $handle ) ) ) {
+		$headers = fgetcsv( $handle, 0, $delimiter, $enclosure );
+		while( ( $row = fgetcsv( $handle, 0, $delimiter, $enclosure ) ) ) {
 			// validate
 			$rule = array_combine( $headers, $row );
 			if ( empty( $rule[$args['source']] ) || empty( $rule[$args['target']] ) ) {
@@ -1028,10 +1058,10 @@ class SRM_Safe_Redirect_Manager {
 			}
 
 			// sanitize
-			$redirect_from = $this->sanitize_redirect_from( $rule[$args['source']] );
-			$redirect_to = $this->sanitize_redirect_to( $rule[$args['target']] );
-			$status_code = ! empty( $rule[$args['code']] ) ? $rule[$args['code']] : 302;
 			$regex = ! empty( $rule[$args['regex']] ) ? filter_var( $rule[$args['regex']], FILTER_VALIDATE_BOOLEAN ) : false;
+			$redirect_from = $this->sanitize_redirect_from( $rule[$args['source']], $regex );
+			$redirect_to = $this->sanitize_redirect_to( $rule[$args['target']] );
+			$status_code = ! empty( $rule[$args['code']] ) && in_array( $rule[$args['code']], $this->valid_status_codes ) ? $rule[$args['code']] : 302;
 
 			// import
 			$id = $this->create_redirect( $redirect_from, $redirect_to, $status_code, $regex );
