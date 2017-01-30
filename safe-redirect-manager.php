@@ -751,7 +751,7 @@ class SRM_Safe_Redirect_Manager {
 
 			// Some arguments that don't need to be configurable
 			$query_args['post_type'] = $this->redirect_post_type;
-			$query_args['no_found_rows'] = false;
+			$query_args['no_found_rows'] = true;
 			$query_args['update_term_cache'] = false;
 
 			$redirect_query = new WP_Query( $query_args );
