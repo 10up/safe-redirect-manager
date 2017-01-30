@@ -29,19 +29,19 @@ class Safe_Redirect_Manager_CLI extends WP_CLI_Command {
 		$table->setHeaders( $fields );
 
 		$redirects = $safe_redirect_manager->get_redirects( array( 'post_status' => 'any' ) );
-		foreach( $redirects as $redirect ) {
+		foreach ( $redirects as $redirect ) {
 			$line = array();
-			foreach( $fields as $field ) {
-				if ( 'enable_regex' == $field )
-					$line[] = ( $redirect[$field] ) ? 'true' : 'false';
-				else
-					$line[] = $redirect[$field];
+			foreach ( $fields as $field ) {
+				if ( 'enable_regex' == $field ) {
+					$line[] = ( $redirect[ $field ] ) ? 'true' : 'false';
+				} else { $line[] = $redirect[ $field ];
+				}
 			}
 			$table->addRow( $line );
 		}
 		$table->display();
 
-		WP_CLI::line( "Total of " . count( $redirects ) . " redirects" );
+		WP_CLI::line( 'Total of ' . count( $redirects ) . ' redirects' );
 	}
 
 	/**
@@ -61,24 +61,27 @@ class Safe_Redirect_Manager_CLI extends WP_CLI_Command {
 				'publish',
 			);
 		// array_merge() doesn't work here because our keys are numeric
-		foreach( $defaults as $key => $value ) {
-			if ( ! isset( $args[$key] ) )
-				$args[$key] = $defaults[$key];
+		foreach ( $defaults as $key => $value ) {
+			if ( ! isset( $args[ $key ] ) ) {
+				$args[ $key ] = $defaults[ $key ];
+			}
 		}
 		list( $from, $to, $status_code, $enable_regex, $post_status ) = $args;
 
 		// User might've passed as string.
-		if ( 'false' == $enable_regex )
+		if ( 'false' == $enable_regex ) {
 			$enable_regex = false;
+		}
 
-		if ( empty( $from ) || empty( $to ) )
-			WP_CLI::error( "<from> and <to> are required arguments." );
+		if ( empty( $from ) || empty( $to ) ) {
+			WP_CLI::error( '<from> and <to> are required arguments.' );
+		}
 
 		$ret = $safe_redirect_manager->create_redirect( $from, $to, $status_code, $enable_regex, $post_status );
-		if ( is_wp_error( $ret ) )
+		if ( is_wp_error( $ret ) ) {
 			WP_CLI::error( $ret->get_error_message() );
-		else
-			WP_CLI::success( "Created redirect as #{$ret}" );
+		} else { WP_CLI::success( "Created redirect as #{$ret}" );
+		}
 	}
 
 	/**
@@ -90,11 +93,12 @@ class Safe_Redirect_Manager_CLI extends WP_CLI_Command {
 	public function delete( $args ) {
 		global $safe_redirect_manager;
 
-		$id = ( ! empty( $args[0] ) ) ? (int)$args[0] : 0;
+		$id = ( ! empty( $args[0] ) ) ? (int) $args[0] : 0;
 
 		$redirect = get_post( $id );
-		if ( ! $redirect || $safe_redirect_manager->redirect_post_type != $redirect->post_type )
+		if ( ! $redirect || $safe_redirect_manager->redirect_post_type != $redirect->post_type ) {
 			WP_CLI::error( "{$id} isn't a valid redirect." );
+		}
 
 		wp_delete_post( $id );
 		$safe_redirect_manager->update_redirect_cache();
@@ -110,7 +114,7 @@ class Safe_Redirect_Manager_CLI extends WP_CLI_Command {
 		global $safe_redirect_manager;
 
 		$safe_redirect_manager->update_redirect_cache();
-		WP_CLI::success( "Redirect cache has been updated." );
+		WP_CLI::success( 'Redirect cache has been updated.' );
 	}
 
 	/**
@@ -125,17 +129,19 @@ class Safe_Redirect_Manager_CLI extends WP_CLI_Command {
 		list( $file ) = $args;
 
 		$contents = file_get_contents( $file );
-		if ( ! $contents )
-			WP_CLI::error( "Error retrieving .htaccess file" );
+		if ( ! $contents ) {
+			WP_CLI::error( 'Error retrieving .htaccess file' );
+		}
 
 		$pieces = explode( PHP_EOL, $contents );
 		$created = 0;
 		$skipped = 0;
-		foreach( $pieces as $piece ) {
+		foreach ( $pieces as $piece ) {
 
 			// Ignore if this line isn't a redirect
-			if ( ! preg_match( '/^Redirect( permanent)?/i', $piece ) )
+			if ( ! preg_match( '/^Redirect( permanent)?/i', $piece ) ) {
 				continue;
+			}
 
 			// Parse the redirect
 			$redirect = preg_replace( '/\s{2,}/', ' ', $piece );
@@ -166,7 +172,7 @@ class Safe_Redirect_Manager_CLI extends WP_CLI_Command {
 
 			$id = $safe_redirect_manager->create_redirect( $sanitized_redirect_from, $sanitized_redirect_to, $http_status );
 			if ( is_wp_error( $id ) ) {
-				WP_CLI::warning( "Error - " . $id->get_error_message() );
+				WP_CLI::warning( 'Error - ' . $id->get_error_message() );
 				$skipped++;
 			} else {
 				WP_CLI::line( "Success - Created redirect from '{$sanitized_redirect_from}' to '{$sanitized_redirect_to}'" );
@@ -182,10 +188,10 @@ class Safe_Redirect_Manager_CLI extends WP_CLI_Command {
 	 * ## OPTIONS
 	 *
 	 * <file>
-	 * : Path to one or more valid CSV file for import. This file should contain 
+	 * : Path to one or more valid CSV file for import. This file should contain
 	 * redirection from and to URLs, regex flag and HTTP redirection code. Here
 	 * is example table:
-	 *   
+	 *
 	 * | source                     | target             | regex | code |
 	 * |----------------------------|--------------------|-------|------|
 	 * | /legacy-url                | /new-url           | 0     | 301  |
@@ -215,7 +221,7 @@ class Safe_Redirect_Manager_CLI extends WP_CLI_Command {
 	 * @synopsis <file> [--source=<source-column>] [--target=<target-column>] [--regex=<regex-column>] [--code=<code-column>]
 	 *
 	 * @since 1.7.6
-	 * 
+	 *
 	 * @access public
 	 * @global SRM_Safe_Redirect_Manager $safe_redirect_manager The plugin instance.
 	 * @param array $args The array of input files.
@@ -237,7 +243,7 @@ class Safe_Redirect_Manager_CLI extends WP_CLI_Command {
 			if ( ! empty( $processed ) ) {
 				$created += $processed['created'];
 				$skipped += $processed['skipped'];
-				
+
 				WP_CLI::success( basename( $file ) . ' file processed successfully.' );
 			}
 		}

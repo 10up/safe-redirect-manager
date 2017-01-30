@@ -7,7 +7,7 @@ if ( ! $_tests_dir ) {
 
 define( 'PHPUNIT_SRM_TESTSUITE', 1 );
 
-require_once ( $_tests_dir . '/includes/functions.php' );
+require_once( $_tests_dir . '/includes/functions.php' );
 
 function _manually_load_plugin() {
 	require dirname( __FILE__ ) . '/../safe-redirect-manager.php';
