@@ -4,7 +4,7 @@ Plugin Name: Safe Redirect Manager
 Plugin URI: http://www.10up.com
 Description: Easily and safely manage HTTP redirects.
 Author: Taylor Lovett (10up)
-Version: 1.7.7
+Version: 1.7.8
 Author URI: http://www.10up.com
 
 GNU General Public License, Free Software Foundation <http://creativecommons.org/licenses/GPL/2.0/>
@@ -152,18 +152,25 @@ class SRM_Safe_Redirect_Manager {
         if ( empty( $wp_query ) || $this->redirect_post_type != get_query_var( 'post_type' ) || ! is_search() || empty( $where ) )
             return $where;
 
+        $terms = $this->get_search_terms();
+
+        if ( empty( $terms ) ) {
+            return $where;
+        }
+
         $exact = get_query_var( 'exact' );
         $n = ( ! empty( $exact ) ) ? '' : '%';
 
         $search = '';
         $seperator = '';
-        $terms = $this->get_search_terms();
         $search .= '(';
 
         // we check the meta values against each term in the search
         foreach ( $terms as $term ) {
             $search .= $seperator;
-            $search .= sprintf( "( ( m.meta_value LIKE '%s%s%s' AND m.meta_key = '%s') OR ( m.meta_value LIKE '%s%s%s' AND m.meta_key = '%s') )", $n, $term, $n, $this->meta_key_redirect_from, $n, $term, $n, $this->meta_key_redirect_to );
+            // Used esc_sql instead of wpdb->prepare since wpdb->prepare wraps things in quotes
+            $search .= sprintf( "( ( m.meta_value LIKE '%s%s%s' AND m.meta_key = '%s') OR ( m.meta_value LIKE '%s%s%s' AND m.meta_key = '%s') )", $n, esc_sql( $term ), $n, esc_sql( $this->meta_key_redirect_from ), $n, esc_sql( $term ), $n, esc_sql( $this->meta_key_redirect_to ) );
+            
             $seperator = ' OR ';
         }
 
@@ -643,7 +650,7 @@ class SRM_Safe_Redirect_Manager {
             <input type="text" name="srm<?php echo $this->meta_key_redirect_from; ?>" id="srm<?php echo $this->meta_key_redirect_from; ?>" value="<?php echo esc_attr( $redirect_from ); ?>" />
             <input type="checkbox" name="srm<?php echo $this->meta_key_enable_redirect_from_regex; ?>" id="srm<?php echo $this->meta_key_enable_redirect_from_regex; ?>" <?php checked( true, (bool) $enable_regex ); ?> value="1" />
             <label for="srm<?php echo $this->meta_key_enable_redirect_from_regex; ?>"><?php _e( 'Enable Regular Expressions (advanced)', 'safe-redirect-manager' ); ?></label><br />
-        <p class="description"><?php _e( "This path should be relative to the root of this WordPress installation (or the sub-site, if you are running a multi-site). Appending a (*) wildcard character will match all requests with the base. Warning: Enabling regular expressions will disable wildcards and completely change the way the * symbol is interpreted.", 'safe-redirect-manager' ); ?></p>
+        <p class="description"><?php _e( "This path should be relative to the root of this WordPress installation (or the sub-site, if you are running a multi-site). Appending a (*) wildcard character will match all requests with the base. Warning: Enabling regular expressions will disable wildcards and completely change the way the * symbol is interpretted.", 'safe-redirect-manager' ); ?></p>
         </p>
 
         <p>
@@ -1036,7 +1043,7 @@ class SRM_Safe_Redirect_Manager {
 			// import
 			$id = $this->create_redirect( $redirect_from, $redirect_to, $status_code, $regex );
 			if ( is_wp_error( $id ) ) {
-				$doing_wp_cli && WP_CLI::error( $id );
+				$doing_wp_cli && WP_CLI::warning( $id );
 				$skipped++;
 			} else {
 				$doing_wp_cli && WP_CLI::line( "Success - Created redirect from '{$redirect_from}' to '{$redirect_to}'" );
