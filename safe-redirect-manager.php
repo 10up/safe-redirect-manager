@@ -213,7 +213,7 @@ class SRM_Safe_Redirect_Manager {
 		if ( $this->is_plugin_page() ) {
 			?>
 			<style type="text/css">
-				#visibility, .view-switch, .posts .inline-edit-col-left .inline-edit-group {
+				#visibility, .view-switch, .posts .inline-edit-col-left .inline-edit-group, #preview-action {
 					display: none;
 				}
 				#srm<?php echo $this->meta_key_redirect_from; ?> {
