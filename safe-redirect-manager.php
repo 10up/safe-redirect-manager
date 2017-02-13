@@ -44,14 +44,7 @@ class SRM_Safe_Redirect_Manager {
 
 	public $valid_status_codes = array( 301, 302, 303, 307, 403, 404 );
 
-	public $status_code_labels = array(
-		301 => 'Moved Permanently',
-		302 => 'Found',
-		303 => 'See Other',
-		307 => 'Temporary Redirect',
-		403 => 'Forbidden',
-		404 => 'Not Found',
-	);
+	public $status_code_labels = array(); // Defined later to allow i18n
 
 	private $whitelist_hosts = array();
 
@@ -65,6 +58,15 @@ class SRM_Safe_Redirect_Manager {
 	 * @return object
 	 */
 	public function __construct() {
+		$this->status_code_labels = array(
+			301 => __( 'Moved Permanently', 'safe-redirect-manager' ),
+			302 => __( 'Found', 'safe-redirect-manager' ),
+			303 => __( 'See Other', 'safe-redirect-manager' ),
+			307 => __( 'Temporary Redirect', 'safe-redirect-manager' ),
+			403 => __( 'Forbidden', 'safe-redirect-manager' ),
+			404 => __( 'Not Found', 'safe-redirect-manager' ),
+		);
+
 		add_action( 'init', array( $this, 'action_init_load_textdomain' ), 9 );
 		add_action( 'init', array( $this, 'action_init' ) );
 		add_action( 'init', array( $this, 'action_register_post_types' ) );
