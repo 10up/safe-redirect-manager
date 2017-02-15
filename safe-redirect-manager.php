@@ -673,7 +673,8 @@ class SRM_Safe_Redirect_Manager {
 
 		<p>
 			<label for="srm<?php echo $this->meta_key_redirect_to; ?>"><?php _e( 'Redirect To:', 'safe-redirect-manager' ); ?></label><br />
-			<input class="widefat" type="text" name="srm<?php echo $this->meta_key_redirect_to; ?>" id="srm<?php echo $this->meta_key_redirect_to; ?>" value="<?php echo esc_attr( $redirect_to ); ?>" /><br />
+			<input class="widefat" type="text" name="srm<?php echo $this->meta_key_redirect_to; ?>" id="srm<?php echo $this->meta_key_redirect_to; ?>" value="<?php echo esc_attr( $redirect_to ); ?>" />
+		</p>
 		<p class="description"><?php _e( 'This can be a URL or a path relative to the root of your website (not your WordPress installation). Ending with a (*) wildcard character will append the request match to the redirect.', 'safe-redirect-manager' ); ?></p>
 
 		<p>
