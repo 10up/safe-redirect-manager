@@ -44,14 +44,7 @@ class SRM_Safe_Redirect_Manager {
 
 	public $valid_status_codes = array( 301, 302, 303, 307, 403, 404 );
 
-	public $status_code_labels = array(
-		301 => 'Moved Permanently',
-		302 => 'Found',
-		303 => 'See Other',
-		307 => 'Temporary Redirect',
-		403 => 'Forbidden',
-		404 => 'Not Found',
-	);
+	public $status_code_labels = array(); // Defined later to allow i18n
 
 	private $whitelist_hosts = array();
 
@@ -65,6 +58,15 @@ class SRM_Safe_Redirect_Manager {
 	 * @return object
 	 */
 	public function __construct() {
+		$this->status_code_labels = array(
+			301 => __( 'Moved Permanently', 'safe-redirect-manager' ),
+			302 => __( 'Found', 'safe-redirect-manager' ),
+			303 => __( 'See Other', 'safe-redirect-manager' ),
+			307 => __( 'Temporary Redirect', 'safe-redirect-manager' ),
+			403 => __( 'Forbidden', 'safe-redirect-manager' ),
+			404 => __( 'Not Found', 'safe-redirect-manager' ),
+		);
+
 		add_action( 'init', array( $this, 'action_init_load_textdomain' ), 9 );
 		add_action( 'init', array( $this, 'action_init' ) );
 		add_action( 'init', array( $this, 'action_register_post_types' ) );
@@ -587,7 +589,7 @@ class SRM_Safe_Redirect_Manager {
 		$redirect_labels = array(
 			'name' => _x( 'Safe Redirect Manager', 'post type general name', 'safe-redirect-manager' ),
 			'singular_name' => _x( 'Redirect', 'post type singular name', 'safe-redirect-manager' ),
-			'add_new' => _x( 'Create Redirect Rule', $this->redirect_post_type, 'safe-redirect-manager' ),
+			'add_new' => _x( 'Create Redirect Rule', 'redirect rule', 'safe-redirect-manager' ),
 			'add_new_item' => __( 'Safe Redirect Manager', 'safe-redirect-manager' ),
 			'edit_item' => __( 'Edit Redirect Rule', 'safe-redirect-manager' ),
 			'new_item' => __( 'New Redirect Rule', 'safe-redirect-manager' ),
@@ -665,15 +667,14 @@ class SRM_Safe_Redirect_Manager {
 			<label for="srm<?php echo $this->meta_key_redirect_from; ?>"><?php esc_html_e( 'Redirect From:', 'safe-redirect-manager' ); ?></label><br />
 			<input type="text" name="srm<?php echo $this->meta_key_redirect_from; ?>" id="srm<?php echo $this->meta_key_redirect_from; ?>" value="<?php echo esc_attr( $redirect_from ); ?>" />
 			<input type="checkbox" name="srm<?php echo $this->meta_key_enable_redirect_from_regex; ?>" id="srm<?php echo $this->meta_key_enable_redirect_from_regex; ?>" <?php checked( true, (bool) $enable_regex ); ?> value="1" />
-			<label for="srm<?php echo $this->meta_key_enable_redirect_from_regex; ?>"><?php esc_html_e( 'Enable Regular Expressions (advanced)', 'safe-redirect-manager' ); ?></label><br />
-		<p class="description"><?php esc_html_e( 'This path should be relative to the root of this WordPress installation (or the sub-site, if you are running a multi-site). Appending a (*) wildcard character will match all requests with the base. Warning: Enabling regular expressions will disable wildcards and completely change the way the * symbol is interpretted.', 'safe-redirect-manager' ); ?></p>
+			<label for="srm<?php echo $this->meta_key_enable_redirect_from_regex; ?>"><?php esc_html_e( 'Enable Regular Expressions (advanced)', 'safe-redirect-manager' ); ?></label>
 		</p>
+		<p class="description"><?php _e( 'This path should be relative to the root of this WordPress installation (or the sub-site, if you are running a multi-site). Appending a (*) wildcard character will match all requests with the base. Warning: Enabling regular expressions will disable wildcards and completely change the way the * symbol is interpretted.', 'safe-redirect-manager' ); ?></p>
 
 		<p>
 			<label for="srm<?php echo $this->meta_key_redirect_to; ?>"><?php esc_html_e( 'Redirect To:', 'safe-redirect-manager' ); ?></label><br />
 			<input class="widefat" type="text" name="srm<?php echo $this->meta_key_redirect_to; ?>" id="srm<?php echo $this->meta_key_redirect_to; ?>" value="<?php echo esc_attr( $redirect_to ); ?>" /><br />
 		<p class="description"><?php esc_html_e( 'This can be a URL or a path relative to the root of your website (not your WordPress installation). Ending with a (*) wildcard character will append the request match to the redirect.', 'safe-redirect-manager' ); ?></p>
-		</p>
 
 		<p>
 			<label for="srm<?php echo $this->meta_key_redirect_status_code; ?>"><?php esc_html_e( 'HTTP Status Code:', 'safe-redirect-manager' ); ?></label>
