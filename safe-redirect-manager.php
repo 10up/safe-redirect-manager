@@ -786,8 +786,6 @@ class SRM_Safe_Redirect_Manager {
 	 */
 	public function update_redirect_cache() {
 		
-		delete_transient($this->cache_key_redirects); 
-		
 		$redirect_cache = $this->get_redirects();
 
 		set_transient( $this->cache_key_redirects, $redirect_cache );
