@@ -47,8 +47,8 @@ class SRM_Safe_Redirect_Manager {
 	public $status_code_labels = array(); // Defined later to allow i18n
 
 	private $whitelist_hosts = array();
-	//let users have 5000 rediercts
-	public $default_max_redirects = 5000;
+	
+	public $default_max_redirects = 150;
 
 	/**
 	 * Sets up redirect manager
