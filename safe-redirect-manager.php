@@ -823,12 +823,7 @@ class SRM_Safe_Redirect_Manager {
 
 		// get requested path and add a / before it
 		$requested_path = esc_url_raw( $_SERVER['REQUEST_URI'] );
-		$requested_path = stripslashes( $requested_path );
-
-		$requested_path = untrailingslashit( $requested_path );
-		if ( empty( $requested_path ) ) {
-			$requested_path = '/';
-		}
+		$requested_path = untrailingslashit( stripslashes( $requested_path ) );
 
 		/**
 		 * If WordPress resides in a directory that is not the public root, we have to chop
@@ -837,6 +832,10 @@ class SRM_Safe_Redirect_Manager {
 		$parsed_home_url = parse_url( home_url() );
 		if ( isset( $parsed_home_url['path'] ) && '/' != $parsed_home_url['path'] ) {
 			$requested_path = preg_replace( '@' . $parsed_home_url['path'] . '@i', '', $requested_path, 1 );
+		}
+
+		if ( empty( $requested_path ) ) {
+			$requested_path = '/';
 		}
 
 		// Allow redirects to be filtered
