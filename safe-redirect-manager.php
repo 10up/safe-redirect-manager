@@ -47,7 +47,7 @@ class SRM_Safe_Redirect_Manager {
 	public $status_code_labels = array(); // Defined later to allow i18n
 
 	private $whitelist_hosts = array();
-
+	
 	public $default_max_redirects = 150;
 
 	/**
@@ -733,11 +733,8 @@ class SRM_Safe_Redirect_Manager {
 	public function get_redirects( $args = array() ) {
 
 		$redirects = array();
-
-		if ( $this->default_max_redirects > 50 ) {
-			$posts_per_page = 50;
-		} else { $posts_per_page = $this->default_max_redirects;
-		}
+		//read redirects by 50
+		$posts_per_page = 50;
 
 		$i = 1;
 		do {
@@ -768,8 +765,7 @@ class SRM_Safe_Redirect_Manager {
 				);
 			}
 
-			if ( count( $redirects ) == $this->default_max_redirects
-				|| count( $redirect_query->posts ) < $posts_per_page ) {
+			if (count( $redirect_query->posts ) < $posts_per_page ) {
 				$build = false;
 			} else { $build = true;
 			}
@@ -789,7 +785,7 @@ class SRM_Safe_Redirect_Manager {
 	 * @return array
 	 */
 	public function update_redirect_cache() {
-
+		
 		$redirect_cache = $this->get_redirects();
 
 		set_transient( $this->cache_key_redirects, $redirect_cache );
