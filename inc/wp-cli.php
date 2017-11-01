@@ -17,13 +17,13 @@ class Safe_Redirect_Manager_CLI extends WP_CLI_Command {
 		global $safe_redirect_manager;
 
 		$fields = array(
-				'ID',
-				'redirect_from',
-				'redirect_to',
-				'status_code',
-				'enable_regex',
-				'post_status',
-			);
+			'ID',
+			'redirect_from',
+			'redirect_to',
+			'status_code',
+			'enable_regex',
+			'post_status',
+		);
 
 		$table = new \cli\Table();
 		$table->setHeaders( $fields );
