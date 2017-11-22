@@ -42,6 +42,12 @@ class SRM_Safe_Redirect_Manager {
 	public $default_max_redirects = 250;
 
 	/**
+	 * Post type name for redirect rules.
+	 * @var string
+	 */
+	protected $redirect_rule_post_type_name = 'redirect_rule';
+
+	/**
 	 * Sets up redirect manager
 	 *
 	 * @since 1.0
@@ -637,7 +643,7 @@ class SRM_Safe_Redirect_Manager {
 			'menu_position' => 80,
 			'supports' => array( '' ),
 		);
-		register_post_type( 'redirect_rule', $redirect_args );
+		register_post_type( $this->redirect_rule_post_type_name, $redirect_args );
 	}
 
 	/**
