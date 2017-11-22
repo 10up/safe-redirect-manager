@@ -42,6 +42,12 @@ class SRM_Safe_Redirect_Manager {
 	public $default_max_redirects = 250;
 
 	/**
+	 * Post type name for redirect rules.
+	 * @var string
+	 */
+	protected $redirect_rule_post_type_name = 'redirect_rule';
+
+	/**
 	 * Sets up redirect manager
 	 *
 	 * @since 1.0
@@ -79,7 +85,7 @@ class SRM_Safe_Redirect_Manager {
 		add_filter( 'posts_join', array( $this, 'filter_search_join' ) );
 		add_filter( 'posts_where', array( $this, 'filter_search_where' ) );
 		add_filter( 'posts_distinct', array( $this, 'filter_search_distinct' ) );
-		add_filter( 'post_row_actions', array( $this, 'filter_disable_quick_edit' ) );
+		add_filter( 'post_row_actions', array( $this, 'filter_disable_quick_edit' ), 10, 2 );
 	}
 
 	/**
@@ -89,8 +95,9 @@ class SRM_Safe_Redirect_Manager {
 	 * @since  1.8
 	 * @return array
 	 */
-	public function filter_disable_quick_edit( $actions = array() ) {
-		if ( isset( $actions['inline hide-if-no-js'] ) ) {
+	public function filter_disable_quick_edit( $actions = array(), $post ) {
+		$post = get_post( $post );
+		if ( isset( $actions['inline hide-if-no-js'] ) && $post->post_type === $this->redirect_rule_post_type_name ) {
 			unset( $actions['inline hide-if-no-js'] );
 		}
 
@@ -637,7 +644,7 @@ class SRM_Safe_Redirect_Manager {
 			'menu_position' => 80,
 			'supports' => array( '' ),
 		);
-		register_post_type( 'redirect_rule', $redirect_args );
+		register_post_type( $this->redirect_rule_post_type_name, $redirect_args );
 	}
 
 	/**
