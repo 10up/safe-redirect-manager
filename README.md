@@ -10,7 +10,7 @@ them store redirects in the options table or in custom tables. Most of them prov
 of them have serious performance implications (404 error logging). Safe Redirect Manager stores redirects as Custom
 Post Types. This makes your data portable and your website scalable. Safe Redirect Manager is built to handle enterprise
 level traffic and is used on major publishing websites. The plugin comes with only what you need following the
-WordPress mantra decisions not options. Actions in filters make the plugin very extensible.
+WordPress mantra, decisions not options. Actions in filters make the plugin very extensible.
 
 ## Installation
 
@@ -55,7 +55,7 @@ temporarily moved, or 301, permanently moved.
 
 * Redirects are cached using the Transients API. Cache busts occur when redirects are added, updated, and deleted
 so you shouldn't be serving stale redirects.
-* By default the plugin only allows at most 150 redirects to prevent performance issues. There is a filter
+* By default the plugin only allows at most 250 redirects to prevent performance issues. There is a filter
 `srm_max_redirects` that you can utilize to up this number.
 * "Redirect From" and requested paths are case insensitive by default.
 
