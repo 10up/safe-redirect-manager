@@ -1,6 +1,6 @@
 {
   "name": "safe-redirect-manager",
-  "description": "Redirect URLs within WordPress.",
+  "description": "Easily and safely manage HTTP redirects.",
   "dependencies": {
     "node-wp-i18n": "^1.0.4"
   },

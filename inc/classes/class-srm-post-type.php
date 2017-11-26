@@ -315,7 +315,6 @@ class SRM_Post_Type {
 	 * @param string $new_status
 	 * @param string $old_status
 	 * @param object $post
-	 * @uses delete_transient
 	 * @return void
 	 */
 	public function action_transition_post_status( $new_status, $old_status, $post ) {
@@ -325,8 +324,7 @@ class SRM_Post_Type {
 
 		// recreate redirect cache
 		if ( 'redirect_rule' === $post->post_type ) {
-			delete_transient( '_srm_redirects' );
-			$this->update_redirect_cache();
+			srm_flush_cache();
 		}
 	}
 
@@ -415,7 +413,7 @@ class SRM_Post_Type {
 			 * updated on transition_post_status which gets called BEFORE save post. But since save_post is where all the important
 			 * redirect info is saved, updating the cache before it is not sufficient.
 			 */
-			$this->update_redirect_cache();
+			srm_flush_cache();
 		}
 	}
 

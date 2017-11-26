@@ -234,7 +234,7 @@ class SRM_WP_CLI extends WP_CLI_Command {
 		$created = $skipped = 0;
 
 		foreach ( $args as $file ) {
-			$processed = $this->import_file( $file, $mapping );
+			$processed = srm_import_file( $file, $mapping );
 			if ( ! empty( $processed ) ) {
 				$created += $processed['created'];
 				$skipped += $processed['skipped'];
@@ -244,81 +244,6 @@ class SRM_WP_CLI extends WP_CLI_Command {
 		}
 
 		WP_CLI::success( "All done! {$created} redirects were imported, {$skipped} were skipped" );
-	}
-
-	/**
-	 * Imports redirects from CSV file or stream.
-	 *
-	 * @since 1.8
-	 *
-	 * @access public
-	 * @param string|resource $file File path, file pointer or stream to read redirects from.
-	 * @param array           $args The array of arguments. Includes column mapping and CSV settings.
-	 * @return array Returns importing statistic on success, otherwise FALSE.
-	 */
-	public function import_file( $file, $args ) {
-		$handle = $file;
-		$close_handle = false;
-		$doing_wp_cli = defined( 'WP_CLI' ) && WP_CLI;
-
-		// filter arguments
-		$args = apply_filters( 'srm_import_file_args', $args );
-
-		// enable line endings auto detection
-		@ini_set( 'auto_detect_line_endings', true );
-
-		// open file pointer if $file is not a resource
-		if ( ! is_resource( $file ) ) {
-			$handle = fopen( $file, 'rb' );
-			if ( ! $handle ) {
-				$doing_wp_cli && WP_CLI::error( sprintf( 'Error retrieving %s file', basename( $file ) ) );
-				return false;
-			}
-
-			$close_handle = true;
-		}
-
-		// process all rows of the file
-		$created = $skipped = 0;
-		$headers = fgetcsv( $handle );
-
-		while ( ( $row = fgetcsv( $handle ) ) ) {
-			// validate
-			$rule = array_combine( $headers, $row );
-			if ( empty( $rule[ $args['source'] ] ) || empty( $rule[ $args['target'] ] ) ) {
-				$doing_wp_cli && WP_CLI::warning( 'Skipping - redirection rule is formatted improperly.' );
-				$skipped++;
-				continue;
-			}
-
-			// sanitize
-			$redirect_from = srm_sanitize_redirect_from( $rule[ $args['source'] ] );
-			$redirect_to = srm_sanitize_redirect_to( $rule[ $args['target'] ] );
-			$status_code = ! empty( $rule[ $args['code'] ] ) ? $rule[ $args['code'] ] : 302;
-			$regex = ! empty( $rule[ $args['regex'] ] ) ? filter_var( $rule[ $args['regex'] ], FILTER_VALIDATE_BOOLEAN ) : false;
-
-			// import
-			$id = srm_create_redirect( $redirect_from, $redirect_to, $status_code, $regex );
-
-			if ( is_wp_error( $id ) ) {
-				$doing_wp_cli && WP_CLI::warning( $id );
-				$skipped++;
-			} else {
-				$doing_wp_cli && WP_CLI::line( "Success - Created redirect from '{$redirect_from}' to '{$redirect_to}'" );
-				$created++;
-			}
-		}
-
-		// close an open file pointer if we've opened it
-		if ( $close_handle ) {
-			fclose( $handle );
-		}
-
-		// return result statistic
-		return array(
-			'created' => $created,
-			'skipped' => $skipped,
-		);
 	}
 }
 

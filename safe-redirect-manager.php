@@ -1,13 +1,13 @@
 <?php
 /**
  * Plugin Name: Safe Redirect Manager
- * Plugin URI: http://www.10up.com
+ * Plugin URI: https://10up.com
  * Description: Easily and safely manage HTTP redirects.
  * Author: Taylor Lovett (10up)
  * Version: 1.8
  * Text Domain: safe-redirect-manager
  * Domain Path: /lang/
- * Author URI: http://www.10up.com
+ * Author URI: https://10up.com
  * License: GPLv2 or later
  * License URI: http://www.gnu.org/licenses/gpl-2.0.html
  */
@@ -16,8 +16,6 @@
  * Localize plugin
  *
  * @since 1.8
- * @uses load_plugin_textdomain
- * @return void
  */
 function srm_load_textdomain() {
 	load_plugin_textdomain( 'safe-redirect-manager', false, dirname( __FILE__ ) . '/lang' );

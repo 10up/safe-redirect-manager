@@ -8,12 +8,10 @@ class SRMTestCore extends WP_UnitTestCase {
 	 * @since 1.7.3
 	 */
 	public function testRootRedirect() {
-		global $safe_redirect_manager;
-
 		$_SERVER['REQUEST_URI'] = '/';
 		$redirected = false;
 		$redirect_to = '/gohere';
-		$safe_redirect_manager->create_redirect( '/', $redirect_to );
+		srm_create_redirect( '/', $redirect_to );
 
 		add_action( 'srm_do_redirect', function( $requested_path, $redirected_to, $status_code ) use ( &$redirect_to, &$redirected ) {
 			if ( $redirected_to === $redirect_to ) {
@@ -21,7 +19,7 @@ class SRMTestCore extends WP_UnitTestCase {
 			}
 		}, 10, 3 );
 
-		$safe_redirect_manager->action_parse_request();
+		SRM_Redirect::factory()->maybe_redirect();
 
 		$this->assertTrue( $redirected );
 	}
@@ -32,12 +30,10 @@ class SRMTestCore extends WP_UnitTestCase {
 	 * @since 1.7.4
 	 */
 	public function testCaseInsensitiveRedirect() {
-		global $safe_redirect_manager;
-
 		$_SERVER['REQUEST_URI'] = '/ONE';
 		$redirected = false;
 		$redirect_to = '/gohere';
-		$safe_redirect_manager->create_redirect( '/one/', $redirect_to );
+		srm_create_redirect( '/one/', $redirect_to );
 
 		add_action( 'srm_do_redirect', function( $requested_path, $redirected_to, $status_code ) use ( &$redirect_to, &$redirected ) {
 			if ( $redirected_to === $redirect_to ) {
@@ -45,14 +41,14 @@ class SRMTestCore extends WP_UnitTestCase {
 			}
 		}, 10, 3 );
 
-		$safe_redirect_manager->action_parse_request();
+		SRM_Redirect::factory()->maybe_redirect();
 
 		$this->assertTrue( $redirected );
 
 		$_SERVER['REQUEST_URI'] = '/one';
 		$redirected = false;
 		$redirect_to = '/gohere';
-		$safe_redirect_manager->create_redirect( '/ONE/', $redirect_to );
+		srm_create_redirect( '/ONE/', $redirect_to );
 
 		add_action( 'srm_do_redirect', function( $requested_path, $redirected_to, $status_code ) use ( &$redirect_to, &$redirected ) {
 			if ( $redirected_to === $redirect_to ) {
@@ -60,7 +56,7 @@ class SRMTestCore extends WP_UnitTestCase {
 			}
 		}, 10, 3 );
 
-		$safe_redirect_manager->action_parse_request();
+		SRM_Redirect::factory()->maybe_redirect();
 
 		$this->assertTrue( $redirected );
 	}
@@ -71,12 +67,10 @@ class SRMTestCore extends WP_UnitTestCase {
 	 * @since 1.7.4
 	 */
 	public function testCaseSensitiveRedirect() {
-		global $safe_redirect_manager;
-
 		$_SERVER['REQUEST_URI'] = '/ONE';
 		$redirected = false;
 		$redirect_to = '/gohere';
-		$safe_redirect_manager->create_redirect( '/one/', $redirect_to );
+		srm_create_redirect( '/one/', $redirect_to );
 
 		add_filter( 'srm_case_insensitive_redirects', function( $value ) {
 			return false;
@@ -88,7 +82,7 @@ class SRMTestCore extends WP_UnitTestCase {
 			}
 		}, 10, 3 );
 
-		$safe_redirect_manager->action_parse_request();
+		SRM_Redirect::factory()->maybe_redirect();
 
 		$this->assertFalse( $redirected );
 	}
@@ -99,12 +93,10 @@ class SRMTestCore extends WP_UnitTestCase {
 	 * @since 1.7.4
 	 */
 	public function testCaseSensitiveRedirectTo() {
-		global $safe_redirect_manager;
-
 		$_SERVER['REQUEST_URI'] = '/ONE';
 		$redirected = false;
 		$redirect_to = '/goHERE';
-		$safe_redirect_manager->create_redirect( '/one/', $redirect_to );
+		srm_create_redirect( '/one/', $redirect_to );
 
 		add_action( 'srm_do_redirect', function( $requested_path, $redirected_to, $status_code ) use ( &$redirect_to, &$redirected ) {
 			if ( $redirected_to === $redirect_to ) {
@@ -112,7 +104,7 @@ class SRMTestCore extends WP_UnitTestCase {
 			}
 		}, 10, 3 );
 
-		$safe_redirect_manager->action_parse_request();
+		SRM_Redirect::factory()->maybe_redirect();
 
 		$this->assertTrue( $redirected );
 	}
@@ -123,12 +115,10 @@ class SRMTestCore extends WP_UnitTestCase {
 	 * @since 1.7.4
 	 */
 	public function testBasicWildcard() {
-		global $safe_redirect_manager;
-
 		$_SERVER['REQUEST_URI'] = '/one/dfsdf';
 		$redirected = false;
 		$redirect_to = '/gohere';
-		$safe_redirect_manager->create_redirect( '/one*', $redirect_to );
+		srm_create_redirect( '/one*', $redirect_to );
 
 		add_action( 'srm_do_redirect', function( $requested_path, $redirected_to, $status_code ) use ( &$redirect_to, &$redirected ) {
 			if ( $redirected_to === $redirect_to ) {
@@ -136,7 +126,7 @@ class SRMTestCore extends WP_UnitTestCase {
 			}
 		}, 10, 3 );
 
-		$safe_redirect_manager->action_parse_request();
+		SRM_Redirect::factory()->maybe_redirect();
 
 		$this->assertTrue( $redirected );
 	}
@@ -147,12 +137,10 @@ class SRMTestCore extends WP_UnitTestCase {
 	 * @since 1.7.4
 	 */
 	public function testReplaceWildcard() {
-		global $safe_redirect_manager;
-
 		$_SERVER['REQUEST_URI'] = '/one/two';
 		$redirected = false;
 		$redirect_to = '/gohere/*';
-		$safe_redirect_manager->create_redirect( '/one/*', $redirect_to );
+		srm_create_redirect( '/one/*', $redirect_to );
 
 		add_action( 'srm_do_redirect', function( $requested_path, $redirected_to, $status_code ) use ( &$redirect_to, &$redirected ) {
 			if ( $redirected_to === '/gohere/two' ) {
@@ -160,7 +148,7 @@ class SRMTestCore extends WP_UnitTestCase {
 			}
 		}, 10, 3 );
 
-		$safe_redirect_manager->action_parse_request();
+		SRM_Redirect::factory()->maybe_redirect();
 
 		$this->assertTrue( $redirected );
 	}
@@ -175,12 +163,10 @@ class SRMTestCore extends WP_UnitTestCase {
 		 * First without regex
 		 */
 
-		global $safe_redirect_manager;
-
 		$_SERVER['REQUEST_URI'] = '/one';
 		$redirected = false;
 		$redirect_to = '/gohere';
-		$safe_redirect_manager->create_redirect( '/one/', $redirect_to );
+		srm_create_redirect( '/one/', $redirect_to );
 
 		add_action( 'srm_do_redirect', function( $requested_path, $redirected_to, $status_code ) use ( &$redirect_to, &$redirected ) {
 			if ( $redirected_to === $redirect_to ) {
@@ -188,14 +174,14 @@ class SRMTestCore extends WP_UnitTestCase {
 			}
 		}, 10, 3 );
 
-		$safe_redirect_manager->action_parse_request();
+		SRM_Redirect::factory()->maybe_redirect();
 
 		$this->assertTrue( $redirected );
 
 		$_SERVER['REQUEST_URI'] = '/one/';
 		$redirected = false;
 		$redirect_to = '/gohere';
-		$safe_redirect_manager->create_redirect( '/one', $redirect_to );
+		srm_create_redirect( '/one', $redirect_to );
 
 		add_action( 'srm_do_redirect', function( $requested_path, $redirected_to, $status_code ) use ( &$redirect_to, &$redirected ) {
 			if ( $redirected_to === $redirect_to ) {
@@ -203,14 +189,14 @@ class SRMTestCore extends WP_UnitTestCase {
 			}
 		}, 10, 3 );
 
-		$safe_redirect_manager->action_parse_request();
+		SRM_Redirect::factory()->maybe_redirect();
 
 		$this->assertTrue( $redirected );
 
 		$_SERVER['REQUEST_URI'] = '/one/two';
 		$redirected = false;
 		$redirect_to = '/gohere';
-		$safe_redirect_manager->create_redirect( '/one/two/', $redirect_to );
+		srm_create_redirect( '/one/two/', $redirect_to );
 
 		add_action( 'srm_do_redirect', function( $requested_path, $redirected_to, $status_code ) use ( &$redirect_to, &$redirected ) {
 			if ( $redirected_to === $redirect_to ) {
@@ -218,14 +204,14 @@ class SRMTestCore extends WP_UnitTestCase {
 			}
 		}, 10, 3 );
 
-		$safe_redirect_manager->action_parse_request();
+		SRM_Redirect::factory()->maybe_redirect();
 
 		$this->assertTrue( $redirected );
 
 		$_SERVER['REQUEST_URI'] = '/one/two/';
 		$redirected = false;
 		$redirect_to = '/gohere';
-		$safe_redirect_manager->create_redirect( '/one/two', $redirect_to );
+		srm_create_redirect( '/one/two', $redirect_to );
 
 		add_action( 'srm_do_redirect', function( $requested_path, $redirected_to, $status_code ) use ( &$redirect_to, &$redirected ) {
 			if ( $redirected_to === $redirect_to ) {
@@ -233,7 +219,7 @@ class SRMTestCore extends WP_UnitTestCase {
 			}
 		}, 10, 3 );
 
-		$safe_redirect_manager->action_parse_request();
+		SRM_Redirect::factory()->maybe_redirect();
 
 		$this->assertTrue( $redirected );
 
@@ -244,7 +230,7 @@ class SRMTestCore extends WP_UnitTestCase {
 		$_SERVER['REQUEST_URI'] = '/one/two';
 		$redirected = false;
 		$redirect_to = '/gohere';
-		$safe_redirect_manager->create_redirect( '/.*/', $redirect_to, 301, true );
+		srm_create_redirect( '/.*/', $redirect_to, 301, true );
 
 		add_action( 'srm_do_redirect', function( $requested_path, $redirected_to, $status_code ) use ( &$redirect_to, &$redirected ) {
 			if ( $redirected_to === $redirect_to ) {
@@ -252,14 +238,14 @@ class SRMTestCore extends WP_UnitTestCase {
 			}
 		}, 10, 3 );
 
-		$safe_redirect_manager->action_parse_request();
+		SRM_Redirect::factory()->maybe_redirect();
 
 		$this->assertTrue( $redirected );
 
 		$_SERVER['REQUEST_URI'] = '/one/two/';
 		$redirected = false;
 		$redirect_to = '/gohere';
-		$safe_redirect_manager->create_redirect( '/.*', $redirect_to, 301, true );
+		srm_create_redirect( '/.*', $redirect_to, 301, true );
 
 		add_action( 'srm_do_redirect', function( $requested_path, $redirected_to, $status_code ) use ( &$redirect_to, &$redirected ) {
 			if ( $redirected_to === $redirect_to ) {
@@ -267,7 +253,7 @@ class SRMTestCore extends WP_UnitTestCase {
 			}
 		}, 10, 3 );
 
-		$safe_redirect_manager->action_parse_request();
+		SRM_Redirect::factory()->maybe_redirect();
 
 		$this->assertTrue( $redirected );
 	}
@@ -278,12 +264,10 @@ class SRMTestCore extends WP_UnitTestCase {
 	 * @since 1.7.3
 	 */
 	public function testSimplePath() {
-		global $safe_redirect_manager;
-
 		$_SERVER['REQUEST_URI'] = '/test';
 		$redirected = false;
 		$redirect_to = '/gohere';
-		$safe_redirect_manager->create_redirect( '/test', $redirect_to );
+		srm_create_redirect( '/test', $redirect_to );
 
 		add_action( 'srm_do_redirect', function( $requested_path, $redirected_to, $status_code ) use ( &$redirect_to, &$redirected ) {
 			if ( $redirected_to === $redirect_to ) {
@@ -291,7 +275,7 @@ class SRMTestCore extends WP_UnitTestCase {
 			}
 		}, 10, 3 );
 
-		$safe_redirect_manager->action_parse_request();
+		SRM_Redirect::factory()->maybe_redirect();
 
 		$this->assertTrue( $redirected );
 
@@ -302,7 +286,7 @@ class SRMTestCore extends WP_UnitTestCase {
 		$_SERVER['REQUEST_URI'] = '/test/this/path';
 		$redirected = false;
 		$redirect_to = '/gohere';
-		$safe_redirect_manager->create_redirect( '/test/this/path/', $redirect_to );
+		srm_create_redirect( '/test/this/path/', $redirect_to );
 
 		add_action( 'srm_do_redirect', function( $requested_path, $redirected_to, $status_code ) use ( &$redirect_to, &$redirected ) {
 			if ( $redirected_to === $redirect_to ) {
@@ -310,7 +294,7 @@ class SRMTestCore extends WP_UnitTestCase {
 			}
 		}, 10, 3 );
 
-		$safe_redirect_manager->action_parse_request();
+		SRM_Redirect::factory()->maybe_redirect();
 
 		$this->assertTrue( $redirected );
 
@@ -321,7 +305,7 @@ class SRMTestCore extends WP_UnitTestCase {
 		$_SERVER['REQUEST_URI'] = '/test/wrong/path';
 		$redirected = false;
 		$redirect_to = '/gohere';
-		$safe_redirect_manager->create_redirect( '/test/right/path/', $redirect_to );
+		srm_create_redirect( '/test/right/path/', $redirect_to );
 
 		add_action( 'srm_do_redirect', function( $requested_path, $redirected_to, $status_code ) use ( &$redirect_to, &$redirected ) {
 			if ( $redirected_to === $redirect_to ) {
@@ -329,7 +313,7 @@ class SRMTestCore extends WP_UnitTestCase {
 			}
 		}, 10, 3 );
 
-		$safe_redirect_manager->action_parse_request();
+		SRM_Redirect::factory()->maybe_redirect();
 
 		$this->assertTrue( ! $redirected );
 	}
@@ -340,12 +324,10 @@ class SRMTestCore extends WP_UnitTestCase {
 	 * @since 1.7.3
 	 */
 	public function testSimplePathRegex() {
-		global $safe_redirect_manager;
-
 		$_SERVER['REQUEST_URI'] = '/tet/555/path/sdfsfsdf';
 		$redirected = false;
 		$redirect_to = '/gohere';
-		$safe_redirect_manager->create_redirect( '/tes?t/[0-9]+/path/[^/]+/?', $redirect_to, 301, true );
+		srm_create_redirect( '/tes?t/[0-9]+/path/[^/]+/?', $redirect_to, 301, true );
 
 		add_action( 'srm_do_redirect', function( $requested_path, $redirected_to, $status_code ) use ( &$redirect_to, &$redirected ) {
 			if ( $redirected_to === $redirect_to ) {
@@ -353,7 +335,7 @@ class SRMTestCore extends WP_UnitTestCase {
 			}
 		}, 10, 3 );
 
-		$safe_redirect_manager->action_parse_request();
+		SRM_Redirect::factory()->maybe_redirect();
 
 		$this->assertTrue( $redirected );
 
@@ -364,7 +346,7 @@ class SRMTestCore extends WP_UnitTestCase {
 		$_SERVER['REQUEST_URI'] = '/well/everything-else/strip';
 		$redirected = false;
 		$redirect_to = '/$1';
-		$safe_redirect_manager->create_redirect( '/([a-z]+)/.*', $redirect_to, 301, true );
+		srm_create_redirect( '/([a-z]+)/.*', $redirect_to, 301, true );
 
 		add_action( 'srm_do_redirect', function( $requested_path, $redirected_to, $status_code ) use ( &$redirect_to, &$redirected ) {
 			if ( $redirected_to === '/well' ) {
@@ -372,7 +354,7 @@ class SRMTestCore extends WP_UnitTestCase {
 			}
 		}, 10, 3 );
 
-		$safe_redirect_manager->action_parse_request();
+		SRM_Redirect::factory()->maybe_redirect();
 
 		$this->assertTrue( $redirected );
 
@@ -383,7 +365,7 @@ class SRMTestCore extends WP_UnitTestCase {
 		$_SERVER['REQUEST_URI'] = '/another/test';
 		$redirected = false;
 		$redirect_to = '/gohere';
-		$safe_redirect_manager->create_redirect( '/[0-9]+', $redirect_to, 301, true );
+		srm_create_redirect( '/[0-9]+', $redirect_to, 301, true );
 
 		add_action( 'srm_do_redirect', function( $requested_path, $redirected_to, $status_code ) use ( &$redirect_to, &$redirected ) {
 			if ( $redirected_to === $redirect_to ) {
@@ -391,7 +373,7 @@ class SRMTestCore extends WP_UnitTestCase {
 			}
 		}, 10, 3 );
 
-		$safe_redirect_manager->action_parse_request();
+		SRM_Redirect::factory()->maybe_redirect();
 
 		$this->assertTrue( ! $redirected );
 	}
@@ -402,13 +384,11 @@ class SRMTestCore extends WP_UnitTestCase {
 	 * @since 1.7.5
 	 */
 	public function testReplaceCasing() {
-		global $safe_redirect_manager;
-
 		// with wildcard
 		$_SERVER['REQUEST_URI'] = '/myfiles1/FooBar.JPEG';
 		$redirected = false;
 		$redirect_to = '/images1/*';
-		$safe_redirect_manager->create_redirect( '/myfiles1/*', $redirect_to );
+		srm_create_redirect( '/myfiles1/*', $redirect_to );
 
 		add_action( 'srm_do_redirect', function( $requested_path, $redirected_to, $status_code ) use ( &$redirect_to, &$redirected ) {
 			if ( $redirected_to === '/images1/FooBar.JPEG' ) {
@@ -416,7 +396,7 @@ class SRMTestCore extends WP_UnitTestCase {
 			}
 		}, 10, 3 );
 
-		$safe_redirect_manager->action_parse_request();
+		SRM_Redirect::factory()->maybe_redirect();
 
 		$this->assertTrue( $redirected );
 
@@ -424,7 +404,7 @@ class SRMTestCore extends WP_UnitTestCase {
 		$_SERVER['REQUEST_URI'] = '/myfiles2/FooBar.JPEG';
 		$redirected = false;
 		$redirect_to = '/images2/$1';
-		$safe_redirect_manager->create_redirect( '/myfiles2/(.*\.jpe?g)', $redirect_to, 301, true );
+		srm_create_redirect( '/myfiles2/(.*\.jpe?g)', $redirect_to, 301, true );
 
 		add_action( 'srm_do_redirect', function( $requested_path, $redirected_to, $status_code ) use ( &$redirect_to, &$redirected ) {
 			if ( $redirected_to === '/images2/FooBar.JPEG' ) {
@@ -432,7 +412,7 @@ class SRMTestCore extends WP_UnitTestCase {
 			}
 		}, 10, 3 );
 
-		$safe_redirect_manager->action_parse_request();
+		SRM_Redirect::factory()->maybe_redirect();
 
 		$this->assertTrue( $redirected );
 	}
@@ -443,11 +423,8 @@ class SRMTestCore extends WP_UnitTestCase {
 	 * @since 1.7.6
 	 *
 	 * @access public
-	 * @global SRM_Safe_Redirect_Manager $safe_redirect_manager The plugin instance.
 	 */
 	public function testFileImport() {
-		global $safe_redirect_manager;
-
 		// create temp file and fill up it with redirects
 		$tmp_file = tmpfile();
 
@@ -466,7 +443,7 @@ class SRMTestCore extends WP_UnitTestCase {
 
 		// let's import it
 		fseek( $tmp_file, 0 );
-		$processed = $safe_redirect_manager->import_file( $tmp_file, array(
+		$processed = srm_import_file( $tmp_file, array(
 			'source' => 'legacy url',
 			'target' => 'new url',
 			'regex'  => 'is_regex',

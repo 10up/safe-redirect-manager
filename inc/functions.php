@@ -171,7 +171,7 @@ function srm_create_redirect( $redirect_from, $redirect_to, $status_code = 302, 
 		return new WP_Error( 'invalid-argument', esc_html__( 'Redirect from and/or redirect to arguments are invalid.', 'safe-redirect-manager' ) );
 	}
 
-	if ( ! in_array( $sanitized_status_code, $this->valid_status_codes ) ) {
+	if ( ! in_array( $sanitized_status_code, srm_get_valid_status_codes() ) ) {
 		return new WP_Error( 'invalid-argument', esc_html__( 'Invalid status code.', 'safe-redirect-manager' ) );
 	}
 
@@ -200,7 +200,7 @@ function srm_create_redirect( $redirect_from, $redirect_to, $status_code = 302, 
 	update_post_meta( $post_id, '_redirect_rule_from_regex', $sanitized_enable_regex );
 
 	// We need to update the cache after creating this redirect
-	delete_transient( '_srm_redirects' );
+	srm_flush_cache();
 
 	return $post_id;
 }
@@ -265,4 +265,79 @@ function srm_sanitize_redirect_from( $path, $allow_regex = false ) {
 	$path = str_replace( '@', '', $path );
 
 	return $path;
+}
+
+/**
+ * Imports redirects from CSV file or stream.
+ *
+ * @since 1.8
+ *
+ * @access public
+ * @param string|resource $file File path, file pointer or stream to read redirects from.
+ * @param array           $args The array of arguments. Includes column mapping and CSV settings.
+ * @return array Returns importing statistic on success, otherwise FALSE.
+ */
+function srm_import_file( $file, $args ) {
+	$handle = $file;
+	$close_handle = false;
+	$doing_wp_cli = defined( 'WP_CLI' ) && WP_CLI;
+
+	// filter arguments
+	$args = apply_filters( 'srm_import_file_args', $args );
+
+	// enable line endings auto detection
+	@ini_set( 'auto_detect_line_endings', true );
+
+	// open file pointer if $file is not a resource
+	if ( ! is_resource( $file ) ) {
+		$handle = fopen( $file, 'rb' );
+		if ( ! $handle ) {
+			$doing_wp_cli && WP_CLI::error( sprintf( 'Error retrieving %s file', basename( $file ) ) );
+			return false;
+		}
+
+		$close_handle = true;
+	}
+
+	// process all rows of the file
+	$created = $skipped = 0;
+	$headers = fgetcsv( $handle );
+
+	while ( ( $row = fgetcsv( $handle ) ) ) {
+		// validate
+		$rule = array_combine( $headers, $row );
+		if ( empty( $rule[ $args['source'] ] ) || empty( $rule[ $args['target'] ] ) ) {
+			$doing_wp_cli && WP_CLI::warning( 'Skipping - redirection rule is formatted improperly.' );
+			$skipped++;
+			continue;
+		}
+
+		// sanitize
+		$redirect_from = srm_sanitize_redirect_from( $rule[ $args['source'] ] );
+		$redirect_to = srm_sanitize_redirect_to( $rule[ $args['target'] ] );
+		$status_code = ! empty( $rule[ $args['code'] ] ) ? $rule[ $args['code'] ] : 302;
+		$regex = ! empty( $rule[ $args['regex'] ] ) ? filter_var( $rule[ $args['regex'] ], FILTER_VALIDATE_BOOLEAN ) : false;
+
+		// import
+		$id = srm_create_redirect( $redirect_from, $redirect_to, $status_code, $regex );
+
+		if ( is_wp_error( $id ) ) {
+			$doing_wp_cli && WP_CLI::warning( $id );
+			$skipped++;
+		} else {
+			$doing_wp_cli && WP_CLI::line( "Success - Created redirect from '{$redirect_from}' to '{$redirect_to}'" );
+			$created++;
+		}
+	}
+
+	// close an open file pointer if we've opened it
+	if ( $close_handle ) {
+		fclose( $handle );
+	}
+
+	// return result statistic
+	return array(
+		'created' => $created,
+		'skipped' => $skipped,
+	);
 }
