@@ -21,6 +21,7 @@ Extract the zip file and just drop the contents in the wp-content/plugins/ direc
 
 = 1.8 =
 * Improved escaping
+* Custom redirect capability
 * Code refactor
 * Fix root redirect in sub directory bug
 * Fix broken html
