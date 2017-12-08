@@ -445,8 +445,23 @@ class SRM_Post_Type {
 			'parent_item_colon'  => '',
 			'menu_name'          => esc_html__( 'Safe Redirect Manager', 'safe-redirect-manager' ),
 		);
-		$redirect_capability = 'manage_options';
+
+		$redirect_capability = 'srm_manage_redirects';
+
+        $roles = array( 'administrator' );
+
+        foreach ( $roles as $role ) {
+			$role = get_role( $role );
+
+			if ( empty( $role ) || $role->has_cap( $redirect_capability ) ) {
+				continue;
+			}
+
+            $role->add_cap( $redirect_capability );
+        }
+
 		$redirect_capability = apply_filters( 'srm_restrict_to_capability', $redirect_capability );
+
 		$capabilities        = array(
 			'edit_post'          => $redirect_capability,
 			'read_post'          => $redirect_capability,
