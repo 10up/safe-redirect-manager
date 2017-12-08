@@ -5,12 +5,36 @@
 
 class SRM_Redirect {
 	/**
+	 * Store whitelisted host
+	 *
+	 * @var array
+	 */
+	private $whitelist_host;
+
+	/**
 	 * Initialize redirect listening
 	 *
 	 * @since 1.8
 	 */
 	public function setup() {
 		add_action( 'parse_request', array( $this, 'maybe_redirect' ), 0 );
+	}
+
+	/**
+	 * Apply whitelisted host to allowed_redirect_hosts filter
+	 *
+	 * @since 1.8
+	 * @param array $hosts
+	 * @return array
+	 */
+	public function filter_allowed_redirect_hosts( $hosts ) {
+		$without_www = preg_replace( '/^www\./i', '', $this->whitelist_host );
+		$with_www = 'www.' . $without_www;
+
+		$hosts[] = $without_www;
+		$hosts[] = $with_www;
+
+		return array_unique( $hosts );
 	}
 
 	/**
@@ -103,6 +127,15 @@ class SRM_Redirect {
 			}
 
 			if ( $matched_path ) {
+				/**
+				 * Whitelist redirect host
+				 */
+				$parsed_redirect = parse_url( $redirect_to );
+				if ( is_array( $parsed_redirect ) && ! empty( $parsed_redirect['host'] ) ) {
+					$this->whitelist_host = $parsed_redirect['host'];
+					add_filter( 'allowed_redirect_hosts' , array( $this, 'filter_allowed_redirect_hosts' ) );
+				}
+
 				// Allow for regex replacement in $redirect_to
 				if ( $enable_regex ) {
 					$redirect_to = preg_replace( '@' . $redirect_from . '@' . $regex_flag, $redirect_to, $requested_path );
@@ -121,9 +154,9 @@ class SRM_Redirect {
 
 				// if we have a valid status code, then redirect with it
 				if ( in_array( $status_code, srm_get_valid_status_codes() ) ) {
-					wp_redirect( $sanitized_redirect_to, $status_code );
+					wp_safe_redirect( $sanitized_redirect_to, $status_code );
 				} else {
-					wp_redirect( $sanitized_redirect_to );
+					wp_safe_redirect( $sanitized_redirect_to );
 				}
 
 				exit;
