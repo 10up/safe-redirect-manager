@@ -52,12 +52,12 @@ class SRM_WP_CLI extends WP_CLI_Command {
 	 */
 	public function create( $args ) {
 		$defaults = array(
-				'',
-				'',
-				302,
-				false,
-				'publish',
-			);
+			'',
+			'',
+			302,
+			false,
+			'publish',
+		);
 		// array_merge() doesn't work here because our keys are numeric
 		foreach ( $defaults as $key => $value ) {
 			if ( ! isset( $args[ $key ] ) ) {
@@ -67,7 +67,7 @@ class SRM_WP_CLI extends WP_CLI_Command {
 		list( $from, $to, $status_code, $enable_regex, $post_status ) = $args;
 
 		// User might've passed as string.
-		if ( 'false' == $enable_regex ) {
+		if ( empty( $enable_regex ) || 'false' === $enable_regex ) {
 			$enable_regex = false;
 		}
 
@@ -130,7 +130,7 @@ class SRM_WP_CLI extends WP_CLI_Command {
 			WP_CLI::error( 'Error retrieving .htaccess file' );
 		}
 
-		$pieces = explode( PHP_EOL, $contents );
+		$pieces  = explode( PHP_EOL, $contents );
 		$created = 0;
 		$skipped = 0;
 		foreach ( $pieces as $piece ) {
@@ -146,14 +146,14 @@ class SRM_WP_CLI extends WP_CLI_Command {
 			$redirect = explode( ' ', $redirect );
 
 			// if there are three parts to the redirect, we assume the first part is a status code
-			if ( 2 == count( $redirect ) ) {
-				$from = $redirect[0];
-				$to = $redirect[1];
+			if ( 2 === count( $redirect ) ) {
+				$from        = $redirect[0];
+				$to          = $redirect[1];
 				$http_status = 301;
-			} elseif ( 3 == count( $redirect ) ) {
+			} elseif ( 3 === count( $redirect ) ) {
 				$http_status = $redirect[0];
-				$from = $redirect[1];
-				$to = $redirect[2];
+				$from        = $redirect[1];
+				$to          = $redirect[2];
 			} else {
 				continue;
 			}
@@ -165,7 +165,7 @@ class SRM_WP_CLI extends WP_CLI_Command {
 			}
 
 			$sanitized_redirect_from = srm_sanitize_redirect_from( $from );
-			$sanitized_redirect_to = srm_sanitize_redirect_to( $to );
+			$sanitized_redirect_to   = srm_sanitize_redirect_to( $to );
 
 			$id = srm_create_redirect( $sanitized_redirect_from, $sanitized_redirect_to, $http_status );
 			if ( is_wp_error( $id ) ) {
@@ -224,12 +224,14 @@ class SRM_WP_CLI extends WP_CLI_Command {
 	 * @param array $assoc_args The array of column mappings.
 	 */
 	public function import( $args, $assoc_args ) {
-		$mapping = wp_parse_args( $assoc_args, array(
-			'source' => 'source',
-			'target' => 'target',
-			'regex'  => 'regex',
-			'code'   => 'code',
-		) );
+		$mapping = wp_parse_args(
+			$assoc_args, array(
+				'source' => 'source',
+				'target' => 'target',
+				'regex'  => 'regex',
+				'code'   => 'code',
+			)
+		);
 
 		$created = $skipped = 0;
 

@@ -35,7 +35,7 @@ function srm_get_redirects( $args = array(), $hard = false ) {
 			$query_args = array_merge( $defaults, $args );
 
 			// Some arguments that don't need to be configurable
-			$query_args['post_type'] = 'redirect_rule';
+			$query_args['post_type']         = 'redirect_rule';
 			$query_args['update_term_cache'] = false;
 
 			$redirect_query = new WP_Query( $query_args );
@@ -113,7 +113,7 @@ function srm_check_for_possible_redirect_loops() {
 	$redirects = srm_get_redirects();
 
 	$current_url = parse_url( home_url() );
-	$this_host = ( is_array( $current_url ) && ! empty( $current_url['host'] ) ) ? $current_url['host'] : '';
+	$this_host   = ( is_array( $current_url ) && ! empty( $current_url['host'] ) ) ? $current_url['host'] : '';
 
 	foreach ( $redirects as $redirect ) {
 		$redirect_from = $redirect['redirect_from'];
@@ -122,16 +122,17 @@ function srm_check_for_possible_redirect_loops() {
 		foreach ( $redirects as $compare_redirect ) {
 			$redirect_to = $compare_redirect['redirect_to'];
 
-			$redirect_url = parse_url( $redirect_to );
+			$redirect_url  = parse_url( $redirect_to );
 			$redirect_host = ( is_array( $redirect_url ) && ! empty( $redirect_url['host'] ) ) ? $redirect_url['host'] : '';
 
 			// check if we are redirecting locally
 			if ( empty( $redirect_host ) || $redirect_host === $this_host ) {
 				$redirect_from_url = preg_replace( '/(http:\/\/|https:\/\/|www\.)/i', '', home_url() . $redirect_from );
-				$redirect_to_url = $redirect_to;
+				$redirect_to_url   = $redirect_to;
 				if ( ! preg_match( '/https?:\/\//i', $redirect_to_url ) ) {
 					$redirect_to_url = $this_host . $redirect_to_url;
-				} else { $redirect_to_url = preg_replace( '/(http:\/\/|https:\/\/|www\.)/i', '', $redirect_to_url );
+				} else {
+					$redirect_to_url = preg_replace( '/(http:\/\/|https:\/\/|www\.)/i', '', $redirect_to_url );
 				}
 
 				// possible loop/chain found
@@ -161,17 +162,17 @@ function srm_create_redirect( $redirect_from, $redirect_to, $status_code = 302, 
 	global $wpdb;
 
 	$sanitized_redirect_from = srm_sanitize_redirect_from( $redirect_from );
-	$sanitized_redirect_to = srm_sanitize_redirect_to( $redirect_to );
-	$sanitized_status_code = absint( $status_code );
-	$sanitized_enable_regex = (bool) $enable_regex;
-	$sanitized_post_status = sanitize_key( $post_status );
+	$sanitized_redirect_to   = srm_sanitize_redirect_to( $redirect_to );
+	$sanitized_status_code   = absint( $status_code );
+	$sanitized_enable_regex  = (bool) $enable_regex;
+	$sanitized_post_status   = sanitize_key( $post_status );
 
 	// check and make sure no parameters are empty or invalid after sanitation
 	if ( empty( $sanitized_redirect_from ) || empty( $sanitized_redirect_to ) ) {
 		return new WP_Error( 'invalid-argument', esc_html__( 'Redirect from and/or redirect to arguments are invalid.', 'safe-redirect-manager' ) );
 	}
 
-	if ( ! in_array( $sanitized_status_code, srm_get_valid_status_codes() ) ) {
+	if ( ! in_array( $sanitized_status_code, srm_get_valid_status_codes(), true ) ) {
 		return new WP_Error( 'invalid-argument', esc_html__( 'Invalid status code.', 'safe-redirect-manager' ) );
 	}
 
@@ -182,7 +183,7 @@ function srm_create_redirect( $redirect_from, $redirect_to, $status_code = 302, 
 
 	// create the post
 	$post_args = array(
-		'post_type' => 'redirect_rule',
+		'post_type'   => 'redirect_rule',
 		'post_status' => $sanitized_post_status,
 		'post_author' => 1,
 	);
@@ -220,7 +221,7 @@ function srm_create_redirect( $redirect_from, $redirect_to, $status_code = 302, 
 function srm_sanitize_redirect_to( $path ) {
 	$path = trim( $path );
 
-	if (  preg_match( '/^www\./i', $path ) ) {
+	if ( preg_match( '/^www\./i', $path ) ) {
 		$path = 'http://' . $path;
 	}
 
@@ -278,7 +279,7 @@ function srm_sanitize_redirect_from( $path, $allow_regex = false ) {
  * @return array Returns importing statistic on success, otherwise FALSE.
  */
 function srm_import_file( $file, $args ) {
-	$handle = $file;
+	$handle       = $file;
 	$close_handle = false;
 	$doing_wp_cli = defined( 'WP_CLI' ) && WP_CLI;
 
@@ -314,9 +315,9 @@ function srm_import_file( $file, $args ) {
 
 		// sanitize
 		$redirect_from = srm_sanitize_redirect_from( $rule[ $args['source'] ] );
-		$redirect_to = srm_sanitize_redirect_to( $rule[ $args['target'] ] );
-		$status_code = ! empty( $rule[ $args['code'] ] ) ? $rule[ $args['code'] ] : 302;
-		$regex = ! empty( $rule[ $args['regex'] ] ) ? filter_var( $rule[ $args['regex'] ], FILTER_VALIDATE_BOOLEAN ) : false;
+		$redirect_to   = srm_sanitize_redirect_to( $rule[ $args['target'] ] );
+		$status_code   = ! empty( $rule[ $args['code'] ] ) ? $rule[ $args['code'] ] : 302;
+		$regex         = ! empty( $rule[ $args['regex'] ] ) ? filter_var( $rule[ $args['regex'] ], FILTER_VALIDATE_BOOLEAN ) : false;
 
 		// import
 		$id = srm_create_redirect( $redirect_from, $redirect_to, $status_code, $regex );

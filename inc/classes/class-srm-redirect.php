@@ -29,7 +29,7 @@ class SRM_Redirect {
 	 */
 	public function filter_allowed_redirect_hosts( $hosts ) {
 		$without_www = preg_replace( '/^www\./i', '', $this->whitelist_host );
-		$with_www = 'www.' . $without_www;
+		$with_www    = 'www.' . $without_www;
 
 		$hosts[] = $without_www;
 		$hosts[] = $with_www;
@@ -64,7 +64,12 @@ class SRM_Redirect {
 		 * If WordPress resides in a directory that is not the public root, we have to chop
 		 * the pre-WP path off the requested path.
 		 */
-		$parsed_home_url = parse_url( home_url() );
+		if ( function_exists( 'wp_parse_url' ) ) {
+			$parsed_home_url = wp_parse_url( home_url() );
+		} else {
+			$parsed_home_url = parse_url( home_url() );
+		}
+
 		if ( isset( $parsed_home_url['path'] ) && '/' !== $parsed_home_url['path'] ) {
 			$requested_path = preg_replace( '@' . $parsed_home_url['path'] . '@i', '', $requested_path, 1 );
 		}
@@ -84,7 +89,7 @@ class SRM_Redirect {
 			// normalized path is used for matching but not for replace
 			$normalized_requested_path = strtolower( $requested_path );
 		} else {
-			$regex_flag = '';
+			$regex_flag                = '';
 			$normalized_requested_path = $requested_path;
 		}
 
@@ -95,8 +100,8 @@ class SRM_Redirect {
 				$redirect_from = '/'; // this only happens in the case where there is a redirect on the root
 			}
 
-			$redirect_to = $redirect['redirect_to'];
-			$status_code = $redirect['status_code'];
+			$redirect_to  = $redirect['redirect_to'];
+			$status_code  = $redirect['status_code'];
 			$enable_regex = ( isset( $redirect['enable_regex'] ) ) ? $redirect['enable_regex'] : false;
 
 			// check if the redirection destination is valid, otherwise just skip it
@@ -115,12 +120,12 @@ class SRM_Redirect {
 				$matched_path = ( $normalized_requested_path === $redirect_from );
 
 				// check if the redirect_from ends in a wildcard
-				if ( ! $matched_path && (strrpos( $redirect_from, '*' ) === strlen( $redirect_from ) - 1) ) {
+				if ( ! $matched_path && ( strrpos( $redirect_from, '*' ) === strlen( $redirect_from ) - 1 ) ) {
 					$wildcard_base = substr( $redirect_from, 0, strlen( $redirect_from ) - 1 );
 
 					// mark as match if requested path matches the base of the redirect from
-					$matched_path = (substr( $normalized_requested_path, 0, strlen( $wildcard_base ) ) === $wildcard_base);
-					if ( (strrpos( $redirect_to, '*' ) === strlen( $redirect_to ) - 1 ) ) {
+					$matched_path = ( substr( $normalized_requested_path, 0, strlen( $wildcard_base ) ) === $wildcard_base );
+					if ( ( strrpos( $redirect_to, '*' ) === strlen( $redirect_to ) - 1 ) ) {
 						$redirect_to = rtrim( $redirect_to, '*' ) . ltrim( substr( $requested_path, strlen( $wildcard_base ) ), '/' );
 					}
 				}
@@ -130,10 +135,15 @@ class SRM_Redirect {
 				/**
 				 * Whitelist redirect host
 				 */
-				$parsed_redirect = parse_url( $redirect_to );
+				if ( function_exists( 'wp_parse_url' ) ) {
+					$parsed_redirect = wp_parse_url( $redirect_to );
+				} else {
+					$parsed_redirect = parse_url( $redirect_to );
+				}
+
 				if ( is_array( $parsed_redirect ) && ! empty( $parsed_redirect['host'] ) ) {
 					$this->whitelist_host = $parsed_redirect['host'];
-					add_filter( 'allowed_redirect_hosts' , array( $this, 'filter_allowed_redirect_hosts' ) );
+					add_filter( 'allowed_redirect_hosts', array( $this, 'filter_allowed_redirect_hosts' ) );
 				}
 
 				// Allow for regex replacement in $redirect_to
@@ -153,7 +163,7 @@ class SRM_Redirect {
 				header( 'X-Safe-Redirect-Manager: true' );
 
 				// if we have a valid status code, then redirect with it
-				if ( in_array( $status_code, srm_get_valid_status_codes() ) ) {
+				if ( in_array( $status_code, srm_get_valid_status_codes(), true ) ) {
 					wp_safe_redirect( $sanitized_redirect_to, $status_code );
 				} else {
 					wp_safe_redirect( $sanitized_redirect_to );
@@ -173,7 +183,7 @@ class SRM_Redirect {
 	public static function factory() {
 		static $instance = false;
 
-		if ( ! $instance  ) {
+		if ( ! $instance ) {
 			$instance = new self();
 			$instance->setup();
 		}

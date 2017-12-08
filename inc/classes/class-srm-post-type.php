@@ -26,8 +26,8 @@ class SRM_Post_Type {
 
 		add_action( 'init', array( $this, 'action_register_post_types' ) );
 		add_action( 'save_post', array( $this, 'action_save_post' ) );
-		add_filter( 'manage_redirect_rule_posts_columns' , array( $this, 'filter_redirect_columns' ) );
-		add_action( 'manage_redirect_rule_posts_custom_column' , array( $this, 'action_custom_redirect_columns' ), 10, 2 );
+		add_filter( 'manage_redirect_rule_posts_columns', array( $this, 'filter_redirect_columns' ) );
+		add_action( 'manage_redirect_rule_posts_custom_column', array( $this, 'action_custom_redirect_columns' ), 10, 2 );
 		add_action( 'transition_post_status', array( $this, 'action_transition_post_status' ), 10, 3 );
 		add_filter( 'post_updated_messages', array( $this, 'filter_redirect_updated_messages' ) );
 		add_action( 'admin_notices', array( $this, 'action_redirect_chain_alert' ) );
@@ -126,11 +126,11 @@ class SRM_Post_Type {
 		}
 
 		$exact = get_query_var( 'exact' );
-		$n = ( ! empty( $exact ) ) ? '' : '%';
+		$n     = ( ! empty( $exact ) ) ? '' : '%';
 
-		$search = '';
+		$search    = '';
 		$seperator = '';
-		$search .= '(';
+		$search   .= '(';
 
 		// we check the meta values against each term in the search
 		foreach ( $terms as $term ) {
@@ -237,7 +237,10 @@ class SRM_Post_Type {
 				}
 			} if ( srm_max_redirects_reached() ) {
 				?>
-				<?php if ( 'post-new.php' === $hook_suffix ) : ?><style type="text/css">#post { display: none; }</style><?php endif; ?>
+				<?php
+				if ( 'post-new.php' === $hook_suffix ) :
+?>
+<style type="text/css">#post { display: none; }</style><?php endif; ?>
 				<div class="error">
 					<p><?php esc_html_e( 'Safe Redirect Manager Error: You have reached the maximum allowable number of redirects', 'safe-redirect-manager' ); ?></p>
 				</div>
@@ -289,19 +292,21 @@ class SRM_Post_Type {
 		global $post, $post_ID;
 
 		$messages['redirect_rule'] = array(
-			0 => '', // Unused. Messages start at index 1.
-			1 => sprintf( esc_html__( 'Redirect rule updated.', 'safe-redirect-manager' ), esc_url( get_permalink( $post_ID ) ) ),
-			2 => esc_html__( 'Custom field updated.', 'safe-redirect-manager' ),
-			3 => esc_html__( 'Custom field deleted.', 'safe-redirect-manager' ),
-			4 => esc_html__( 'Redirect rule updated.', 'safe-redirect-manager' ),
+			0  => '', // Unused. Messages start at index 1.
+			1  => sprintf( esc_html__( 'Redirect rule updated.', 'safe-redirect-manager' ), esc_url( get_permalink( $post_ID ) ) ),
+			2  => esc_html__( 'Custom field updated.', 'safe-redirect-manager' ),
+			3  => esc_html__( 'Custom field deleted.', 'safe-redirect-manager' ),
+			4  => esc_html__( 'Redirect rule updated.', 'safe-redirect-manager' ),
 			/* translators: %s: date and time of the revision */
-			5 => isset( $_GET['revision'] ) ? sprintf( esc_html__( 'Redirect rule restored to revision from %s', 'safe-redirect-manager' ), wp_post_revision_title( (int) $_GET['revision'], false ) ) : false,
-			6 => sprintf( esc_html__( 'Redirect rule published.', 'safe-redirect-manager' ), esc_url( get_permalink( $post_ID ) ) ),
-			7 => esc_html__( 'Redirect rule saved.', 'safe-redirect-manager' ),
-			8 => sprintf( esc_html__( 'Redirect rule submitted.', 'safe-redirect-manager' ), esc_url( add_query_arg( 'preview', 'true', get_permalink( $post_ID ) ) ) ),
-			9 => sprintf( esc_html__( 'Redirect rule scheduled for: %1$s.', 'safe-redirect-manager' ),
+			5  => isset( $_GET['revision'] ) ? sprintf( esc_html__( 'Redirect rule restored to revision from %s', 'safe-redirect-manager' ), wp_post_revision_title( (int) $_GET['revision'], false ) ) : false,
+			6  => sprintf( esc_html__( 'Redirect rule published.', 'safe-redirect-manager' ), esc_url( get_permalink( $post_ID ) ) ),
+			7  => esc_html__( 'Redirect rule saved.', 'safe-redirect-manager' ),
+			8  => sprintf( esc_html__( 'Redirect rule submitted.', 'safe-redirect-manager' ), esc_url( add_query_arg( 'preview', 'true', get_permalink( $post_ID ) ) ) ),
+			9  => sprintf(
+				esc_html__( 'Redirect rule scheduled for: %1$s.', 'safe-redirect-manager' ),
 				// translators: Publish box date format, see http://php.net/date
-			date_i18n( esc_html__( 'M j, Y @ G:i' ), strtotime( $post->post_date ) ), esc_url( get_permalink( $post_ID ) ) ),
+				date_i18n( esc_html__( 'M j, Y @ G:i' ), strtotime( $post->post_date ) ), esc_url( get_permalink( $post_ID ) )
+			),
 			10 => sprintf( esc_html__( 'Redirect rule draft updated.', 'safe-redirect-manager' ), esc_url( add_query_arg( 'preview', 'true', get_permalink( $post_ID ) ) ) ),
 		);
 
@@ -353,7 +358,7 @@ class SRM_Post_Type {
 	 * @return array
 	 */
 	public function filter_redirect_columns( $columns ) {
-		$columns['srm_redirect_rule_to'] = esc_html__( 'Redirect To', 'safe-redirect-manager' );
+		$columns['srm_redirect_rule_to']          = esc_html__( 'Redirect To', 'safe-redirect-manager' );
 		$columns['srm_redirect_rule_status_code'] = esc_html__( 'HTTP Status Code', 'safe-redirect-manager' );
 
 		// Change the title column
@@ -425,49 +430,49 @@ class SRM_Post_Type {
 	 * @return void
 	 */
 	public function action_register_post_types() {
-		$redirect_labels = array(
-			'name' => esc_html_x( 'Safe Redirect Manager', 'post type general name', 'safe-redirect-manager' ),
-			'singular_name' => esc_html_x( 'Redirect', 'post type singular name', 'safe-redirect-manager' ),
-			'add_new' => _x( 'Create Redirect Rule', 'redirect rule', 'safe-redirect-manager' ),
-			'add_new_item' => esc_html__( 'Safe Redirect Manager', 'safe-redirect-manager' ),
-			'edit_item' => esc_html__( 'Edit Redirect Rule', 'safe-redirect-manager' ),
-			'new_item' => esc_html__( 'New Redirect Rule', 'safe-redirect-manager' ),
-			'all_items' => esc_html__( 'Safe Redirect Manager', 'safe-redirect-manager' ),
-			'view_item' => esc_html__( 'View Redirect Rule', 'safe-redirect-manager' ),
-			'search_items' => esc_html__( 'Search Redirects', 'safe-redirect-manager' ),
-			'not_found' => esc_html__( 'No redirect rules found.', 'safe-redirect-manager' ),
+		$redirect_labels     = array(
+			'name'               => esc_html_x( 'Safe Redirect Manager', 'post type general name', 'safe-redirect-manager' ),
+			'singular_name'      => esc_html_x( 'Redirect', 'post type singular name', 'safe-redirect-manager' ),
+			'add_new'            => _x( 'Create Redirect Rule', 'redirect rule', 'safe-redirect-manager' ),
+			'add_new_item'       => esc_html__( 'Safe Redirect Manager', 'safe-redirect-manager' ),
+			'edit_item'          => esc_html__( 'Edit Redirect Rule', 'safe-redirect-manager' ),
+			'new_item'           => esc_html__( 'New Redirect Rule', 'safe-redirect-manager' ),
+			'all_items'          => esc_html__( 'Safe Redirect Manager', 'safe-redirect-manager' ),
+			'view_item'          => esc_html__( 'View Redirect Rule', 'safe-redirect-manager' ),
+			'search_items'       => esc_html__( 'Search Redirects', 'safe-redirect-manager' ),
+			'not_found'          => esc_html__( 'No redirect rules found.', 'safe-redirect-manager' ),
 			'not_found_in_trash' => esc_html__( 'No redirect rules found in trash.', 'safe-redirect-manager' ),
-			'parent_item_colon' => '',
-			'menu_name' => esc_html__( 'Safe Redirect Manager', 'safe-redirect-manager' ),
+			'parent_item_colon'  => '',
+			'menu_name'          => esc_html__( 'Safe Redirect Manager', 'safe-redirect-manager' ),
 		);
 		$redirect_capability = 'manage_options';
 		$redirect_capability = apply_filters( 'srm_restrict_to_capability', $redirect_capability );
-		$capabilities = array(
-			'edit_post' => $redirect_capability,
-			'read_post' => $redirect_capability,
-			'delete_post' => $redirect_capability,
-			'delete_posts' => $redirect_capability,
-			'edit_posts' => $redirect_capability,
-			'edit_others_posts' => $redirect_capability,
-			'publish_posts' => $redirect_capability,
+		$capabilities        = array(
+			'edit_post'          => $redirect_capability,
+			'read_post'          => $redirect_capability,
+			'delete_post'        => $redirect_capability,
+			'delete_posts'       => $redirect_capability,
+			'edit_posts'         => $redirect_capability,
+			'edit_others_posts'  => $redirect_capability,
+			'publish_posts'      => $redirect_capability,
 			'read_private_posts' => $redirect_capability,
 		);
 
 		$redirect_args = array(
-			'labels' => $redirect_labels,
-			'public' => false,
-			'publicly_queryable' => true,
-			'show_ui' => true,
-			'show_in_menu' => 'tools.php',
-			'query_var' => false,
-			'rewrite' => false,
-			'capability_type' => 'post',
-			'capabilities' => $capabilities,
-			'has_archive' => false,
-			'hierarchical' => false,
+			'labels'               => $redirect_labels,
+			'public'               => false,
+			'publicly_queryable'   => true,
+			'show_ui'              => true,
+			'show_in_menu'         => 'tools.php',
+			'query_var'            => false,
+			'rewrite'              => false,
+			'capability_type'      => 'post',
+			'capabilities'         => $capabilities,
+			'has_archive'          => false,
+			'hierarchical'         => false,
 			'register_meta_box_cb' => array( $this, 'action_redirect_rule_metabox' ),
-			'menu_position' => 80,
-			'supports' => array( '' ),
+			'menu_position'        => 80,
+			'supports'             => array( '' ),
 		);
 		register_post_type( 'redirect_rule', $redirect_args );
 	}
@@ -495,9 +500,9 @@ class SRM_Post_Type {
 		wp_nonce_field( 'srm-save-redirect-meta', 'srm_redirect_nonce' );
 
 		$redirect_from = get_post_meta( $post->ID, '_redirect_rule_from', true );
-		$redirect_to = get_post_meta( $post->ID, '_redirect_rule_to', true );
-		$status_code = get_post_meta( $post->ID, '_redirect_rule_status_code', true );
-		$enable_regex = get_post_meta( $post->ID, '_redirect_rule_from_regex', true );
+		$redirect_to   = get_post_meta( $post->ID, '_redirect_rule_to', true );
+		$status_code   = get_post_meta( $post->ID, '_redirect_rule_status_code', true );
+		$enable_regex  = get_post_meta( $post->ID, '_redirect_rule_from_regex', true );
 
 		if ( empty( $status_code ) ) {
 			$status_code = apply_filters( 'srm_default_direct_status', 302 );
@@ -573,7 +578,7 @@ class SRM_Post_Type {
 	public static function factory() {
 		static $instance = false;
 
-		if ( ! $instance  ) {
+		if ( ! $instance ) {
 			$instance = new self();
 			$instance->setup();
 		}
