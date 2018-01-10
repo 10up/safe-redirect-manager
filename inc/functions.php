@@ -30,6 +30,7 @@ function srm_get_redirects( $args = array(), $hard = false ) {
 				'post_status'    => 'publish',
 				'paged'          => $i,
 				'fields'         => 'ids',
+				'orderby'        => 'menu_order',
 			);
 
 			$query_args = array_merge( $defaults, $args );
@@ -154,11 +155,12 @@ function srm_check_for_possible_redirect_loops() {
  * @param int    $status_code
  * @param bool   $enable_regex
  * @param string $post_status
+ * @param int    $menu_order
  * @since 1.8
  * @uses wp_insert_post, update_post_meta
  * @return int|WP_Error
  */
-function srm_create_redirect( $redirect_from, $redirect_to, $status_code = 302, $enable_regex = false, $post_status = 'publish' ) {
+function srm_create_redirect( $redirect_from, $redirect_to, $status_code = 302, $enable_regex = false, $post_status = 'publish', $menu_order = 0 ) {
 	global $wpdb;
 
 	$sanitized_redirect_from = srm_sanitize_redirect_from( $redirect_from );
@@ -166,6 +168,7 @@ function srm_create_redirect( $redirect_from, $redirect_to, $status_code = 302, 
 	$sanitized_status_code   = absint( $status_code );
 	$sanitized_enable_regex  = (bool) $enable_regex;
 	$sanitized_post_status   = sanitize_key( $post_status );
+	$sanitized_menu_order 	 = absint( $menu_order );
 
 	// check and make sure no parameters are empty or invalid after sanitation
 	if ( empty( $sanitized_redirect_from ) || empty( $sanitized_redirect_to ) ) {
@@ -186,6 +189,7 @@ function srm_create_redirect( $redirect_from, $redirect_to, $status_code = 302, 
 		'post_type'   => 'redirect_rule',
 		'post_status' => $sanitized_post_status,
 		'post_author' => 1,
+		'menu_order' => $sanitized_menu_order,
 	);
 
 	$post_id = wp_insert_post( $post_args );
@@ -318,9 +322,10 @@ function srm_import_file( $file, $args ) {
 		$redirect_to   = srm_sanitize_redirect_to( $rule[ $args['target'] ] );
 		$status_code   = ! empty( $rule[ $args['code'] ] ) ? $rule[ $args['code'] ] : 302;
 		$regex         = ! empty( $rule[ $args['regex'] ] ) ? filter_var( $rule[ $args['regex'] ], FILTER_VALIDATE_BOOLEAN ) : false;
+		$menu_order 	= ! empty( $rule[ $args['order'] ] ) ? $rule[ $args['order'] ] : 0;
 
 		// import
-		$id = srm_create_redirect( $redirect_from, $redirect_to, $status_code, $regex );
+		$id = srm_create_redirect( $redirect_from, $redirect_to, $status_code, $regex, 'publish', $menu_order );
 
 		if ( is_wp_error( $id ) ) {
 			$doing_wp_cli && WP_CLI::warning( $id );
