@@ -31,6 +31,7 @@ function srm_get_redirects( $args = array(), $hard = false ) {
 				'paged'          => $i,
 				'fields'         => 'ids',
 				'orderby'        => 'menu_order',
+				'order'          => 'ASC',
 			);
 
 			$query_args = array_merge( $defaults, $args );
@@ -322,7 +323,7 @@ function srm_import_file( $file, $args ) {
 		$redirect_to   = srm_sanitize_redirect_to( $rule[ $args['target'] ] );
 		$status_code   = ! empty( $rule[ $args['code'] ] ) ? $rule[ $args['code'] ] : 302;
 		$regex         = ! empty( $rule[ $args['regex'] ] ) ? filter_var( $rule[ $args['regex'] ], FILTER_VALIDATE_BOOLEAN ) : false;
-		$menu_order 	= ! empty( $rule[ $args['order'] ] ) ? $rule[ $args['order'] ] : 0;
+		$menu_order 	 = ! empty( $rule[ $args['order'] ] ) ? $rule[ $args['order'] ] : 0;
 
 		// import
 		$id = srm_create_redirect( $redirect_from, $redirect_to, $status_code, $regex, 'publish', $menu_order );
