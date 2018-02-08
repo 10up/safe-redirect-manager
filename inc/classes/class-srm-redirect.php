@@ -57,7 +57,7 @@ class SRM_Redirect {
 		}
 
 		// get requested path and add a / before it
-		$requested_path = esc_url_raw( $_SERVER['REQUEST_URI'] );
+		$requested_path = esc_url_raw( parse_url( $_SERVER['REQUEST_URI'], PHP_URL_PATH ) );
 		$requested_path = untrailingslashit( stripslashes( $requested_path ) );
 
 		/**
