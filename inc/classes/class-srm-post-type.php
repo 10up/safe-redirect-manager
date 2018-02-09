@@ -161,7 +161,7 @@ class SRM_Post_Type {
 		if ( ! empty( $s ) ) {
 			preg_match_all( '/".*?("|$)|((?<=[\\s",+])|^)[^\\s",+]+/', stripslashes( $s ), $matches );
 			$search_terms = array_map( function( $a ) {
-				return trim( $a, "\\"'\\n\\r " );
+				return trim( $a, "\\\"'\\n\\r " );
 			}, $matches[0] );
 		}
 		return $search_terms;
