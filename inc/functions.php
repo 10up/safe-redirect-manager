@@ -30,7 +30,7 @@ function srm_get_redirects( $args = array(), $hard = false ) {
 				'post_status'    => 'publish',
 				'paged'          => $i,
 				'fields'         => 'ids',
-				'orderby'        => 'menu_order',
+				'orderby'        => 'menu_order ID',
 				'order'          => 'ASC',
 			);
 
