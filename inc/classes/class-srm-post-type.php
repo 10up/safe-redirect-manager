@@ -239,12 +239,13 @@ class SRM_Post_Type {
 					</div>
 				<?php
 				}
-			} if ( srm_max_redirects_reached() ) {
+			}
+			if ( srm_max_redirects_reached() ) {
+
+				if ( 'post-new.php' === $hook_suffix ) {
+					?><style type="text/css">#post { display: none; }</style><?php
+				}
 				?>
-				<?php
-				if ( 'post-new.php' === $hook_suffix ) :
-?>
-<style type="text/css">#post { display: none; }</style><?php endif; ?>
 				<div class="error">
 					<p><?php esc_html_e( 'Safe Redirect Manager Error: You have reached the maximum allowable number of redirects', 'safe-redirect-manager' ); ?></p>
 				</div>
@@ -452,17 +453,17 @@ class SRM_Post_Type {
 
 		$redirect_capability = 'srm_manage_redirects';
 
-        $roles = array( 'administrator' );
+		$roles = array( 'administrator' );
 
-        foreach ( $roles as $role ) {
+		foreach ( $roles as $role ) {
 			$role = get_role( $role );
 
 			if ( empty( $role ) || $role->has_cap( $redirect_capability ) ) {
 				continue;
 			}
 
-            $role->add_cap( $redirect_capability );
-        }
+            	$role->add_cap( $redirect_capability );
+		}
 
 		$redirect_capability = apply_filters( 'srm_restrict_to_capability', $redirect_capability );
 
