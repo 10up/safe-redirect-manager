@@ -160,11 +160,13 @@ class SRM_Post_Type {
 
 		if ( ! empty( $s ) ) {
 			preg_match_all( '/".*?("|$)|((?<=[\\s",+])|^)[^\\s",+]+/', stripslashes( $s ), $matches );
-			$search_terms = array_map( function( $a ) {
-				return trim( $a, "\\\"'\\n\\r " );
-			}, $matches[0] );
+			$search_terms = array_map( array( 'SRM_Post_Type', 'clean_search_term' ), $matches[0] );
 		}
 		return $search_terms;
+	}
+
+	public static function clean_search_term( $a ) {
+		return trim( $a, "\\\"'\\n\\r " );
 	}
 
 	/**
