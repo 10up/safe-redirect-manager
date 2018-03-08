@@ -192,4 +192,3 @@ class SRM_Redirect {
 	}
 }
 
-SRM_Redirect::factory();

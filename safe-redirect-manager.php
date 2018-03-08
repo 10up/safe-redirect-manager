@@ -29,4 +29,8 @@ require_once( dirname( __FILE__ ) . '/inc/classes/class-srm-redirect.php' );
 
 if ( defined( 'WP_CLI' ) && WP_CLI ) {
 	require_once( dirname( __FILE__ ) . '/inc/classes/class-srm-wp-cli.php' );
+	WP_CLI::add_command( 'safe-redirect-manager', 'SRM_WP_CLI' );
 }
+
+SRM_Post_Type::factory();
+SRM_Redirect::factory();

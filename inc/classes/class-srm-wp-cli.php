@@ -248,5 +248,3 @@ class SRM_WP_CLI extends WP_CLI_Command {
 		WP_CLI::success( "All done! {$created} redirects were imported, {$skipped} were skipped" );
 	}
 }
-
-WP_CLI::add_command( 'safe-redirect-manager', 'SRM_WP_CLI' );
