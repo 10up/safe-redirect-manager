@@ -462,7 +462,7 @@ class SRM_Post_Type {
 				continue;
 			}
 
-            	$role->add_cap( $redirect_capability );
+			$role->add_cap( $redirect_capability );
 		}
 
 		$redirect_capability = apply_filters( 'srm_restrict_to_capability', $redirect_capability );
