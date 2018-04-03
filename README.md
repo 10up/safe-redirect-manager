@@ -3,6 +3,10 @@ Safe Redirect Manager [![Build Status](https://travis-ci.org/10up/safe-redirect-
 
 A WordPress plugin to safely and easily manage your website's HTTP redirects.
 
+<p align="center">
+<a href="http://10up.com/contact/"><img src="https://10updotcom-wpengine.s3.amazonaws.com/uploads/2016/10/10up-Github-Banner.png" width="850"></a>
+</p>
+
 ## Purpose
 
 Easily and safely manage your site's redirects the WordPress way. There are many redirect plugins available. Most of
