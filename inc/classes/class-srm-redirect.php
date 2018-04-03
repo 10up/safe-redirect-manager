@@ -57,7 +57,7 @@ class SRM_Redirect {
 		}
 
 		// get requested path and add a / before it
-		$requested_path = esc_url_raw( $_SERVER['REQUEST_URI'] );
+		$requested_path = esc_url_raw( apply_filters( 'srm_requested_path', $_SERVER['REQUEST_URI'] ) );
 		$requested_path = untrailingslashit( stripslashes( $requested_path ) );
 
 		/**
@@ -151,7 +151,7 @@ class SRM_Redirect {
 					$redirect_to = preg_replace( '@' . $redirect_from . '@' . $regex_flag, $redirect_to, $requested_path );
 				}
 
-				$sanitized_redirect_to = esc_url_raw( $redirect_to );
+				$sanitized_redirect_to = esc_url_raw( apply_filters( 'srm_redirect_to', $redirect_to ) );
 
 				do_action( 'srm_do_redirect', $requested_path, $sanitized_redirect_to, $status_code );
 
