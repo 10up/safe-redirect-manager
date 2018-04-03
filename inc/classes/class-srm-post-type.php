@@ -27,6 +27,7 @@ class SRM_Post_Type {
 		add_action( 'init', array( $this, 'action_register_post_types' ) );
 		add_action( 'save_post', array( $this, 'action_save_post' ) );
 		add_filter( 'manage_redirect_rule_posts_columns', array( $this, 'filter_redirect_columns' ) );
+		add_filter( 'manage_edit-redirect_rule_sortable_columns', array( $this, 'filter_redirect_sortable_columns' ) );
 		add_action( 'manage_redirect_rule_posts_custom_column', array( $this, 'action_custom_redirect_columns' ), 10, 2 );
 		add_action( 'transition_post_status', array( $this, 'action_transition_post_status' ), 10, 3 );
 		add_filter( 'post_updated_messages', array( $this, 'filter_redirect_updated_messages' ) );
@@ -352,7 +353,10 @@ class SRM_Post_Type {
 			echo esc_html( get_post_meta( $post_id, '_redirect_rule_to', true ) );
 		} elseif ( 'srm_redirect_rule_status_code' === $column ) {
 			echo absint( get_post_meta( $post_id, '_redirect_rule_status_code', true ) );
-		}
+		} elseif ( 'menu_order' == $column ) {
+			global $post;
+			echo $post->menu_order;
+ 		}
 	}
 
 	/**
@@ -365,6 +369,7 @@ class SRM_Post_Type {
 	public function filter_redirect_columns( $columns ) {
 		$columns['srm_redirect_rule_to']          = esc_html__( 'Redirect To', 'safe-redirect-manager' );
 		$columns['srm_redirect_rule_status_code'] = esc_html__( 'HTTP Status Code', 'safe-redirect-manager' );
+		$columns[ 'menu_order'] 									= esc_html__( 'Order', 'safe-redirect-manager' );
 
 		// Change the title column
 		$columns['title'] = esc_html__( 'Redirect From', 'safe-redirect-manager' );
@@ -373,6 +378,17 @@ class SRM_Post_Type {
 		unset( $columns['date'] );
 		$columns['date'] = esc_html__( 'Date', 'safe-redirect-manager' );
 
+		return $columns;
+	}
+
+	/**
+	 * Allow menu_order column to be sortable.
+	 *
+	 * @param $columns
+	 * @return mixed
+	 */
+	public function filter_redirect_sortable_columns( $columns ) {
+		$columns['menu_order'] = 'menu_order';
 		return $columns;
 	}
 
@@ -498,7 +514,7 @@ class SRM_Post_Type {
 			'hierarchical'         => false,
 			'register_meta_box_cb' => array( $this, 'action_redirect_rule_metabox' ),
 			'menu_position'        => 80,
-			'supports'             => array( '' ),
+			'supports'             => array( 'page-attributes' ),
 		);
 		register_post_type( 'redirect_rule', $redirect_args );
 	}

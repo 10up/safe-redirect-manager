@@ -189,12 +189,12 @@ class SRM_WP_CLI extends WP_CLI_Command {
 	 * redirection from and to URLs, regex flag and HTTP redirection code. Here
 	 * is example table:
 	 *
-	 * | source                     | target             | regex | code |
-	 * |----------------------------|--------------------|-------|------|
-	 * | /legacy-url                | /new-url           | 0     | 301  |
-	 * | /category-1                | /new-category-slug | 0     | 302  |
-	 * | /tes?t/[0-9]+/path/[^/]+/? | /go/here           | 1     | 302  |
-	 * | ...                        | ...                | ...   | ...  |
+	 * | source                     | target             | regex | code | order |
+	 * |----------------------------|--------------------|-------|------|-------|
+	 * | /legacy-url                | /new-url           | 0     | 301  | 0     |
+	 * | /category-1                | /new-category-slug | 0     | 302  | 1     |
+	 * | /tes?t/[0-9]+/path/[^/]+/? | /go/here           | 1     | 302  | 3     |
+	 * | ...                        | ...                | ...   | ...  | ...   |
 	 *
 	 * You can also use exported redirects from "Redirection" plugin, which you
 	 * can download here: /wp-admin/tools.php?page=redirection.php&sub=modules
@@ -211,11 +211,15 @@ class SRM_WP_CLI extends WP_CLI_Command {
 	 * <code-column>
 	 * : Header title for code column mapping.
 	 *
+	 * <order-column>
+	 * : Header title for order column mapping.
+	 *
+	 *
 	 * ## EXAMPLE
 	 *
 	 *     wp safe-redirect-manager import redirections.csv
 	 *
-	 * @synopsis <file> [--source=<source-column>] [--target=<target-column>] [--regex=<regex-column>] [--code=<code-column>]
+	 * @synopsis <file> [--source=<source-column>] [--target=<target-column>] [--regex=<regex-column>] [--code=<code-column>]  [--order=<order-column>]
 	 *
 	 * @since 1.7.6
 	 *
