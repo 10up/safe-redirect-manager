@@ -160,9 +160,13 @@ class SRM_Post_Type {
 
 		if ( ! empty( $s ) ) {
 			preg_match_all( '/".*?("|$)|((?<=[\\s",+])|^)[^\\s",+]+/', stripslashes( $s ), $matches );
-			$search_terms = array_map( create_function( '$a', 'return trim( $a, "\\"\'\\n\\r " );' ), $matches[0] );
+			$search_terms = array_map( array( 'SRM_Post_Type', 'clean_search_term' ), $matches[0] );
 		}
 		return $search_terms;
+	}
+
+	public static function clean_search_term( $a ) {
+		return trim( $a, "\\\"'\\n\\r " );
 	}
 
 	/**
@@ -235,12 +239,13 @@ class SRM_Post_Type {
 					</div>
 				<?php
 				}
-			} if ( srm_max_redirects_reached() ) {
+			}
+			if ( srm_max_redirects_reached() ) {
+
+				if ( 'post-new.php' === $hook_suffix ) {
+					?><style type="text/css">#post { display: none; }</style><?php
+				}
 				?>
-				<?php
-				if ( 'post-new.php' === $hook_suffix ) :
-?>
-<style type="text/css">#post { display: none; }</style><?php endif; ?>
 				<div class="error">
 					<p><?php esc_html_e( 'Safe Redirect Manager Error: You have reached the maximum allowable number of redirects', 'safe-redirect-manager' ); ?></p>
 				</div>
@@ -448,17 +453,17 @@ class SRM_Post_Type {
 
 		$redirect_capability = 'srm_manage_redirects';
 
-        $roles = array( 'administrator' );
+		$roles = array( 'administrator' );
 
-        foreach ( $roles as $role ) {
+		foreach ( $roles as $role ) {
 			$role = get_role( $role );
 
 			if ( empty( $role ) || $role->has_cap( $redirect_capability ) ) {
 				continue;
 			}
 
-            $role->add_cap( $redirect_capability );
-        }
+			$role->add_cap( $redirect_capability );
+		}
 
 		$redirect_capability = apply_filters( 'srm_restrict_to_capability', $redirect_capability );
 
