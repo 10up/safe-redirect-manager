@@ -602,4 +602,3 @@ class SRM_Post_Type {
 	}
 }
 
-SRM_Post_Type::factory();
