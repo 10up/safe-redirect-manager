@@ -4,7 +4,7 @@
  * Plugin URI: https://10up.com
  * Description: Easily and safely manage HTTP redirects.
  * Author: Taylor Lovett, 10up
- * Version: 1.8
+ * Version: 1.9
  * Text Domain: safe-redirect-manager
  * Domain Path: /lang/
  * Author URI: https://10up.com

@@ -19,6 +19,12 @@ Extract the zip file and just drop the contents in the wp-content/plugins/ direc
 
 == Changelog ==
 
+= 1.9 =
+* Add redirect notes feature.
+* Fix PHP 7.2 errors
+* Instantiate classes in main file instead of individual files for improved testability.
+* Add filters for request path and redirect path
+
 = 1.8 =
 * Improved escaping
 * Custom redirect capability
