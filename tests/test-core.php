@@ -474,11 +474,11 @@ class SRMTestCore extends WP_UnitTestCase {
 
 		$redirects = array(
 			// headers
-			array( 'http code', 'legacy url', 'new url', 'is_regex' ),
+			array( 'http code', 'legacy url', 'new url', 'is_regex', 'order' ),
 			// redirects
-			array( 302, '/some-url', '/new-url', 0 ),
-			array( 301, '/broken-url', '/fixed-url', 0 ),
-			array( 301, '/reg?ex/\d+/path', '/go/here', 1 ),
+			array( 302, '/some-url', '/new-url', 0, 0 ),
+			array( 301, '/broken-url', '/fixed-url', 0, 0 ),
+			array( 301, '/reg?ex/\d+/path', '/go/here', 1, 0 ),
 		);
 
 		foreach ( $redirects as $row ) {
@@ -493,6 +493,7 @@ class SRMTestCore extends WP_UnitTestCase {
 				'target' => 'new url',
 				'regex'  => 'is_regex',
 				'code'   => 'http code',
+				'order'  => 'order'
 			)
 		);
 
