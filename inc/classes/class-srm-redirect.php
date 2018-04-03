@@ -17,7 +17,16 @@ class SRM_Redirect {
 	 * @since 1.8
 	 */
 	public function setup() {
-		add_action( 'parse_request', array( $this, 'maybe_redirect' ), 0 );
+		/**
+		 * To only redirect on 404 pages, use:
+		 *   add_filter( 'srm_redirect_only_on_404', '__return_true' );
+		 *
+		 */
+		if ( apply_filters( 'srm_redirect_only_on_404', false ) ) {
+			add_action( 'template_redirect', array( $this, 'maybe_redirect' ), 0 );
+		} else {
+			add_action( 'parse_request', array( $this, 'maybe_redirect' ), 0 );
+		}
 	}
 
 	/**
@@ -44,8 +53,8 @@ class SRM_Redirect {
 	 */
 	public function maybe_redirect() {
 
-		// Don't redirect from wp-admin
-		if ( is_admin() ) {
+		// Don't redirect unless not on admin. If 404 filter enabled, require query is a 404.
+		if ( is_admin() || ( apply_filters( 'srm_redirect_only_on_404', false ) && ! is_404() ) ) {
 			return;
 		}
 
