@@ -3,7 +3,7 @@
  * Plugin Name: Safe Redirect Manager
  * Plugin URI: https://10up.com
  * Description: Easily and safely manage HTTP redirects.
- * Author: Taylor Lovett, 10up
+ * Author: 10up
  * Version: 1.9
  * Text Domain: safe-redirect-manager
  * Domain Path: /lang/
