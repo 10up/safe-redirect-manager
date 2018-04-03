@@ -418,6 +418,12 @@ class SRM_Post_Type {
 				delete_post_meta( $post_id, '_redirect_rule_status_code' );
 			}
 
+			if ( ! empty( $_POST['srm_redirect_rule_status_code'] ) ) {
+				update_post_meta( $post_id, '_redirect_rule_notes', sanitize_text_field( $_POST['srm_redirect_rule_notes'] ) );
+			} else {
+				delete_post_meta( $post_id, '_redirect_rule_notes' );
+			}
+
 			/**
 			 * This fixes an important bug where the redirect cache was not up-to-date. Previously the cache was only being
 			 * updated on transition_post_status which gets called BEFORE save post. But since save_post is where all the important
@@ -520,8 +526,9 @@ class SRM_Post_Type {
 		wp_nonce_field( 'srm-save-redirect-meta', 'srm_redirect_nonce' );
 
 		$redirect_from = get_post_meta( $post->ID, '_redirect_rule_from', true );
-		$redirect_to   = get_post_meta( $post->ID, '_redirect_rule_to', true );
-		$status_code   = get_post_meta( $post->ID, '_redirect_rule_status_code', true );
+		$redirect_to = get_post_meta( $post->ID, '_redirect_rule_to', true );
+		$redirect_notes  = get_post_meta( $post->ID, '_redirect_rule_notes', true );
+		$status_code = get_post_meta( $post->ID, '_redirect_rule_status_code', true );
 		$enable_regex  = get_post_meta( $post->ID, '_redirect_rule_from_regex', true );
 
 		if ( empty( $status_code ) ) {
@@ -529,7 +536,7 @@ class SRM_Post_Type {
 		}
 		?>
 		<p>
-			<label for="srm_redirect_rule_from"><?php esc_html_e( 'Redirect From:', 'safe-redirect-manager' ); ?></label><br />
+			<label for="srm_redirect_rule_from"><strong><?php esc_html_e( '* Redirect From:', 'safe-redirect-manager' ); ?></strong></label><br />
 			<input type="text" name="srm_redirect_rule_from" id="srm_redirect_rule_from" value="<?php echo esc_attr( $redirect_from ); ?>" />
 			<input type="checkbox" name="srm_redirect_rule_from_regex" id="srm_redirect_rule_from_regex" <?php checked( true, (bool) $enable_regex ); ?> value="1" />
 			<label for="srm_redirect_rule_from_regex"><?php esc_html_e( 'Enable Regular Expressions (advanced)', 'safe-redirect-manager' ); ?></label>
@@ -537,19 +544,25 @@ class SRM_Post_Type {
 		<p class="description"><?php esc_html_e( 'This path should be relative to the root of this WordPress installation (or the sub-site, if you are running a multi-site). Appending a (*) wildcard character will match all requests with the base. Warning: Enabling regular expressions will disable wildcards and completely change the way the * symbol is interpretted.', 'safe-redirect-manager' ); ?></p>
 
 		<p>
-			<label for="srm_redirect_rule_to"><?php esc_html_e( 'Redirect To:', 'safe-redirect-manager' ); ?></label><br />
+			<label for="srm_redirect_rule_to"><strong><?php esc_html_e( '* Redirect To:', 'safe-redirect-manager' ); ?></strong></label><br />
 			<input class="widefat" type="text" name="srm_redirect_rule_to" id="srm_redirect_rule_to" value="<?php echo esc_attr( $redirect_to ); ?>" />
 		</p>
 		<p class="description"><?php esc_html_e( 'This can be a URL or a path relative to the root of your website (not your WordPress installation). Ending with a (*) wildcard character will append the request match to the redirect.', 'safe-redirect-manager' ); ?></p>
 
 		<p>
-			<label for="srm_redirect_rule_status_code"><?php esc_html_e( 'HTTP Status Code:', 'safe-redirect-manager' ); ?></label>
+			<label for="srm_redirect_rule_status_code"><strong><?php esc_html_e( '* HTTP Status Code:', 'safe-redirect-manager' ); ?></strong></label>
 			<select name="srm_redirect_rule_status_code" id="srm_redirect_rule_status_code">
 				<?php foreach ( srm_get_valid_status_codes() as $code ) : ?>
 					<option value="<?php echo esc_attr( $code ); ?>" <?php selected( $status_code, $code ); ?>><?php echo esc_html( $code . ' ' . $this->status_code_labels[ $code ] ); ?></option>
 				<?php endforeach; ?>
 			</select>
 			<em><?php esc_html_e( "If you don't know what this is, leave it as is.", 'safe-redirect-manager' ); ?></em>
+		</p>
+
+		<p>
+			<label for="srm_redirect_rule_notes"><strong><?php esc_html_e( 'Notes:', 'safe-redirect-manager' ); ?></strong></label>
+			<textarea name="srm_redirect_rule_notes" id="srm_redirect_rule_notes" class="widefat"><?php echo esc_attr( $redirect_notes ); ?></textarea>
+			<em><?php esc_html_e( "Optionally leave notes on this redirect e.g. why was it created.", 'safe-redirect-manager' ); ?></em>
 		</p>
 	<?php
 	}
