@@ -24,6 +24,7 @@ Extract the zip file and just drop the contents in the wp-content/plugins/ direc
 * Fix PHP 7.2 errors
 * Instantiate classes in main file instead of individual files for improved testability.
 * Add filters for request path and redirect path
+* Add filter to only apply redirects on 404
 
 = 1.8 =
 * Improved escaping
