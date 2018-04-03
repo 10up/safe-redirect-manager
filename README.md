@@ -1,4 +1,4 @@
-Safe Redirect Manager [![Build Status](https://travis-ci.org/tlovett1/safe-redirect-manager.svg?branch=master)](https://travis-ci.org/tlovett1/safe-redirect-manager)
+Safe Redirect Manager [![Build Status](https://travis-ci.org/10up/safe-redirect-manager.svg?branch=master)](https://travis-ci.org/10up/safe-redirect-manager)
 ==============
 
 A WordPress plugin to safely and easily manage your website's HTTP redirects.
@@ -15,7 +15,7 @@ WordPress mantra, decisions not options. Actions in filters make the plugin very
 ## Installation
 
 Install the plugin in WordPress. You can download a
-[zip via Github](https://github.com/tlovett1/safe-redirect-manager/archive/master.zip) and upload it using the WP
+[zip via Github](https://github.com/10up/safe-redirect-manager/archive/master.zip) and upload it using the WP
 plugin uploader.
 
 ## Non-English Usage
@@ -74,7 +74,7 @@ Follow the configuration instructions above to setup the plugin. I recommend dev
 environment such as [WP Local Docker](https://github.com/10up/wp-local-docker).
 
 #### Translation
-Safe Redirect Manager has a [.pot file](https://github.com/tlovett1/Safe-Redirect-Manager/blob/master/lang/safe-redirect-manager.pot)
+Safe Redirect Manager has a [.pot file](https://github.com/10up/Safe-Redirect-Manager/blob/master/lang/safe-redirect-manager.pot)
 containing strings ready for translation.
 
 #### Testing
@@ -92,4 +92,4 @@ phpunit
 
 #### Issues
 If you identify any errors or have an idea for improving the plugin, please
-[open an issue](https://github.com/tlovett1/safe-redirect-manager/issues?state=open).
+[open an issue](https://github.com/10up/safe-redirect-manager/issues?state=open).
