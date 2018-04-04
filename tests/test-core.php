@@ -493,7 +493,7 @@ class SRMTestCore extends WP_UnitTestCase {
 				'target' => 'new url',
 				'regex'  => 'is_regex',
 				'code'   => 'http code',
-				'order'  => 'order'
+				'order'  => 'order',
 			)
 		);
 

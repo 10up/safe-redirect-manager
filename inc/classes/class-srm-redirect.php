@@ -20,7 +20,6 @@ class SRM_Redirect {
 		/**
 		 * To only redirect on 404 pages, use:
 		 *   add_filter( 'srm_redirect_only_on_404', '__return_true' );
-		 *
 		 */
 		if ( apply_filters( 'srm_redirect_only_on_404', false ) ) {
 			add_action( 'template_redirect', array( $this, 'maybe_redirect' ), 0 );
