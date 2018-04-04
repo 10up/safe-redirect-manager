@@ -77,10 +77,6 @@ add_filter( 'my_srm_redirect_loop_filter', '__return_true' );
 Follow the configuration instructions above to setup the plugin. I recommend developing the plugin locally in an
 environment such as [WP Local Docker](https://github.com/10up/wp-local-docker).
 
-#### Translation
-Safe Redirect Manager has a [.pot file](https://github.com/10up/Safe-Redirect-Manager/blob/master/lang/safe-redirect-manager.pot)
-containing strings ready for translation.
-
 #### Testing
 Within the terminal change directories to the plugin folder. Initialize your unit testing environment by running the
 following command:
