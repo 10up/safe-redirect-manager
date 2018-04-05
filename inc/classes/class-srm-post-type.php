@@ -436,7 +436,7 @@ class SRM_Post_Type {
 				delete_post_meta( $post_id, '_redirect_rule_status_code' );
 			}
 
-			if ( ! empty( $_POST['srm_redirect_rule_status_code'] ) ) {
+			if ( ! empty( $_POST['srm_redirect_rule_notes'] ) ) {
 				update_post_meta( $post_id, '_redirect_rule_notes', sanitize_text_field( $_POST['srm_redirect_rule_notes'] ) );
 			} else {
 				delete_post_meta( $post_id, '_redirect_rule_notes' );
