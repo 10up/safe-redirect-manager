@@ -175,6 +175,57 @@ class SRMTestCore extends WP_UnitTestCase {
 	}
 
 	/**
+	 * Test handle empty wildcards.
+	 *
+	 * @since 1.9.3
+	 */
+	public function testHandleEmptyWildcard() {
+		$_SERVER['REQUEST_URI'] = '/one/';
+		$redirected             = false;
+		$redirect_to            = '/gohere/*';
+
+		// Create two redirects for testing.
+		srm_create_redirect( '/one/*', $redirect_to );
+		srm_create_redirect( '/two/', $redirect_to );
+
+		add_action(
+			'srm_do_redirect',
+			function( $requested_path, $redirected_to, $status_code ) use ( &$redirect_to, &$redirected ) {
+				if ( $redirected_to === '/gohere/' ) {
+					$redirected = true;
+				}
+			},
+			10,
+			3
+		);
+
+		SRM_Redirect::factory()->maybe_redirect();
+
+		$this->assertTrue( $redirected );
+
+		// Now test something that shouldn't redirect.
+		$_SERVER['REQUEST_URI'] = '/something-else/';
+		// Reset this back to false.
+		$redirected = false;
+
+		add_action(
+			'srm_do_redirect',
+			function( $requested_path, $redirected_to, $status_code ) use ( &$redirect_to, &$redirected ) {
+				// If this is called, it means that a redirect happened.
+				// For this bug, $redirected_to = '/gohere/*'
+				// but for this test, any redirect is an issue.
+				$redirected = true;
+			},
+			10,
+			3
+		);
+
+		SRM_Redirect::factory()->maybe_redirect();
+		// Redirected shouldn't happen.
+		$this->assertFalse( $redirected, 'Expected that /something-else/ would not cause a redirect.' );
+	}
+
+	/**
 	 * Test lots of permutations of URL trailing slashes with and without regex
 	 *
 	 * @since 1.7.3
@@ -199,7 +250,7 @@ class SRMTestCore extends WP_UnitTestCase {
 
 		SRM_Redirect::factory()->maybe_redirect();
 
-		$this->assertTrue( $redirected );
+		$this->assertTrue( $redirected, 'Expected that /one would cause a redirect when redirect_from is /one/.' );
 
 		$_SERVER['REQUEST_URI'] = '/one/';
 		$redirected             = false;
@@ -216,7 +267,7 @@ class SRMTestCore extends WP_UnitTestCase {
 
 		SRM_Redirect::factory()->maybe_redirect();
 
-		$this->assertTrue( $redirected );
+		$this->assertTrue( $redirected, 'Expected that /one/ would cause a redirect when redirect_from is /one.' );
 
 		$_SERVER['REQUEST_URI'] = '/one/two';
 		$redirected             = false;
@@ -233,7 +284,7 @@ class SRMTestCore extends WP_UnitTestCase {
 
 		SRM_Redirect::factory()->maybe_redirect();
 
-		$this->assertTrue( $redirected );
+		$this->assertTrue( $redirected, 'Expected that /one/two would cause a redirect when redirect_from is /one/two/.' );
 
 		$_SERVER['REQUEST_URI'] = '/one/two/';
 		$redirected             = false;
@@ -250,7 +301,7 @@ class SRMTestCore extends WP_UnitTestCase {
 
 		SRM_Redirect::factory()->maybe_redirect();
 
-		$this->assertTrue( $redirected );
+		$this->assertTrue( $redirected, 'Expected that /one/two/ would cause a redirect when redirect_from is /one/two.' );
 
 		/**
 		 * Now with regex
@@ -271,7 +322,7 @@ class SRMTestCore extends WP_UnitTestCase {
 
 		SRM_Redirect::factory()->maybe_redirect();
 
-		$this->assertTrue( $redirected );
+		$this->assertTrue( $redirected, 'Expected that /one/two would cause a redirect when redirect_from is /.*' );
 
 		$_SERVER['REQUEST_URI'] = '/one/two/';
 		$redirected             = false;
@@ -288,7 +339,7 @@ class SRMTestCore extends WP_UnitTestCase {
 
 		SRM_Redirect::factory()->maybe_redirect();
 
-		$this->assertTrue( $redirected );
+		$this->assertTrue( $redirected, 'Expected that /one/two/ would cause a redirect when redirect_from is /.*' );
 	}
 
 	/**

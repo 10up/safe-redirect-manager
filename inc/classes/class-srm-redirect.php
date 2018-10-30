@@ -71,7 +71,7 @@ class SRM_Redirect {
 
 		// get requested path and add a / before it
 		$requested_path = esc_url_raw( apply_filters( 'srm_requested_path', $_SERVER['REQUEST_URI'] ) );
-		$requested_path = untrailingslashit( stripslashes( $requested_path ) );
+		$requested_path = stripslashes( $requested_path );
 
 		/**
 		 * If WordPress resides in a directory that is not the public root, we have to chop
@@ -141,6 +141,17 @@ class SRM_Redirect {
 					if ( ( strrpos( $redirect_to, '*' ) === strlen( $redirect_to ) - 1 ) ) {
 						$redirect_to = rtrim( $redirect_to, '*' ) . ltrim( substr( $requested_path, strlen( $wildcard_base ) ), '/' );
 					}
+				} elseif (
+					// Handle the case of no trailing slashes on redirect from and redirect to, when
+					// requested URL contains the trailingslash.
+					! $matched_path
+					// Check last character in requested URL is a slash.
+					&& strrpos( $normalized_requested_path, '/' ) === strlen( $normalized_requested_path ) - 1
+					// Check that unslashes requested URL exactly matches redirect from.
+					&& untrailingslashit( $normalized_requested_path ) === $redirect_from
+				) {
+					$redirect_to = untrailingslashit( $redirect_to );
+					$matched_path = true;
 				}
 			}
 
