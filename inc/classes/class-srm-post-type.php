@@ -9,6 +9,8 @@ class SRM_Post_Type {
 
 	private $whitelist_hosts = array();
 
+	private $redirect_search_term;
+
 	/**
 	 * Sets up redirect manager
 	 *
@@ -25,6 +27,7 @@ class SRM_Post_Type {
 		);
 
 		add_action( 'init', array( $this, 'action_register_post_types' ) );
+		add_action( 'admin_init', array( $this, 'init_search_filters' ) );
 		add_action( 'save_post', array( $this, 'action_save_post' ) );
 		add_filter( 'manage_redirect_rule_posts_columns', array( $this, 'filter_redirect_columns' ) );
 		add_filter( 'manage_edit-redirect_rule_sortable_columns', array( $this, 'filter_redirect_sortable_columns' ) );
@@ -39,11 +42,22 @@ class SRM_Post_Type {
 		add_action( 'admin_print_styles-post-new.php', array( $this, 'action_print_logo_css' ), 10, 1 );
 		add_filter( 'post_type_link', array( $this, 'filter_post_type_link' ), 10, 2 );
 		add_filter( 'default_hidden_columns', array( $this, 'filter_hidden_columns' ), 10, 1 );
+	}
 
-		// Search filters
-		add_filter( 'posts_join', array( $this, 'filter_search_join' ) );
-		add_filter( 'posts_where', array( $this, 'filter_search_where' ) );
-		add_filter( 'posts_distinct', array( $this, 'filter_search_distinct' ) );
+	public function init_search_filters() {
+		$redirect_capability = $this->get_redirect_capability();
+
+		if ( ! is_admin() ) {
+			return;
+		}
+
+		if ( ! current_user_can( $redirect_capability ) ) {
+			return;
+		}
+
+		add_action( 'pre_get_posts', array( $this, 'disable_core_search' ) );
+		add_filter( 'posts_clauses', array( $this, 'filter_search_clauses' ), 10, 2 );
+
 		add_filter( 'post_row_actions', array( $this, 'filter_disable_quick_edit' ), 10, 2 );
 	}
 
@@ -82,91 +96,51 @@ class SRM_Post_Type {
 		return $actions;
 	}
 
-	/**
-	 * Join posts table with postmeta table on search
-	 *
-	 * @since 1.2
-	 * @param string $join
-	 * @uses get_query_var
-	 * @return string
-	 */
-	public function filter_search_join( $join ) {
-		global $wp_query;
-
-		if ( empty( $wp_query ) || 'redirect_rule' !== get_query_var( 'post_type' ) ) {
-			return $join;
+	// We don't need core's fancy search functionality since we provide our own.
+	public function disable_core_search( $query ) {
+		if ( $query->is_search() && 'redirect_rule' === $query->get( 'post_type' ) ) {
+			// Store a reference to the search term for later use.
+			$this->redirect_search_term = $query->get( 's' );
+			// Don't let core build it's search clauses since we override them.
+			$query->set( 's', '' );
 		}
+	}
 
+	// Build custom JOIN + WHERE clauses to do a more direct search through meta.
+	function filter_search_clauses( $clauses, $query ) {
 		global $wpdb;
 
-		$s = get_query_var( 's' );
-		if ( ! empty( $s ) ) {
-			$join .= " LEFT JOIN $wpdb->postmeta AS m ON ($wpdb->posts.ID = m.post_id) ";
-		}
-		return $join;
-	}
+		if ( $this->redirect_search_term ) {
+			$search_term = $this->redirect_search_term;
+			$search_term_like = '%' . $wpdb->esc_like( $search_term ) . '%';
 
-	/**
-	 * Return distinct search results
-	 *
-	 * @since 1.2
-	 * @param string $distinct
-	 * @uses get_query_var
-	 * @return string
-	 */
-	public function filter_search_distinct( $distinct ) {
-		global $wp_query;
+			$query->set( 's', $this->redirect_search_term );
+			unset( $this->redirect_search_term );
 
-		if ( empty( $wp_query ) || 'redirect_rule' !== get_query_var( 'post_type' ) ) {
-			return $distinct;
-		}
+			$clauses['distinct'] = 'DISTINCT';
 
-		return 'DISTINCT';
-	}
+			$clauses['join'] .= " LEFT JOIN $wpdb->postmeta AS pm ON ($wpdb->posts.ID = pm.post_id) ";
 
-	/**
-	 * Join posts table with postmeta table on search
-	 *
-	 * @since 1.2
-	 * @param string $where
-	 * @uses is_search, get_query_var
-	 * @return string
-	 */
-	public function filter_search_where( $where ) {
-		global $wp_query;
-
-		if ( empty( $wp_query ) || 'redirect_rule' !== get_query_var( 'post_type' ) || ! is_search() || empty( $where ) ) {
-			return $where;
+			$clauses['where'] = $wpdb->prepare(
+				"AND (
+					(
+						pm.meta_value LIKE %s
+						AND pm.meta_key = '_redirect_rule_from'
+					) OR (
+						pm.meta_value LIKE %s
+						AND pm.meta_key = '_redirect_rule_to'
+					)
+				)
+				AND $wpdb->posts.post_type = 'redirect_rule'
+				AND $wpdb->posts.post_status IN ( 'publish', 'future', 'draft', 'pending' )
+				",
+				$search_term_like,
+				$search_term_like
+			);
 		}
 
-		$terms = $this->get_search_terms();
-
-		if ( empty( $terms ) ) {
-			return $where;
-		}
-
-		$exact = get_query_var( 'exact' );
-		$n     = ( ! empty( $exact ) ) ? '' : '%';
-
-		$search    = '';
-		$seperator = '';
-		$search   .= '(';
-
-		// we check the meta values against each term in the search
-		foreach ( $terms as $term ) {
-			$search .= $seperator;
-			// Used esc_sql instead of wpdb->prepare since wpdb->prepare wraps things in quotes
-			$search .= sprintf( "( ( m.meta_value LIKE '%s%s%s' AND m.meta_key = '%s') OR ( m.meta_value LIKE '%s%s%s' AND m.meta_key = '%s') )", $n, esc_sql( $term ), $n, esc_sql( '_redirect_rule_from' ), $n, esc_sql( $term ), $n, esc_sql( '_redirect_rule_to' ) );
-
-			$seperator = ' OR ';
-		}
-
-		$search .= ')';
-
-		$where = preg_replace( '/\(\(\(.*?\)\)\)/is', '((' . $search . '))', $where );
-
-		return $where;
-	}
+		return $clauses;
+}
 
 	/**
 	 * Get an array of search terms
@@ -472,6 +446,29 @@ class SRM_Post_Type {
 	}
 
 	/**
+	 * Get required capability for managing redirects
+	 *
+	 * @return string
+	 */
+	protected function get_redirect_capability() {
+		$redirect_capability = 'srm_manage_redirects';
+
+		$roles = array( 'administrator' );
+
+		foreach ( $roles as $role ) {
+			$role = get_role( $role );
+
+			if ( empty( $role ) || $role->has_cap( $redirect_capability ) ) {
+				continue;
+			}
+
+			$role->add_cap( $redirect_capability );
+		}
+
+		return apply_filters( 'srm_restrict_to_capability', $redirect_capability );
+	}
+
+	/**
 	 * Registers post types for plugin
 	 *
 	 * @since 1.0
@@ -495,21 +492,7 @@ class SRM_Post_Type {
 			'menu_name'          => esc_html__( 'Safe Redirect Manager', 'safe-redirect-manager' ),
 		);
 
-		$redirect_capability = 'srm_manage_redirects';
-
-		$roles = array( 'administrator' );
-
-		foreach ( $roles as $role ) {
-			$role = get_role( $role );
-
-			if ( empty( $role ) || $role->has_cap( $redirect_capability ) ) {
-				continue;
-			}
-
-			$role->add_cap( $redirect_capability );
-		}
-
-		$redirect_capability = apply_filters( 'srm_restrict_to_capability', $redirect_capability );
+		$redirect_capability = $this->get_redirect_capability();
 
 		$capabilities = array(
 			'edit_post'          => $redirect_capability,
@@ -657,4 +640,3 @@ class SRM_Post_Type {
 		return $instance;
 	}
 }
-
