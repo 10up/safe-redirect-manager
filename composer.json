@@ -9,7 +9,8 @@
     }
   ],
   "require-dev": {
-    "phpunit/phpunit": "^6.5"
+    "phpunit/phpunit": "~5.7",
+    "10up/phpcs-composer": "dev-master"
   },
   "scripts": {
     "lint": [
@@ -18,8 +19,5 @@
     "lint-fix": [
       "phpcbf ."
     ]
-  },
-  "require": {
-    "10up/phpcs-composer": "dev-master"
   }
 }
