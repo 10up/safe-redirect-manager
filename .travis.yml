@@ -2,20 +2,6 @@ sudo: false
 
 language: php
 
-notifications:
-  email:
-    on_success: never
-    on_failure: change
-
-branches:
-  only:
-    - master
-
-cache:
-  directories:
-    - vendor
-    - $HOME/.composer/cache
-
 matrix:
   include:
     - php: 7.1
