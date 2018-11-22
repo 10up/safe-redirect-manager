@@ -50,7 +50,4 @@ script:
       phpunit
       WP_MULTISITE=1 phpunit
     fi
-  - |
-    if [[ "$WP_TRAVISCI" == "phpcs" ]] ; then
-      phpcs --standard=phpcs.ruleset.xml $(find . -name '*.php')
-    fi
+  - composer run-script lint

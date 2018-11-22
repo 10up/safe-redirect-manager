@@ -1,8 +1,13 @@
 <?php
 /**
- * Setup SRM WP CLI commands
+ * Setup SRM WP CLI commands.
+ *
+ * @package safe-redirect-manager
  */
 
+/**
+ * WP CLI command class
+ */
 class SRM_WP_CLI extends WP_CLI_Command {
 
 
@@ -11,7 +16,7 @@ class SRM_WP_CLI extends WP_CLI_Command {
 	 *
 	 * @subcommand list
 	 */
-	public function _list() {
+	public function list() {
 		$fields = array(
 			'ID',
 			'redirect_from',
@@ -47,6 +52,7 @@ class SRM_WP_CLI extends WP_CLI_Command {
 	/**
 	 * Create a redirect
 	 *
+	 * @param array $args Array of arguments
 	 * @subcommand create
 	 * @synopsis <from> <to> [<status-code>] [<enable-regex>] [<post-status>]
 	 */
@@ -87,6 +93,7 @@ class SRM_WP_CLI extends WP_CLI_Command {
 	/**
 	 * Delete a redirect
 	 *
+	 * @param array $args Array of arguments
 	 * @subcommand delete
 	 * @synopsis <id>
 	 */
@@ -119,6 +126,8 @@ class SRM_WP_CLI extends WP_CLI_Command {
 	/**
 	 * Import .htaccess file redirects
 	 *
+	 * @param array $args Array of arguments
+	 * @param array $assoc_args Array of associate arguments
 	 * @subcommand import-htaccess
 	 * @synopsis <file>
 	 */
@@ -229,7 +238,8 @@ class SRM_WP_CLI extends WP_CLI_Command {
 	 */
 	public function import( $args, $assoc_args ) {
 		$mapping = wp_parse_args(
-			$assoc_args, array(
+			$assoc_args,
+			array(
 				'source' => 'source',
 				'target' => 'target',
 				'regex'  => 'regex',
@@ -237,7 +247,8 @@ class SRM_WP_CLI extends WP_CLI_Command {
 			)
 		);
 
-		$created = $skipped = 0;
+		$created = 0;
+		$skipped = 0;
 
 		foreach ( $args as $file ) {
 			$processed = srm_import_file( $file, $mapping );

@@ -1,4 +1,9 @@
 <?php
+/**
+ * Test core plugin functionality
+ *
+ * @package safe-redirect-manager
+ */
 
 class SRMTestCore extends WP_UnitTestCase {
 

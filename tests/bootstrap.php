@@ -2,7 +2,7 @@
 /**
  * PHPUnit bootstrap file
  *
- * @package Safe_Redirect_Manager
+ * @package safe-redirect-manager
  */
 
 $_tests_dir = getenv( 'WP_TESTS_DIR' );
