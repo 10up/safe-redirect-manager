@@ -2,114 +2,114 @@
 # This file is distributed under the GPLv2 or later.
 msgid ""
 msgstr ""
-"Project-Id-Version: Safe Redirect Manager 1.9\n"
+"Project-Id-Version: Safe Redirect Manager 1.9.1\n"
 "Report-Msgid-Bugs-To: "
 "https://wordpress.org/support/plugin/safe-redirect-manager\n"
-"POT-Creation-Date: 2018-04-04 03:26:38+00:00\n"
+"POT-Creation-Date: 2018-11-22 02:09:56+00:00\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "PO-Revision-Date: 2018-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
-"X-Generator: node-wp-i18n 1.0.5\n"
+"X-Generator: node-wp-i18n 1.2.1\n"
 
-#: inc/classes/class-srm-post-type.php:19
+#: inc/classes/class-srm-post-type.php:34
 msgid "Moved Permanently"
 msgstr ""
 
-#: inc/classes/class-srm-post-type.php:20
+#: inc/classes/class-srm-post-type.php:35
 msgid "Found"
 msgstr ""
 
-#: inc/classes/class-srm-post-type.php:21
+#: inc/classes/class-srm-post-type.php:36
 msgid "See Other"
 msgstr ""
 
-#: inc/classes/class-srm-post-type.php:22
+#: inc/classes/class-srm-post-type.php:37
 msgid "Temporary Redirect"
 msgstr ""
 
-#: inc/classes/class-srm-post-type.php:23
+#: inc/classes/class-srm-post-type.php:38
 msgid "Forbidden"
 msgstr ""
 
-#: inc/classes/class-srm-post-type.php:24
+#: inc/classes/class-srm-post-type.php:39
 msgid "Not Found"
 msgstr ""
 
-#: inc/classes/class-srm-post-type.php:258
+#: inc/classes/class-srm-post-type.php:237
 msgid ""
 "Safe Redirect Manager Warning: Possible redirect loops and/or chains have "
 "been created."
 msgstr ""
 
-#: inc/classes/class-srm-post-type.php:270
+#: inc/classes/class-srm-post-type.php:251
 msgid ""
 "Safe Redirect Manager Error: You have reached the maximum allowable number "
 "of redirects"
 msgstr ""
 
-#: inc/classes/class-srm-post-type.php:321
-#: inc/classes/class-srm-post-type.php:324
+#: inc/classes/class-srm-post-type.php:302
+#: inc/classes/class-srm-post-type.php:305
 msgid "Redirect rule updated."
 msgstr ""
 
-#: inc/classes/class-srm-post-type.php:322
+#: inc/classes/class-srm-post-type.php:303
 msgid "Custom field updated."
 msgstr ""
 
-#: inc/classes/class-srm-post-type.php:323
+#: inc/classes/class-srm-post-type.php:304
 msgid "Custom field deleted."
 msgstr ""
 
-#: inc/classes/class-srm-post-type.php:326
+#: inc/classes/class-srm-post-type.php:307
 #. translators: %s: date and time of the revision
 msgid "Redirect rule restored to revision from %s"
 msgstr ""
 
-#: inc/classes/class-srm-post-type.php:327
+#: inc/classes/class-srm-post-type.php:308
 msgid "Redirect rule published."
 msgstr ""
 
-#: inc/classes/class-srm-post-type.php:328
+#: inc/classes/class-srm-post-type.php:309
 msgid "Redirect rule saved."
 msgstr ""
 
-#: inc/classes/class-srm-post-type.php:329
+#: inc/classes/class-srm-post-type.php:310
 msgid "Redirect rule submitted."
 msgstr ""
 
-#: inc/classes/class-srm-post-type.php:331
+#: inc/classes/class-srm-post-type.php:312
 msgid "Redirect rule scheduled for: %1$s."
 msgstr ""
 
-#: inc/classes/class-srm-post-type.php:333
+#: inc/classes/class-srm-post-type.php:314
 #. translators: Publish box date format, see http:php.net/date
 msgid "M j, Y @ G:i"
 msgstr ""
 
-#: inc/classes/class-srm-post-type.php:335
+#: inc/classes/class-srm-post-type.php:317
 msgid "Redirect rule draft updated."
 msgstr ""
 
-#: inc/classes/class-srm-post-type.php:389
+#: inc/classes/class-srm-post-type.php:371
 msgid "Redirect To"
 msgstr ""
 
-#: inc/classes/class-srm-post-type.php:390
+#: inc/classes/class-srm-post-type.php:372
 msgid "HTTP Status Code"
 msgstr ""
 
-#: inc/classes/class-srm-post-type.php:391
+#: inc/classes/class-srm-post-type.php:373
 msgid "Order"
 msgstr ""
 
-#: inc/classes/class-srm-post-type.php:394
+#: inc/classes/class-srm-post-type.php:376
 msgid "Redirect From"
 msgstr ""
 
-#: inc/classes/class-srm-post-type.php:398
+#: inc/classes/class-srm-post-type.php:380
 msgid "Date"
 msgstr ""
 
@@ -117,43 +117,43 @@ msgstr ""
 msgid "Safe Redirect Manager"
 msgstr ""
 
-#: inc/classes/class-srm-post-type.php:485
+#: inc/classes/class-srm-post-type.php:490
 msgid "Edit Redirect Rule"
 msgstr ""
 
-#: inc/classes/class-srm-post-type.php:486
+#: inc/classes/class-srm-post-type.php:491
 msgid "New Redirect Rule"
 msgstr ""
 
-#: inc/classes/class-srm-post-type.php:488
+#: inc/classes/class-srm-post-type.php:493
 msgid "View Redirect Rule"
 msgstr ""
 
-#: inc/classes/class-srm-post-type.php:489
+#: inc/classes/class-srm-post-type.php:494
 msgid "Search Redirects"
 msgstr ""
 
-#: inc/classes/class-srm-post-type.php:490
+#: inc/classes/class-srm-post-type.php:495
 msgid "No redirect rules found."
 msgstr ""
 
-#: inc/classes/class-srm-post-type.php:491
+#: inc/classes/class-srm-post-type.php:496
 msgid "No redirect rules found in trash."
 msgstr ""
 
-#: inc/classes/class-srm-post-type.php:550
+#: inc/classes/class-srm-post-type.php:541
 msgid "Redirect Settings"
 msgstr ""
 
-#: inc/classes/class-srm-post-type.php:575
+#: inc/classes/class-srm-post-type.php:566
 msgid "* Redirect From:"
 msgstr ""
 
-#: inc/classes/class-srm-post-type.php:578
+#: inc/classes/class-srm-post-type.php:569
 msgid "Enable Regular Expressions (advanced)"
 msgstr ""
 
-#: inc/classes/class-srm-post-type.php:580
+#: inc/classes/class-srm-post-type.php:571
 msgid ""
 "This path should be relative to the root of this WordPress installation (or "
 "the sub-site, if you are running a multi-site). Appending a (*) wildcard "
@@ -162,51 +162,51 @@ msgid ""
 "symbol is interpretted."
 msgstr ""
 
-#: inc/classes/class-srm-post-type.php:583
+#: inc/classes/class-srm-post-type.php:574
 msgid "* Redirect To:"
 msgstr ""
 
-#: inc/classes/class-srm-post-type.php:586
+#: inc/classes/class-srm-post-type.php:577
 msgid ""
 "This can be a URL or a path relative to the root of your website (not your "
 "WordPress installation). Ending with a (*) wildcard character will append "
 "the request match to the redirect."
 msgstr ""
 
-#: inc/classes/class-srm-post-type.php:589
+#: inc/classes/class-srm-post-type.php:580
 msgid "* HTTP Status Code:"
 msgstr ""
 
-#: inc/classes/class-srm-post-type.php:595
+#: inc/classes/class-srm-post-type.php:586
 msgid "If you don't know what this is, leave it as is."
 msgstr ""
 
-#: inc/classes/class-srm-post-type.php:599
+#: inc/classes/class-srm-post-type.php:590
 msgid "Notes:"
 msgstr ""
 
-#: inc/classes/class-srm-post-type.php:601
+#: inc/classes/class-srm-post-type.php:592
 msgid "Optionally leave notes on this redirect e.g. why was it created."
 msgstr ""
 
-#: inc/functions.php:176
+#: inc/functions.php:193
 msgid "Redirect from and/or redirect to arguments are invalid."
 msgstr ""
 
-#: inc/functions.php:180
+#: inc/functions.php:197
 msgid "Invalid status code."
 msgstr ""
 
-#: inc/functions.php:185
+#: inc/functions.php:202
 msgid "Redirect already exists for %s"
 msgstr ""
 
-#: inc/functions.php:199
+#: inc/functions.php:216
 msgid "An error occurred creating the redirect."
 msgstr ""
 
-#. Author URI of the plugin/theme
-msgid "https://10up.com"
+#. Plugin URI of the plugin/theme
+msgid "https://wordpress.org/plugins/safe-redirect-manager"
 msgstr ""
 
 #. Description of the plugin/theme
@@ -217,17 +217,21 @@ msgstr ""
 msgid "10up"
 msgstr ""
 
-#: inc/classes/class-srm-post-type.php:481
+#. Author URI of the plugin/theme
+msgid "https://10up.com"
+msgstr ""
+
+#: inc/classes/class-srm-post-type.php:486
 msgctxt "post type general name"
 msgid "Safe Redirect Manager"
 msgstr ""
 
-#: inc/classes/class-srm-post-type.php:482
+#: inc/classes/class-srm-post-type.php:487
 msgctxt "post type singular name"
 msgid "Redirect"
 msgstr ""
 
-#: inc/classes/class-srm-post-type.php:483
+#: inc/classes/class-srm-post-type.php:488
 msgctxt "redirect rule"
 msgid "Create Redirect Rule"
 msgstr ""
