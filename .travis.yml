@@ -6,8 +6,6 @@ matrix:
   include:
     - php: 7.2
       env: WP_VERSION=latest
-    - php: 7.0
-      env: WP_VERSION=4.6
 
 before_script:
   - composer install
