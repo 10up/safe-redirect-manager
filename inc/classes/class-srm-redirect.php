@@ -1,8 +1,13 @@
 <?php
 /**
  * Handle redirection
+ *
+ * @package safe-redirect-manager
  */
 
+/**
+ * Redirect functionality class
+ */
 class SRM_Redirect {
 	/**
 	 * Store whitelisted host
@@ -32,7 +37,7 @@ class SRM_Redirect {
 	 * Apply whitelisted host to allowed_redirect_hosts filter
 	 *
 	 * @since 1.8
-	 * @param array $hosts
+	 * @param array $hosts Array of hosts
 	 * @return array
 	 */
 	public function filter_allowed_redirect_hosts( $hosts ) {

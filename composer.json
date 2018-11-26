@@ -1,14 +1,23 @@
 {
-    "name": "10up/safe-redirect-manager",
-    "type": "wordpress-plugin",
-    "description": "Easily and safely manage HTTP redirects.",
-    "authors": [
-        {
-            "name": "Taylor Lovett",
-            "email": "taylor.lovett@10up.com"
-        }
-    ],
-    "require-dev": {
-        "phpunit/phpunit": "^6.5"
+  "name": "10up/safe-redirect-manager",
+  "type": "wordpress-plugin",
+  "description": "Easily and safely manage HTTP redirects.",
+  "authors": [
+    {
+      "name": "Taylor Lovett",
+      "email": "taylor.lovett@10up.com"
     }
+  ],
+  "require-dev": {
+    "phpunit/phpunit": "~6.1",
+    "10up/phpcs-composer": "dev-master"
+  },
+  "scripts": {
+    "lint": [
+      "phpcs ."
+    ],
+    "lint-fix": [
+      "phpcbf ."
+    ]
+  }
 }

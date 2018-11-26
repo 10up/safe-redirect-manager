@@ -19,6 +19,9 @@ Extract the zip file and just drop the contents in the wp-content/plugins/ direc
 
 == Changelog ==
 
+= 1.9.1 =
+* Fix SQL injection bug opened up by SQL search functionality.
+
 = 1.9 =
 * Add redirect notes feature.
 * Fix PHP 7.2 errors
