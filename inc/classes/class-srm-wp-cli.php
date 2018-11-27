@@ -16,7 +16,7 @@ class SRM_WP_CLI extends WP_CLI_Command {
 	 *
 	 * @subcommand list
 	 */
-	public function list() {
+	public function cli_list() {
 		$fields = array(
 			'ID',
 			'redirect_from',
