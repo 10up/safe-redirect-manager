@@ -136,7 +136,11 @@ class SRM_Redirect {
 				if ( ! $matched_path && ( strrpos( $redirect_from, '*' ) === strlen( $redirect_from ) - 1 ) ) {
 					$wildcard_base = substr( $redirect_from, 0, strlen( $redirect_from ) - 1 );
 
-					// mark as match if requested path matches the base of the redirect from
+					// Remove the trailing slash from the wildcard base,
+					// as it was already removed from the request path on line 74.
+					$wildcard_base = untrailingslashit( $wildcard_base );
+
+                    // mark as match if requested path matches the base of the redirect from
 					$matched_path = ( substr( $normalized_requested_path, 0, strlen( $wildcard_base ) ) === $wildcard_base );
 					if ( ( strrpos( $redirect_to, '*' ) === strlen( $redirect_to ) - 1 ) ) {
 						$redirect_to = rtrim( $redirect_to, '*' ) . ltrim( substr( $requested_path, strlen( $wildcard_base ) ), '/' );
