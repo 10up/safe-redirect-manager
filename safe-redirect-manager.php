@@ -20,7 +20,7 @@
  * @since 1.8
  */
 function srm_load_textdomain() {
-	load_plugin_textdomain( 'safe-redirect-manager', false, dirname( __FILE__ ) . '/lang' );
+	load_plugin_textdomain( 'safe-redirect-manager', false, basename( dirname( __FILE__ ) ) . '/lang' );
 }
 add_action( 'plugins_loaded', 'srm_load_textdomain' );
 
