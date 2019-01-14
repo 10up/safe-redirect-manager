@@ -6,7 +6,7 @@ msgstr ""
 "Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/safe-redirect-"
 "manager\n"
 "POT-Creation-Date: 2019-01-11 16:08+0200\n"
-"PO-Revision-Date: 2019-01-11 16:08+0200\n"
+"PO-Revision-Date: 2019-01-14 10:00+0200\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "Language: fi\n"
@@ -167,15 +167,15 @@ msgid ""
 "expressions will disable wildcards and completely change the way the * "
 "symbol is interpretted."
 msgstr ""
-"Tämän polun tulee olla relatiivinen WordPress-asennuksen (tai alasivustoon, "
-"jos käytät multi-site -asennusta). Lisäämällä wildcard -merkin * sovitetaan "
-"kaikki kyselyt sivuston pohjapolkuun. Varoitus: Säännöllisten lausekkeiden "
-"käyttöönottaminen poistaa käytöstä wildcard-säännöt ja muuttaa täysin * -"
-"merkin tulkintatavan."
+"Tämän polun tulee olla relatiivinen WordPress-asennuksen juureen (tai "
+"alasivustoon, jos käytät multi-site -asennusta). Lisäämällä wildcard -"
+"merkin * sovitetaan kaikki kyselyt sivuston pohjapolkuun. Varoitus: "
+"Säännöllisten lausekkeiden käyttöönottaminen poistaa käytöstä wildcard-"
+"säännöt ja muuttaa täysin * -merkin tulkintatavan."
 
 #: inc/classes/class-srm-post-type.php:574
 msgid "* Redirect To:"
-msgstr "* Uudelleen ohjaa tänne"
+msgstr "* Uudelleen ohjaa tänne:"
 
 #: inc/classes/class-srm-post-type.php:577
 msgid ""
@@ -183,16 +183,17 @@ msgid ""
 "WordPress installation). Ending with a (*) wildcard character will append "
 "the request match to the redirect."
 msgstr ""
-"Tämä URL tai relatiivinen polku (ei WordPress-asennus). Lopettaminen "
-"wildcard-merkkiin (*) lisää hakupyynnön uudelleenohjaukseen."
+"Tämä voi olla URL tai relatiivinen polku sivuston juureen (ei WordPress-"
+"asennus). Lopettaminen wildcard-merkkiin (*) lisää hakupyynnön "
+"uudelleenohjaukseen."
 
 #: inc/classes/class-srm-post-type.php:580
 msgid "* HTTP Status Code:"
-msgstr "* HTTP tilakoodi"
+msgstr "* HTTP tilakoodi:"
 
 #: inc/classes/class-srm-post-type.php:586
 msgid "If you don't know what this is, leave it as is."
-msgstr "Jos et tiedä mikä tämä on, jätä se niin kuin se on."
+msgstr "Jos et tiedä mikä tämä on, jätä tämä niin kuin se on."
 
 #: inc/classes/class-srm-post-type.php:590
 msgid "Notes:"
@@ -205,7 +206,7 @@ msgstr ""
 
 #: inc/functions.php:193
 msgid "Redirect from and/or redirect to arguments are invalid."
-msgstr "Uudelleen ohjaa täältä tai uudelleen tänne määritykset ovat väärin."
+msgstr "Uudelleenohjausargumenteissa on virhe."
 
 #: inc/functions.php:197
 msgid "Invalid status code."
