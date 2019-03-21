@@ -9,8 +9,9 @@
     }
   ],
   "require-dev": {
-    "phpunit/phpunit": "~6.1",
-    "10up/phpcs-composer": "dev-master"
+    "phpunit/phpunit": "~7.5",
+    "10up/phpcs-composer": "dev-master",
+    "10up/wpacceptance": "dev-master"
   },
   "scripts": {
     "lint": [
@@ -19,5 +20,6 @@
     "lint-fix": [
       "phpcbf ."
     ]
-  }
+  },
+  "minimum-stability": "dev"
 }

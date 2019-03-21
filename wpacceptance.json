@@ -1,0 +1,25 @@
+{
+    "name": "safe-redirect-manager",
+    "tests": [
+        "tests/wpa/*.php"
+    ],
+    "exclude": [
+      "node_modules",
+      "vendor"
+    ],
+    "enforce_clean_db": false,
+    "environment_instructions":
+    [
+      [
+        "install wordpress where version is 4.7 and url is http://srm.test",
+        "activate plugin where name is safe-redirect-manager",
+        "enable theme where name is twentysixteen"
+      ],
+      [
+        "install wordpress where version is latest and url is http://srm.test",
+        "activate plugin where name is safe-redirect-manager",
+        "enable theme where name is twentysixteen"
+      ]
+    ],
+    "project_path": "%WP_ROOT%/wp-content/plugins/safe-redirect-manager"
+}
