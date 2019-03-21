@@ -31,4 +31,17 @@ class BasicTest extends \WPAcceptance\PHPUnit\TestCase {
 
 		$I->seeElement( '#wpadminbar' );
 	}
+
+	/**
+	 * Admin menu item shows
+	 */
+	public function testAdaminMenuItemShows() {
+		$I = $this->openBrowserPage();
+
+		$I->loginAs( 'admin' );
+
+		$I->moveTo( 'wp-admin/tools.php' );
+
+		$I->seeLink( 'Safe Redirect Manager' );
+	}
 }
