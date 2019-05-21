@@ -14,7 +14,7 @@ them store redirects in the options table or in custom tables. Most of them prov
 of them have serious performance implications (404 error logging). Safe Redirect Manager stores redirects as Custom
 Post Types. This makes your data portable and your website scalable. Safe Redirect Manager is built to handle enterprise
 level traffic and is used on major publishing websites. The plugin comes with only what you need following the
-WordPress mantra, decisions not options. Actions and filters make the plugin very extensible.
+WordPress mantra, decisions not options. Actions in filters make the plugin very extensible.
 
 ## Installation
 
