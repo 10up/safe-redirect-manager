@@ -1,4 +1,4 @@
-Safe Redirect Manager [![Build Status](https://travis-ci.org/10up/safe-redirect-manager.svg?branch=master)](https://travis-ci.org/10up/safe-redirect-manager)
+Safe Redirect Manager [![Build Status](https://travis-ci.org/10up/safe-redirect-manager.svg?branch=master)](https://travis-ci.org/10up/safe-redirect-manager) ![WordPress tested up to version](https://img.shields.io/badge/WordPress-v5.2%20tested-success.svg)
 ==============
 
 A WordPress plugin to safely and easily manage your website's HTTP redirects.
