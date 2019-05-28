@@ -252,6 +252,20 @@ class SRM_Post_Type {
 				</div>
 				<?php
 			}
+
+			if ( ! empty( $_GET['duplicate-redirect-rule'] ) ) {
+
+				?>
+				<div class="notice notice-error is-dismissible">
+					<p>
+						<?php esc_html_e( 'Safe Redirect Manager Error: Duplicate redirection rule found. You can modify below rule instead of adding new one.', 'safe-redirect-manager' ) ?>
+					</p>
+				</div>
+				<?php
+
+				// Delete duplicate post.
+				wp_delete_post( $_GET['duplicate-redirect-rule'], true );
+			}
 		}
 	}
 
@@ -448,7 +462,48 @@ class SRM_Post_Type {
 			 * redirect info is saved, updating the cache before it is not sufficient.
 			 */
 			srm_flush_cache();
+
+			add_filter( 'redirect_post_location', array( $this, 'add_notice_query_var' ), 99, 2 );
 		}
+	}
+
+	/**
+	 * Add custom query var to indicate that this is a duplicate redirection rule.
+	 *
+	 * @param string $location The destination URL.
+	 * @param int    $post_id  The post ID.
+	 *
+	 * @return string
+	 */
+	public function add_notice_query_var( $location, $post_id ) {
+
+		remove_filter( 'redirect_post_location', array( $this, 'add_notice_query_var' ), 99 );
+
+		global $wpdb;
+
+		$post_type = get_post_type( $post_id );
+
+		if ( 'redirect_rule' !== $post_type ) {
+			return $location;
+		}
+
+		$redirect_from = get_post_meta( $post_id, '_redirect_rule_from', true );
+
+		if ( empty( $redirect_from ) ) {
+			return $location;
+		}
+
+		// Get post if exist with same redirection rule.
+		$existing_post_id = $wpdb->get_var( $wpdb->prepare( "SELECT post_id FROM $wpdb->postmeta WHERE meta_key=%s AND meta_value=%s", '_redirect_rule_from', $redirect_from ) );
+
+		// If it is the same post ID, then bail out.
+		if ( (int) $post_id === (int) $existing_post_id ) {
+			return $location;
+		}
+
+		$location = add_query_arg( array( 'duplicate-redirect-rule' => $post_id ), get_edit_post_link( $existing_post_id, 'edit' ) );
+
+		return $location;
 	}
 
 	/**
