@@ -258,7 +258,7 @@ class SRM_Post_Type {
 				?>
 				<div class="notice notice-error is-dismissible">
 					<p>
-						<?php esc_html_e( 'Safe Redirect Manager Error: Duplicate redirection rule found. You can modify below rule instead of adding new one.', 'safe-redirect-manager' ) ?>
+						<?php esc_html_e( 'Safe Redirect Manager Error: Duplicate redirection rule found. You can modify below rule instead of adding new one.', 'safe-redirect-manager' ); ?>
 					</p>
 				</div>
 				<?php
