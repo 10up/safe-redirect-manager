@@ -71,6 +71,12 @@ class SRM_Redirect {
 		return array_unique( $hosts );
 	}
 
+	/**
+	 * Find matching redirect for requested URL
+	 *
+	 * @since 1.9.3
+	 * @return void
+	 */
 	public function get_redirect_match() {
 		// Don't redirect unless not on admin. If 404 filter enabled, require query is a 404.
 		if ( is_admin() || ( apply_filters( 'srm_redirect_only_on_404', false ) && ! is_404() ) ) {
