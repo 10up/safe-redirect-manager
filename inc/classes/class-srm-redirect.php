@@ -17,6 +17,27 @@ class SRM_Redirect {
 	private $whitelist_host;
 
 	/**
+	 * Status Code
+	 *
+	 * @var int
+	 */
+	public $status_code;
+
+	/**
+	 * Reqeust URL
+	 *
+	 * @var string
+	 */
+	public $redirect_from;
+
+	/**
+	 * Redirect destination
+	 *
+	 * @var string
+	 */
+	public $redirect_to;
+
+	/**
 	 * Initialize redirect listening
 	 *
 	 * @since 1.8
@@ -50,13 +71,7 @@ class SRM_Redirect {
 		return array_unique( $hosts );
 	}
 
-	/**
-	 * Check current url against redirects
-	 *
-	 * @since 1.8
-	 */
-	public function maybe_redirect() {
-
+	public function get_redirect_match() {
 		// Don't redirect unless not on admin. If 404 filter enabled, require query is a 404.
 		if ( is_admin() || ( apply_filters( 'srm_redirect_only_on_404', false ) && ! is_404() ) ) {
 			return;
@@ -107,7 +122,6 @@ class SRM_Redirect {
 		}
 
 		foreach ( (array) $redirects as $redirect ) {
-
 			$redirect_from = untrailingslashit( $redirect['redirect_from'] );
 			if ( empty( $redirect_from ) ) {
 				$redirect_from = '/'; // this only happens in the case where there is a redirect on the root
@@ -165,26 +179,38 @@ class SRM_Redirect {
 				}
 
 				$sanitized_redirect_to = esc_url_raw( apply_filters( 'srm_redirect_to', $redirect_to ) );
+				$this->redirect_to   = $sanitized_redirect_to;
+				$this->redirect_from = $redirect_from;
+				$this->status_code   = $status_code;
 
 				do_action( 'srm_do_redirect', $requested_path, $sanitized_redirect_to, $status_code );
-
-				if ( defined( 'PHPUNIT_SRM_TESTSUITE' ) && PHPUNIT_SRM_TESTSUITE ) {
-					// Don't actually redirect if we are testing
-					return;
-				}
-
-				header( 'X-Safe-Redirect-Manager: true' );
-
-				// if we have a valid status code, then redirect with it
-				if ( in_array( $status_code, srm_get_valid_status_codes(), true ) ) {
-					wp_safe_redirect( $sanitized_redirect_to, $status_code );
-				} else {
-					wp_safe_redirect( $sanitized_redirect_to );
-				}
-
-				exit;
 			}
 		}
+	}
+
+	/**
+	 * Check current url against redirects
+	 *
+	 * @since 1.8
+	 */
+	public function maybe_redirect() {
+		$this->get_redirect_match();
+
+		if ( defined( 'PHPUNIT_SRM_TESTSUITE' ) && PHPUNIT_SRM_TESTSUITE ) {
+			// Don't actually redirect if we are testing
+			return;
+		}
+
+		header( 'X-Safe-Redirect-Manager: true' );
+
+		// if we have a valid status code, then redirect with it
+		if ( in_array( $status_code, srm_get_valid_status_codes(), true ) ) {
+			wp_safe_redirect( $sanitized_redirect_to, $status_code );
+		} else {
+			wp_safe_redirect( $sanitized_redirect_to );
+		}
+
+		exit;
 	}
 
 	/**
