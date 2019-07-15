@@ -202,10 +202,10 @@ class SRM_Redirect {
 			header( 'X-Safe-Redirect-Manager: true' );
 
 			// if we have a valid status code, then redirect with it
-			if ( in_array( $status_code, srm_get_valid_status_codes(), true ) ) {
-				wp_safe_redirect( $sanitized_redirect_to, $status_code );
+			if ( in_array( $redirect_match['status_code'], srm_get_valid_status_codes(), true ) ) {
+				wp_safe_redirect( $redirect_match['redirect_to'], $redirect_match['status_code'] );
 			} else {
-				wp_safe_redirect( $sanitized_redirect_to );
+				wp_safe_redirect( $redirect_match['redirect_to'] );
 			}
 
 			exit;
