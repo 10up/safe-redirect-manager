@@ -17,27 +17,6 @@ class SRM_Redirect {
 	private $whitelist_host;
 
 	/**
-	 * Status Code
-	 *
-	 * @var int
-	 */
-	public $status_code;
-
-	/**
-	 * Reqeust URL
-	 *
-	 * @var string
-	 */
-	public $redirect_from;
-
-	/**
-	 * Redirect destination
-	 *
-	 * @var string
-	 */
-	public $redirect_to;
-
-	/**
 	 * Initialize redirect listening
 	 *
 	 * @since 1.8
@@ -78,6 +57,13 @@ class SRM_Redirect {
 	 * @return void
 	 */
 	public function get_redirect_match() {
+		$match = [
+			'redirect_to'    => '',
+			'requested_path' => '',
+			'redirect_from'  => '',
+			'status_code'    => 0,
+		];
+
 		// Don't redirect unless not on admin. If 404 filter enabled, require query is a 404.
 		if ( is_admin() || ( apply_filters( 'srm_redirect_only_on_404', false ) && ! is_404() ) ) {
 			return;
@@ -91,8 +77,8 @@ class SRM_Redirect {
 		}
 
 		// get requested path and add a / before it
-		$requested_path = esc_url_raw( apply_filters( 'srm_requested_path', $_SERVER['REQUEST_URI'] ) );
-		$requested_path = untrailingslashit( stripslashes( $requested_path ) );
+		$requested_path       = esc_url_raw( apply_filters( 'srm_requested_path', $_SERVER['REQUEST_URI'] ) );
+		$requested_path       = untrailingslashit( stripslashes( $requested_path ) );
 
 		/**
 		 * If WordPress resides in a directory that is not the public root, we have to chop
@@ -111,6 +97,9 @@ class SRM_Redirect {
 		if ( empty( $requested_path ) ) {
 			$requested_path = '/';
 		}
+
+		// Set requested path property.
+		$match['requested_path'] = $requested_path;
 
 		// Allow redirects to be filtered
 		$redirects = apply_filters( 'srm_registered_redirects', $redirects, $requested_path );
@@ -141,6 +130,7 @@ class SRM_Redirect {
 			if ( empty( $redirect_to ) ) {
 				continue;
 			}
+			// print_r( $redirect['redirect_to'] );
 
 			// check if requested path is the same as the redirect from path
 			if ( $enable_regex ) {
@@ -185,13 +175,13 @@ class SRM_Redirect {
 				}
 
 				$sanitized_redirect_to = esc_url_raw( apply_filters( 'srm_redirect_to', $redirect_to ) );
-				$this->redirect_to   = $sanitized_redirect_to;
-				$this->redirect_from = $redirect_from;
-				$this->status_code   = $status_code;
-
-				do_action( 'srm_do_redirect', $requested_path, $sanitized_redirect_to, $status_code );
+				$match['redirect_to']   = $sanitized_redirect_to;
+				$match['redirect_from'] = $redirect_from;
+				$match['status_code']   = $status_code;
 			}
 		}
+
+		return $match;
 	}
 
 	/**
@@ -200,23 +190,27 @@ class SRM_Redirect {
 	 * @since 1.8
 	 */
 	public function maybe_redirect() {
-		$this->get_redirect_match();
+		$redirect_match = $this->get_redirect_match();
 
-		if ( defined( 'PHPUNIT_SRM_TESTSUITE' ) && PHPUNIT_SRM_TESTSUITE ) {
-			// Don't actually redirect if we are testing
-			return;
+		if ( ! empty( $redirect_match['redirect_to'] ) ) {
+			do_action( 'srm_do_redirect', $redirect_match['requested_path'], $redirect_match['redirect_to'], $redirect_match['status_code'] );
+
+			if ( defined( 'PHPUNIT_SRM_TESTSUITE' ) && PHPUNIT_SRM_TESTSUITE ) {
+				// Don't actually redirect if we are testing
+				return;
+			}
+
+			header( 'X-Safe-Redirect-Manager: true' );
+
+			// if we have a valid status code, then redirect with it
+			if ( in_array( $status_code, srm_get_valid_status_codes(), true ) ) {
+				wp_safe_redirect( $sanitized_redirect_to, $status_code );
+			} else {
+				wp_safe_redirect( $sanitized_redirect_to );
+			}
+
+			exit;
 		}
-
-		header( 'X-Safe-Redirect-Manager: true' );
-
-		// if we have a valid status code, then redirect with it
-		if ( in_array( $status_code, srm_get_valid_status_codes(), true ) ) {
-			wp_safe_redirect( $sanitized_redirect_to, $status_code );
-		} else {
-			wp_safe_redirect( $sanitized_redirect_to );
-		}
-
-		exit;
 	}
 
 	/**
