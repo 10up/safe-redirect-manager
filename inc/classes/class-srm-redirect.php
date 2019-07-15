@@ -61,7 +61,7 @@ class SRM_Redirect {
 			'redirect_to'    => '',
 			'requested_path' => '',
 			'redirect_from'  => '',
-			'status_code'    => 301,
+			'status_code'    => 0,
 		];
 
 		// Don't redirect unless not on admin. If 404 filter enabled, require query is a 404.
