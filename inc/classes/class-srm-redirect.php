@@ -61,7 +61,7 @@ class SRM_Redirect {
 			'redirect_to'    => '',
 			'requested_path' => '',
 			'redirect_from'  => '',
-			'status_code'    => 0,
+			'status_code'    => 301,
 		];
 
 		// Don't redirect unless not on admin. If 404 filter enabled, require query is a 404.
@@ -77,8 +77,8 @@ class SRM_Redirect {
 		}
 
 		// get requested path and add a / before it
-		$requested_path       = esc_url_raw( apply_filters( 'srm_requested_path', $_SERVER['REQUEST_URI'] ) );
-		$requested_path       = untrailingslashit( stripslashes( $requested_path ) );
+		$requested_path = esc_url_raw( apply_filters( 'srm_requested_path', $_SERVER['REQUEST_URI'] ) );
+		$requested_path = untrailingslashit( stripslashes( $requested_path ) );
 
 		/**
 		 * If WordPress resides in a directory that is not the public root, we have to chop
@@ -130,7 +130,6 @@ class SRM_Redirect {
 			if ( empty( $redirect_to ) ) {
 				continue;
 			}
-			// print_r( $redirect['redirect_to'] );
 
 			// check if requested path is the same as the redirect from path
 			if ( $enable_regex ) {
