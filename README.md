@@ -20,8 +20,7 @@ Install the plugin in WordPress. You can download a
 plugin uploader ("Plugins" > "Add New" > "Upload Plugin").
 
 ## Non-English Usage
-Safe Redirect Manager is available in English, French, and Slovak. Instructions for translating the plugin into other
-languages are below.
+Safe Redirect Manager is available in English, French, Slovak, and Spanish.  Instructions for translating the plugin into other languages is available on [Translating WordPress](https://translate.wordpress.org/projects/wp-plugins/safe-redirect-manager/).  Many thanks to the [contributors on the translation teams](https://translate.wordpress.org/projects/wp-plugins/safe-redirect-manager/contributors/)!
 
 ## Configuration
 
