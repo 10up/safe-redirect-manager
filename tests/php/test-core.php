@@ -518,9 +518,7 @@ class SRMTestCore extends WP_UnitTestCase {
 	 */
 	public function testWildcardRedirectWithSlash() {
 		$_SERVER['REQUEST_URI'] = '/one/';
-		$redirected			 = false;
-
-		// The destination.
+		$redirected			    = false;
 		$redirect_to			= '/gohere/';
 
 		// Create two redirects for testing.
@@ -545,10 +543,8 @@ class SRMTestCore extends WP_UnitTestCase {
 	 */
 	public function testWildcardRedirectWithQueryParams() {
 		$_SERVER['REQUEST_URI'] = '/one/?test=true';
-		$redirected = false;
-
-		// The destination.
-		$redirect_to = '/gohere/*';
+		$redirected             = false;
+		$redirect_to            = '/gohere/*';
 
 		// Create two redirects for testing.
 		srm_create_redirect( '/one/*', $redirect_to );
@@ -573,34 +569,22 @@ class SRMTestCore extends WP_UnitTestCase {
 	 * Test a URL that shouldn't redirect.
 	 */
 	public function testNoRedirect() {
-		// The destination.
-		$redirect_to			= '/gohere/*';
+		$_SERVER['REQUEST_URI'] = '/noredirect/';
+		$redirected             = false;
+		$redirect_to            = '/gohere/*';
 
 		// Create two redirects for testing.
 		srm_create_redirect( '/one/*', $redirect_to );
 		srm_create_redirect( '/two/', $redirect_to );
-
-		// Set up our variable.
-		$redirected = false;
-		/**
-		 * Add an action that will change $redirected to true if any redirect happens.
-		 */
 		add_action(
 			'srm_do_redirect',
-			function( $requested_path, $redirected_to, $status_code ) use ( &$redirect_to, &$redirected ) {
+			function( $requested_path, $redirected_to, $status_code ) use ( &$redirect_to, &$redirected, &$expected ) {
 					$redirected = true;
 			},
 			10,
 			3
 		);
-
-		// Set the Request URI to something that shouldn't redirect.
-		$_SERVER['REQUEST_URI'] = '/something-else/';
-
 		SRM_Redirect::factory()->maybe_redirect();
-
-		// Redirected shouldn't happen.
-		$this->assertFalse( $redirected, 'Expected that /something-else/ would not cause a redirect.' );
+		$this->assertFalse( $redirected, 'Expected that /noredirect/ would not redirect, but instead redirected to ' . $redirect_to );
 	}
-
 }
