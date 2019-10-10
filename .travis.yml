@@ -12,24 +12,13 @@ matrix:
 before_script:
   - composer install
   - export PATH="$HOME/.composer/vendor/bin:$PATH"
-  - |
-    if [[ ! -z "$WP_VERSION" ]] ; then
-      bash bin/install-wp-tests.sh wordpress_test root '' localhost $WP_VERSION
-    fi
-  - |
-    if [[ "$WP_TRAVISCI" == "phpcs" ]] ; then
-      phpcs --config-set installed_paths $HOME/.composer/vendor/wp-coding-standards/wpcs
-    fi
-script:
-  - |
-    if [[ ! -z "$WP_VERSION" ]] ; then
-      vendor/bin/phpunit
-    fi
-  - |
-    if [[ "$WP_TRAVISCI" == "phpcs" ]] ; then
-      vendor/bin/phpcs
-    fi
-  - bash run-wpacceptance.sh
+  - bash bin/install-wp-tests.sh wordpress_test root '' localhost $WP_VERSION
+  - ./vendor/bin/phpcs --config-set installed_paths $HOME/.composer/vendor/wp-coding-standards/wpcs
+
+  script:
+   - ./vendor/bin/phpunit
+   - ./vendor/bin/phpcs
+   - bash run-wpacceptance.sh
 
 services:
   - mysql
