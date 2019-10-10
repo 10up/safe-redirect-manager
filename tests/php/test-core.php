@@ -510,4 +510,97 @@ class SRMTestCore extends WP_UnitTestCase {
 		fclose( $tmp_file );
 	}
 
+
+    /**
+     * Test a redirect rule that ends with a trailing slash followed by an asterisk.
+     *
+     * @since 1.9.3
+     */
+    public function testWildcardRedirectWithSlash() {
+        $_SERVER['REQUEST_URI'] = '/one/';
+        $redirected             = false;
+
+        // The destination.
+        $redirect_to            = '/gohere/';
+
+        // Create two redirects for testing.
+        srm_create_redirect( '/one/*', $redirect_to );
+        srm_create_redirect( '/two/', $redirect_to );
+        add_action(
+            'srm_do_redirect',
+            function( $requested_path, $redirected_to, $status_code ) use ( &$redirect_to, &$redirected ) {
+                if ( $redirected_to === $redirect_to ) {
+                    $redirected = true;
+                }
+            },
+            10,
+            3
+        );
+        SRM_Redirect::factory()->maybe_redirect();
+        $this->assertTrue( $redirected, 'Expected that /one/ would redirect to /gohere/' );
+    }
+
+    /**
+     * Test that the query params are attached to the new redirect.
+     */
+    public function testWildcardRedirectWithQueryParams() {
+        $_SERVER['REQUEST_URI'] = '/one/?test=true';
+        $redirected             = false;
+
+        // The destination.
+        $redirect_to            = '/gohere/*';
+
+        // Create two redirects for testing.
+        srm_create_redirect( '/one/*', $redirect_to );
+        srm_create_redirect( '/two/', $redirect_to );
+        $expected = '/gohere/?test=true';
+        add_action(
+            'srm_do_redirect',
+            function( $requested_path, $redirected_to, $status_code ) use ( &$redirect_to, &$redirected, &$expected ) {
+                if ( $redirected_to === '/gohere/?test=true' ) {
+                    $redirected = true;
+                }
+                $expected = $redirect_to;
+            },
+            10,
+            3
+        );
+        SRM_Redirect::factory()->maybe_redirect();
+        $this->assertTrue( $redirected, 'Expected that /one/?test=true would redirect to /gohere/?test=true but instead redirected to ' . $redirect_to );
+    }
+
+    /**
+     * Test a URL that shouldn't redirect.
+     */
+    public function testNoRedirect() {
+        // The destination.
+        $redirect_to            = '/gohere/*';
+
+        // Create two redirects for testing.
+        srm_create_redirect( '/one/*', $redirect_to );
+        srm_create_redirect( '/two/', $redirect_to );
+
+        // Set up our variable.
+        $redirected = false;
+        /**
+         * Add an action that will change $redirected to true if any redirect happens.
+         */
+        add_action(
+            'srm_do_redirect',
+            function( $requested_path, $redirected_to, $status_code ) use ( &$redirect_to, &$redirected ) {
+                    $redirected = true;
+            },
+            10,
+            3
+        );
+
+        // Set the Request URI to something that shouldn't redirect.
+        $_SERVER['REQUEST_URI'] = '/something-else/';
+
+        SRM_Redirect::factory()->maybe_redirect();
+
+        // Redirected shouldn't happen.
+        $this->assertFalse( $redirected, 'Expected that /something-else/ would not cause a redirect.' );
+    }
+
 }
