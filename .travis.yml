@@ -1,4 +1,3 @@
-
 sudo: false
 dist: trusty
 
@@ -13,12 +12,12 @@ before_script:
   - composer install
   - export PATH="$HOME/.composer/vendor/bin:$PATH"
   - bash bin/install-wp-tests.sh wordpress_test root '' localhost $WP_VERSION
-  - ./vendor/bin/phpcs --config-set installed_paths $HOME/.composer/vendor/wp-coding-standards/wpcs
+  - phpcs --config-set installed_paths $HOME/.composer/vendor/wp-coding-standards/wpcs
 
-  script:
-   - ./vendor/bin/phpunit
-   - ./vendor/bin/phpcs
-   - bash run-wpacceptance.sh
+script:
+  - vendor/bin/phpunit
+  - vendor/bin/phpcs
+  - bash run-wpacceptance.sh
 
 services:
   - mysql
