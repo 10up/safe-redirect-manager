@@ -6,10 +6,11 @@ language: php
 
 matrix:
   include:
-    - php: 7.1
+    - php: 7.2
       env: WP_VERSION=latest
 
 before_script:
+  - composer install
   - export PATH="$HOME/.composer/vendor/bin:$PATH"
   - |
     if [ -f ~/.phpenv/versions/$(phpenv version-name)/etc/conf.d/xdebug.ini ]; then
@@ -29,9 +30,12 @@ script:
   - |
     if [[ ! -z "$WP_VERSION" ]] ; then
       vendor/bin/phpunit
-      WP_MULTISITE=1 phpunit
     fi
   - |
     if [[ "$WP_TRAVISCI" == "phpcs" ]] ; then
       vendor/bin/phpcs
     fi
+  - bash run-wpacceptance.sh
+
+services:
+  - mysql
