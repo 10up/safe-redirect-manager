@@ -253,7 +253,9 @@ class SRM_Post_Type {
 				<?php
 			}
 
-			if ( ! empty( $_GET['duplicate-redirect-rule'] ) ) {
+			$duplicate_redirect_rule = filter_input( INPUT_GET, 'duplicate-redirect-rule', FILTER_VALIDATE_INT );
+
+			if ( ! empty( $duplicate_redirect_rule ) ) {
 
 				?>
 				<div class="notice notice-error is-dismissible">
@@ -263,8 +265,36 @@ class SRM_Post_Type {
 				</div>
 				<?php
 
-				// Delete duplicate post.
-				wp_delete_post( $_GET['duplicate-redirect-rule'], true );
+				$should_delete = true;
+				$_wpnonce      = filter_input( INPUT_GET, '_wpnonce', FILTER_SANITIZE_STRING );
+				$error         = '';
+
+				if ( ! wp_verify_nonce( $_wpnonce, 'delete-duplicate-redirect-rule' ) ) {
+
+					$should_delete = false;
+					$error         = __( 'Security check failed when deleting duplicate redirect rule, please contact your administrator!', 'safe-redirect-manager' );
+
+				} elseif ( ! current_user_can( 'delete_post', $duplicate_redirect_rule ) ) {
+
+					$should_delete = false;
+					$error         = __( 'You don\'t have enough permission to delete duplicate redirect rule, please contact your administrator!', 'safe-redirect-manager' );
+				}
+
+				if ( $should_delete ) {
+
+					// Delete duplicate post.
+					wp_delete_post( $duplicate_redirect_rule, true );
+
+				} else {
+
+					?>
+					<div class="notice notice-error is-dismissible">
+						<p>
+							<?php echo esc_html( $error ); ?>
+						</p>
+					</div>
+					<?php
+				}
 			}
 		}
 	}
@@ -479,11 +509,15 @@ class SRM_Post_Type {
 
 		remove_filter( 'redirect_post_location', array( $this, 'add_notice_query_var' ), 99 );
 
-		global $wpdb;
+		// If post ID is empty, bail out.
+		if ( empty( $post_id ) ) {
+			return $location;
+		}
 
-		$post_type = get_post_type( $post_id );
+		$redirect_post = get_post( $post_id );
 
-		if ( 'redirect_rule' !== $post_type ) {
+		// If post not found or not of redirect_rule type, bail out.
+		if ( empty( $redirect_post ) || 'redirect_rule' !== $redirect_post->post_type ) {
 			return $location;
 		}
 
@@ -493,15 +527,39 @@ class SRM_Post_Type {
 			return $location;
 		}
 
-		// Get post if exist with same redirection rule.
-		$existing_post_id = $wpdb->get_var( $wpdb->prepare( "SELECT post_id FROM $wpdb->postmeta WHERE meta_key=%s AND meta_value=%s", '_redirect_rule_from', $redirect_from ) );
+		$existing_post_ids = new WP_Query(
+			[
+				'meta_key'       => '_redirect_rule_from',
+				'meta_value'     => $redirect_from,
+				'fields'         => 'ids',
+				'posts_per_page' => 1,
+				'no_found_rows'  => true,
+				'post_type'      => 'redirect_rule',
+				'post_status'    => 'publish',
+				'orderby'        => 'ID',
+				'order'          => 'ASC',
+			]
+		);
+
+		// If no posts found, then bail out.
+		if ( empty( $existing_post_ids->posts ) ) {
+			return $location;
+		}
+
+		$existing_post_id = $existing_post_ids->posts[0];
 
 		// If it is the same post ID, then bail out.
 		if ( (int) $post_id === (int) $existing_post_id ) {
 			return $location;
 		}
 
-		$location = add_query_arg( array( 'duplicate-redirect-rule' => $post_id ), get_edit_post_link( $existing_post_id, 'edit' ) );
+		$location = add_query_arg(
+			array(
+				'duplicate-redirect-rule' => $post_id,
+				'_wpnonce'                => wp_create_nonce( 'delete-duplicate-redirect-rule' ),
+			),
+			get_edit_post_link( $existing_post_id, 'edit' )
+		);
 
 		return $location;
 	}
