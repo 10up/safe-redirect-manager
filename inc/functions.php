@@ -217,7 +217,7 @@ function srm_create_redirect( $redirect_from, $redirect_to, $status_code = 302, 
 	}
 
 	// update the posts meta info
-	update_post_meta( $post_id, '_redirect_rule_from', $sanitized_redirect_from );
+	update_post_meta( $post_id, '_redirect_rule_from', wp_slash( $sanitized_redirect_from ) );
 	update_post_meta( $post_id, '_redirect_rule_to', $sanitized_redirect_to );
 	update_post_meta( $post_id, '_redirect_rule_status_code', $sanitized_status_code );
 	update_post_meta( $post_id, '_redirect_rule_from_regex', $sanitized_enable_regex );
