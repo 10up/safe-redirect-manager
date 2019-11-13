@@ -403,12 +403,12 @@ class SRM_Post_Type {
 	 * @return void
 	 */
 	public function action_save_post( $post_id ) {
-		if ( ( defined( 'DOING_AUTOSAVE' ) && DOING_AUTOSAVE ) || ! current_user_can( 'edit_post', $post_id ) || 'revision' === get_post_type( $post_id ) ) {
+		if ( ( defined( 'DOING_AUTOSAVE' ) && DOING_AUTOSAVE ) || 'revision' === get_post_type( $post_id ) ) {
 			return;
 		}
 
 		// Update post meta for redirect rules
-		if ( ! empty( $_POST['srm_redirect_nonce'] ) && wp_verify_nonce( $_POST['srm_redirect_nonce'], 'srm-save-redirect-meta' ) ) {
+		if ( ! empty( $_POST['srm_redirect_nonce'] ) && wp_verify_nonce( $_POST['srm_redirect_nonce'], 'srm-save-redirect-meta' ) && current_user_can( 'edit_post', $post_id ) ) {
 
 			if ( ! empty( $_POST['srm_redirect_rule_from_regex'] ) ) {
 				$allow_regex = (bool) $_POST['srm_redirect_rule_from_regex'];
@@ -436,7 +436,7 @@ class SRM_Post_Type {
 				delete_post_meta( $post_id, '_redirect_rule_status_code' );
 			}
 
-			if ( ! empty( $_POST['srm_redirect_rule_status_code'] ) ) {
+			if ( ! empty( $_POST['srm_redirect_rule_notes'] ) ) {
 				update_post_meta( $post_id, '_redirect_rule_notes', sanitize_text_field( $_POST['srm_redirect_rule_notes'] ) );
 			} else {
 				delete_post_meta( $post_id, '_redirect_rule_notes' );
