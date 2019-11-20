@@ -4,6 +4,20 @@ All notable changes to this project will be documented in this file, per [the Ke
 
 ## [Unreleased] - TBD
 
+## [1.9.3] - 2019-11-20
+### Changed
+- Allow for escaped values on `_redirect_rule_from`, useful when importing regex (props [@raymondware](https://github.com/raymondware) via [#163](https://github.com/10up/safe-redirect-manager/pull/163))
+- Check `current_user_can` cap later to prevent the notice being thrown during Jetpack sitemap cron event runs (props [@rebeccahum](https://github.com/rebeccahum) via [#178](https://github.com/10up/safe-redirect-manager/pull/178))
+- Updated tests and documentation (props [@adamsilverstein](https://github.com/adamsilverstein), [@jeffpaul](https://github.com/jeffpaul), [@helen](https://github.com/helen))
+- Check correct meta field when updating notes (props @lucymtc, [@adamsilverstein](https://github.com/adamsilverstein) via [#154](https://github.com/10up/safe-redirect-manager/pull/154), [#185](https://github.com/10up/safe-redirect-manager/pull/185))
+- Bump WordPress version "tested up to" 5.3 (props [@jeffpaul](https://github.com/jeffpaul) via [#193](https://github.com/10up/safe-redirect-manager/pull/193))
+
+### Fixed
+- Update the logic for wildcard matching to properly match URLs with query parameters (props [@adamsilverstein](https://github.com/adamsilverstein), [@mslinnea](https://github.com/mslinnea) via #182)
+
+### Security
+- Bump lodash from 4.17.11 to 4.17.15 (props [@dependabot](https://github.com/dependabot) via #183)
+
 ## [1.9.2] - 2018-11-27
 ### Fixed
 - CLI list function name for PHP 5
@@ -170,6 +184,7 @@ All notable changes to this project will be documented in this file, per [the Ke
 - Plugin released
 
 [Unreleased]: https://github.com/10up/safe-redirect-manager/compare/master...develop
+[1.9.3]: https://github.com/10up/safe-redirect-manager/compare/1.9.2...1.9.3
 [1.9.2]: https://github.com/10up/safe-redirect-manager/compare/1.9.1...1.9.2
 [1.9.1]: https://github.com/10up/safe-redirect-manager/compare/1.9...1.9.1
 [1.9]: https://github.com/10up/safe-redirect-manager/compare/93ffb3a...1.9
