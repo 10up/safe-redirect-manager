@@ -8,15 +8,15 @@ All notable changes to this project will be documented in this file, per [the Ke
 ### Changed
 - Allow for escaped values on `_redirect_rule_from`, useful when importing regex (props [@raymondware](https://github.com/raymondware) via [#163](https://github.com/10up/safe-redirect-manager/pull/163))
 - Check `current_user_can` cap later to prevent the notice being thrown during Jetpack sitemap cron event runs (props [@rebeccahum](https://github.com/rebeccahum) via [#178](https://github.com/10up/safe-redirect-manager/pull/178))
-- Updated tests and documentation (props [@adamsilverstein](https://github.com/adamsilverstein), [@jeffpaul](https://github.com/jeffpaul), [@helen](https://github.com/helen))
-- Check correct meta field when updating notes (props @lucymtc, [@adamsilverstein](https://github.com/adamsilverstein) via [#154](https://github.com/10up/safe-redirect-manager/pull/154), [#185](https://github.com/10up/safe-redirect-manager/pull/185))
+- Updated tests and documentation (props [@adamsilverstein](https://github.com/adamsilverstein), [@jeffpaul](https://github.com/jeffpaul), [@helen](https://github.com/helen) via [#173](https://github.com/10up/safe-redirect-manager/pull/173), [#179](https://github.com/10up/safe-redirect-manager/pull/179), [#180](https://github.com/10up/safe-redirect-manager/pull/180), [#181](https://github.com/10up/safe-redirect-manager/pull/181), [#184](https://github.com/10up/safe-redirect-manager/pull/184), [#190](https://github.com/10up/safe-redirect-manager/pull/190), [#192](https://github.com/10up/safe-redirect-manager/pull/192))
+- Check correct meta field when updating notes (props [@lucymtc](https://github.com/lucymtc), [@adamsilverstein](https://github.com/adamsilverstein) via [#154](https://github.com/10up/safe-redirect-manager/pull/154), [#185](https://github.com/10up/safe-redirect-manager/pull/185))
 - Bump WordPress version "tested up to" 5.3 (props [@jeffpaul](https://github.com/jeffpaul) via [#193](https://github.com/10up/safe-redirect-manager/pull/193))
 
 ### Fixed
-- Update the logic for wildcard matching to properly match URLs with query parameters (props [@adamsilverstein](https://github.com/adamsilverstein), [@mslinnea](https://github.com/mslinnea) via #182)
+- Update the logic for wildcard matching to properly match URLs with query parameters (props [@adamsilverstein](https://github.com/adamsilverstein), [@mslinnea](https://github.com/mslinnea) via [#182](https://github.com/10up/safe-redirect-manager/pull/182))
 
 ### Security
-- Bump lodash from 4.17.11 to 4.17.15 (props [@dependabot](https://github.com/dependabot) via #183)
+- Bump lodash from 4.17.11 to 4.17.15 (props [@dependabot](https://github.com/dependabot) via [#183](https://github.com/10up/safe-redirect-manager/pull/183))
 
 ## [1.9.2] - 2018-11-27
 ### Fixed
