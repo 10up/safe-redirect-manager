@@ -19,10 +19,6 @@ Install the plugin in WordPress. You can download a
 [zip via Github](https://github.com/10up/safe-redirect-manager/archive/master.zip) and upload it using the WordPress
 plugin uploader ("Plugins" > "Add New" > "Upload Plugin").
 
-## Non-English Usage
-Safe Redirect Manager is available in English, French, and Slovak. Instructions for translating the plugin into other
-languages are below.
-
 ## Configuration
 
 There are no overarching settings for this plugin. To manage redirects, navigate to the administration panel ("Tools" > "Safe Redirect Manager").
@@ -88,6 +84,9 @@ phpunit
 #### Issues
 If you identify any errors or have an idea for improving the plugin, please
 [open an issue](https://github.com/10up/safe-redirect-manager/issues?state=open).
+
+## Translations
+Safe Redirect Manager is available in English and other languages.  A listing of those languages and instructions for translating the plugin into other languages is available on [Translating WordPress](https://translate.wordpress.org/projects/wp-plugins/safe-redirect-manager/).  Many thanks to the [contributors on the translation teams](https://translate.wordpress.org/projects/wp-plugins/safe-redirect-manager/contributors/)!
 
 ## Support Level
 
