@@ -2,7 +2,7 @@
 Contributors: tlovett1, tollmanz, taylorde, 10up, jakemgold, danielbachhuber, VentureBeat
 Tags: http redirects, redirect manager, url redirection, safe http redirection, multisite redirects, redirects
 Requires at least: 3.1
-Tested up to: 5.2
+Tested up to: 5.3
 Stable tag: trunk
 
 Safely and easily manage your website's HTTP redirects.
