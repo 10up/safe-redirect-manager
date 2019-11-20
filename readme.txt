@@ -3,8 +3,10 @@ Contributors: tlovett1, tollmanz, taylorde, 10up, jakemgold, danielbachhuber, Ve
 Tags: http redirects, redirect manager, url redirection, safe http redirection, multisite redirects, redirects
 Requires at least: 3.1
 Tested up to: 5.3
-Stable tag: trunk
-
+Stable tag: 1.9.3
+License: GPLv2 or later
+License URI: http://www.gnu.org/licenses/gpl-2.0.html
+ 
 Safely and easily manage your website's HTTP redirects.
 
 == Description ==
