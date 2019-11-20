@@ -1,0 +1,19 @@
+The following acknowledges the Maintainers for this repository, those who have Contributed to this repository (via bug reports, code, design, ideas, project management, translation, testing, etc.), and any Libraries utilized.
+
+## Maintainers
+
+The following individuals are responsible for curating the list of issues, responding to pull requests, and ensuring regular releases happen.
+
+[Taylor Lovett (@tlovett1)](https://github.com/tlovett1) and [Jeffrey Paul (@jeffpaul)](https://github.com/jeffpaul).
+
+## Contributors
+
+Thank you to all the people who have already contributed to this repository via bug reports, code, design, ideas, project management, translation, testing, etc.
+
+[Taylor Lovett (@tlovett1)](https://github.com/tlovett1), [Zack Tollman (@tollmanz)](https://github.com/tollmanz), [Taylor Dewey (@tddewey)](https://github.com/tddewey), [10up (@10up)](https://github.com/10up), [Jake Goldman (@jakemgold)](https://github.com/jakemgold), [Daniel Bachhuber (@danielbachhuber)](https://github.com/danielbachhuber), [VentureBeat (@VentureBeat)](https://github.com/VentureBeat), [Jeffrey Paul (@jeffpaul)](https://github.com/jeffpaul), [Tom J Nowell (@tomjn)](https://github.com/tomjn), [Helen Hou-Sandi (@helen)](https://github.com/helen), [Simon Wheatley (@simonwheatley)](https://github.com/simonwheatley), [Davis Shaver (@davisshaver)](https://github.com/davisshaver), [Tauno Hogue (@tauno)](https://github.com/tauno), [Eugene Manuilov (@eugene-manuilov)](https://github.com/eugene-manuilov), [Chris Marslender (@cmmarslender)](https://github.com/cmmarslender), [Benoît Chantre (@benoitchantre)](https://github.com/benoitchantre), [Viktor Szépe (@szepeviktor)](https://github.com/szepeviktor), [Molnár Éva (@milli05)](https://github.com/milli05), [Henrique Mouta (@vaurdan)](https://github.com/vaurdan), [Raymond Ware (@raymondware)](https://github.com/raymondware), [Kevin Langley Jr (@kevinlangleyjr)](https://github.com/kevinlangleyjr), [Justin Sternberg (@jtsternberg)](https://github.com/jtsternberg), [Francesco Laffi (@francescolaffi)](https://github.com/francescolaffi), [Scott Walkinshaw (@swalkinshaw)](https://github.com/swalkinshaw), [Rebecca Hum (@rebeccahum)](https://github.com/rebeccahum), [Peter Sorensen (@psorensen)](https://github.com/psorensen), [Tyrel Kelsey (@ninnypants)](https://github.com/ninnypants), [Lucy Tomás (@lucymtc)](https://github.com/lucymtc), [Luca Speranza (@lucspe)](https://github.com/lucspe), [Luke Gedeon (@lgedeon)](https://github.com/lgedeon), [Josh Betz (@joshbetz)](https://github.com/joshbetz), [Jeremy Felt (@jeremyfelt)](https://github.com/jeremyfelt), [James Burke (@jameswburke)](https://github.com/jameswburke), [@inathani](https://github.com/inathani), [Ulrich Pogson (@grappler)](https://github.com/grappler), [Chancey Mathews (@chanceymathews)](https://github.com/chanceymathews), [Ramon van Belzen (@Ramoonus)](https://github.com/Ramoonus), [Adam Silverstein (@adamsilverstein)](https://github.com/adamsilverstein), [Linnea Huxford (@mslinnea)](https://github.com/mslinnea), [Jon Sherrard (@jonsherrard)](https://github.com/jonsherrard), Jean-Christophe Brebion, [Michael Pretty (@prettyboymp)](https://github.com/prettyboymp).
+
+## Libraries
+
+The following software libraries are utilized in this repository.
+
+N/A.

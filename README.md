@@ -1,11 +1,8 @@
-Safe Redirect Manager [![Build Status](https://travis-ci.org/10up/safe-redirect-manager.svg?branch=master)](https://travis-ci.org/10up/safe-redirect-manager) ![WordPress tested up to version](https://img.shields.io/badge/WordPress-v5.2%20tested-success.svg)
-==============
+# Safe Redirect Manager 
 
-A WordPress plugin to safely and easily manage your website's HTTP redirects.
+> A WordPress plugin to safely and easily manage your website's HTTP redirects.
 
-<p align="center">
-<a href="http://10up.com/contact/"><img src="https://10updotcom-wpengine.s3.amazonaws.com/uploads/2016/10/10up-Github-Banner.png" width="850"></a>
-</p>
+[![Support Level](https://img.shields.io/badge/support-active-green.svg)](#support-level) [![Build Status](https://travis-ci.org/10up/safe-redirect-manager.svg?branch=develop)](https://travis-ci.org/10up/safe-redirect-manager) [![Release Version](https://img.shields.io/github/release/10up/safe-redirect-manager.svg)](https://github.com/10up/safe-redirect-manager/releases/latest) ![WordPress tested up to version](https://img.shields.io/badge/WordPress-v5.3%20tested-success.svg) [![GPLv2 License](https://img.shields.io/github/license/10up/safe-redirect-manager.svg)](https://github.com/10up/safe-redirect-manager/blob/develop/LICENSE.md)
 
 ## Purpose
 
@@ -19,17 +16,12 @@ WordPress mantra, decisions not options. Actions and filters make the plugin ver
 ## Installation
 
 Install the plugin in WordPress. You can download a
-[zip via Github](https://github.com/10up/safe-redirect-manager/archive/master.zip) and upload it using the WP
-plugin uploader.
-
-## Non-English Usage
-Safe Redirect Manager is available in English, French, and Slovak. Instructions for translating the plugin into other
-languages are below.
+[zip via Github](https://github.com/10up/safe-redirect-manager/archive/master.zip) and upload it using the WordPress
+plugin uploader ("Plugins" > "Add New" > "Upload Plugin").
 
 ## Configuration
 
-There are no overarching settings for this plugin. To manager redirects navigate to the administration panel. Within
-the main menu, click "Tools" > "Safe Redirect Manager".
+There are no overarching settings for this plugin. To manage redirects, navigate to the administration panel ("Tools" > "Safe Redirect Manager").
 
 Each redirect contains a few fields that you can utilize:
 
@@ -47,13 +39,12 @@ wildcard in your from path that matches a string, you can have that string repla
 `http://google.com/*`, and the requested path is `/test/string`, the user would be redirect to `http://google.com/string`.
 
 #### "Redirect To"
-This should be a path i.e. `/test` or a URL i.e. `http://example.com/wp/test`. If a requested path matches
+This should be a path (i.e. `/test`) or a URL (i.e. `http://example.com/wp/test`). If a requested path matches
 "Redirect From", they will be redirected here. "Redirect To" supports wildcard and regular expression replacements.
 
 #### "HTTP Status Code"
 [HTTP status codes](http://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html) are numbers that contain information about
-a request i.e. whether it was successful, unauthorized, not found, etc. You should almost always use either 302,
-temporarily moved, or 301, permanently moved.
+a request (i.e. whether it was successful, unauthorized, not found, etc). You should almost always use either 302 (temporarily moved) or 301 (permanently moved).
 
 *Note:*
 
@@ -74,7 +65,7 @@ add_filter( 'my_srm_redirect_loop_filter', '__return_true' );
 ## Development
 
 #### Setup
-Follow the configuration instructions above to setup the plugin. I recommend developing the plugin locally in an
+Follow the configuration instructions above to setup the plugin. We recommend developing the plugin locally in an
 environment such as [WP Local Docker](https://github.com/10up/wp-local-docker).
 
 #### Testing
@@ -93,3 +84,24 @@ phpunit
 #### Issues
 If you identify any errors or have an idea for improving the plugin, please
 [open an issue](https://github.com/10up/safe-redirect-manager/issues?state=open).
+
+## Translations
+Safe Redirect Manager is available in English and other languages.  A listing of those languages and instructions for translating the plugin into other languages is available on [Translating WordPress](https://translate.wordpress.org/projects/wp-plugins/safe-redirect-manager/).  Many thanks to the [contributors on the translation teams](https://translate.wordpress.org/projects/wp-plugins/safe-redirect-manager/contributors/)!
+
+## Support Level
+
+**Active:** 10up is actively working on this, and we expect to continue work for the foreseeable future including keeping tested up to the most recent version of WordPress.  Bug reports, feature requests, questions, and pull requests are welcome.
+
+## Changelog
+
+A complete listing of all notable changes to Safe Redirect Manager are documented in [CHANGELOG.md](https://github.com/10up/safe-redirect-manager/blob/develop/CHANGELOG.md).
+
+## Contributing
+
+Please read [CODE_OF_CONDUCT.md](https://github.com/10up/safe-redirect-manager/blob/develop/CODE_OF_CONDUCT.md) for details on our code of conduct, [CONTRIBUTING.md](https://github.com/10up/safe-redirect-manager/blob/develop/CONTRIBUTING.md) for details on the process for submitting pull requests to us, and [CREDITS.md](https://github.com/10up/safe-redirect-manager/blob/develop/CREDITS.md) for a listing of maintainers of, contributors to, and libraries used by Safe Redirect Manager.
+
+## Like what you see?
+
+<p align="center">
+<a href="http://10up.com/contact/"><img src="https://10updotcom-wpengine.s3.amazonaws.com/uploads/2016/10/10up-Github-Banner.png" width="850"></a>
+</p>
