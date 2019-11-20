@@ -92,6 +92,14 @@ Safe Redirect Manager is available in English and other languages.  A listing of
 
 **Active:** 10up is actively working on this, and we expect to continue work for the foreseeable future including keeping tested up to the most recent version of WordPress.  Bug reports, feature requests, questions, and pull requests are welcome.
 
+## Changelog
+
+A complete listing of all notable changes to Safe Redirect Manager are documented in [CHANGELOG.md](https://github.com/10up/safe-redirect-manager/blob/develop/CHANGELOG.md).
+
+## Contributing
+
+Please read [CODE_OF_CONDUCT.md](https://github.com/10up/safe-redirect-manager/blob/develop/CODE_OF_CONDUCT.md) for details on our code of conduct, [CONTRIBUTING.md](https://github.com/10up/safe-redirect-manager/blob/develop/CONTRIBUTING.md) for details on the process for submitting pull requests to us, and [CREDITS.md](https://github.com/10up/safe-redirect-manager/blob/develop/CREDITS.md) for a listing of maintainers of, contributors to, and libraries used by Safe Redirect Manager.
+
 ## Like what you see?
 
 <p align="center">
