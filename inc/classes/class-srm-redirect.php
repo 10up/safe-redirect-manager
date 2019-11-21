@@ -106,6 +106,15 @@ class SRM_Redirect {
 			$normalized_requested_path = $requested_path;
 		}
 
+		// normalise the request path with and without query strings, for comparison later
+		$requested_query_params = '';
+		$normalized_requested_path_no_query = false;
+		if (strpos($normalized_requested_path, "?")) {
+			$normalized_requested_path_no_query = substr($normalized_requested_path, 0, strpos($normalized_requested_path, "?"));
+			$normalized_requested_path_no_query = untrailingslashit( stripslashes( $normalized_requested_path_no_query ) );
+			$requested_query_params = substr($normalized_requested_path, strpos($normalized_requested_path, "?") + 1);
+		}
+
 		foreach ( (array) $redirects as $redirect ) {
 
 			$redirect_from = untrailingslashit( $redirect['redirect_from'] );
@@ -124,13 +133,17 @@ class SRM_Redirect {
 
 			// check if requested path is the same as the redirect from path
 			if ( $enable_regex ) {
+				$match_query_params = false;
 				$matched_path = preg_match( '@' . $redirect_from . '@' . $regex_flag, $requested_path );
 			} else {
 				if ( $case_insensitive ) {
 					$redirect_from = strtolower( $redirect_from );
 				}
 
-				$matched_path = ( $normalized_requested_path === $redirect_from );
+				// only compare query params if the $redirect_from value contains parameters
+				$match_query_params = apply_filters('srm_match_query_params', strpos($redirect_from, "?"));
+				$to_match = (!$match_query_params && !empty($normalized_requested_path_no_query)) ?  $normalized_requested_path_no_query : $normalized_requested_path;
+				$matched_path = ( $to_match === $redirect_from );
 
 				// check if the redirect_from ends in a wildcard
 				if ( ! $matched_path && ( strrpos( $redirect_from, '*' ) === strlen( $redirect_from ) - 1 ) ) {
@@ -165,6 +178,12 @@ class SRM_Redirect {
 				// Allow for regex replacement in $redirect_to
 				if ( $enable_regex ) {
 					$redirect_to = preg_replace( '@' . $redirect_from . '@' . $regex_flag, $redirect_to, $requested_path );
+				}
+
+				// re-add the query params if they've not already been added by the wildcard
+				// query params are forwarded to allow for attribution and marketing params to be maintained
+				if (!$match_query_params && !empty($requested_query_params) && !strpos($redirect_to, "?")) {
+					$redirect_to .= '?' . $requested_query_params;
 				}
 
 				$sanitized_redirect_to = esc_url_raw( apply_filters( 'srm_redirect_to', $redirect_to ) );
