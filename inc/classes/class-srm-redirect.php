@@ -167,9 +167,9 @@ class SRM_Redirect {
 					'enable_regex' => $enable_regex,
 				];
 			}
-
-			return false;
 		}
+
+		return false;
 	}
 
 	/**
