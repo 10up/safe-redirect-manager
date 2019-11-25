@@ -373,11 +373,11 @@ function srm_import_file( $file, $args ) {
  * @param string $path The path to check redirects for.
  *
  * @return array|bool {
- * 	Redirect array config.
+ *  Redirect array config.
  *
- * 	@type string	$redirect_to	The redirect to url.
- * 	@type int		$status_code	The redirect status code.
- * 	@type bool		$enable_regex	Whether this redirect has regex enabled or not.
+ *  @type string    $redirect_to    The redirect to url.
+ *  @type int       $status_code    The redirect status code.
+ *  @type bool      $enable_regex   Whether this redirect has regex enabled or not.
  * }
  */
 function srm_match_redirect( $path ) {
