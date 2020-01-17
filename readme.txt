@@ -17,7 +17,7 @@ Easily and safely manage your site's redirects the WordPress way. There are many
 
 == Installation ==
 
-Install the plugin in WordPress. You can download a [zip via Github](https://github.com/10up/safe-redirect-manager/archive/master.zip) and upload it using the WordPress plugin uploader ("Plugins" > "Add New" > "Upload Plugin").
+Install the plugin in WordPress. You can download a [zip via GitHub](https://github.com/10up/safe-redirect-manager/archive/master.zip) and upload it using the WordPress plugin uploader ("Plugins" > "Add New" > "Upload Plugin").
 
 == Configuration ==
 
@@ -27,7 +27,7 @@ Each redirect contains a few fields that you can utilize:
 
 === "Redirect From" ===
 This should be a path relative to the root of your WordPress installation. When someone visits your site with a path
-that matches this one, a redirect will occur. If your site is located at `http://example.com/wp/`` and you wanted to redirect `http://example.com/wp/about` to `http://example.com`, your "Redirect From" would be `/about`.
+that matches this one, a redirect will occur. If your site is located at `http://example.com/wp/` and you wanted to redirect `http://example.com/wp/about` to `http://example.com`, your "Redirect From" would be `/about`.
 
 Clicking the "Enable Regex" checkbox allows you to use regular expressions in your path. There are many
 [great tutorials](http://www.regular-expressions.info) on regular expressions.
@@ -156,7 +156,7 @@ Security
 * safe-redirect-manager.php - Globalize SRM class for use in themes/plugins/scripts. Added create_redirect method to make importing easier.
 
 = 1.2 =
-*   safe-redirect-manager.php - manage_options capabilitiy required to use redirect manager, remove checkbox column, hide view switcher, fix search feature, hide privacy stuff for bulk edit
+*   safe-redirect-manager.php - manage_options capability required to use redirect manager, remove checkbox column, hide view switcher, fix search feature, hide privacy stuff for bulk edit
 
 = 1.1 =
 *   safe-redirect-manager.php - plugin_url() used properly, is_plugin_page function
