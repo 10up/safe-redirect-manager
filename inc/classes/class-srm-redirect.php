@@ -190,30 +190,32 @@ class SRM_Redirect {
 
 		$matched_redirect = $this->match_redirect( $requested_path );
 
-		if ( $matched_redirect ) {
-			do_action(
-				'srm_do_redirect',
-				$requested_path,
-				$matched_redirect['redirect_to'],
-				$matched_redirect['status_code']
-			);
-
-			if ( defined( 'PHPUNIT_SRM_TESTSUITE' ) && PHPUNIT_SRM_TESTSUITE ) {
-				// Don't actually redirect if we are testing
-				return;
-			}
-
-			header( 'X-Safe-Redirect-Manager: true' );
-
-			// if we have a valid status code, then redirect with it
-			if ( in_array( $matched_redirect['status_code'], srm_get_valid_status_codes(), true ) ) {
-				wp_safe_redirect( $matched_redirect['redirect_to'], $matched_redirect['status_code'] );
-			} else {
-				wp_safe_redirect( $matched_redirect['redirect_to'] );
-			}
-
-			exit;
+		if ( empty( $matched_redirect ) ) {
+			return;
 		}
+
+		do_action(
+			'srm_do_redirect',
+			$requested_path,
+			$matched_redirect['redirect_to'],
+			$matched_redirect['status_code']
+		);
+
+		if ( defined( 'PHPUNIT_SRM_TESTSUITE' ) && PHPUNIT_SRM_TESTSUITE ) {
+			// Don't actually redirect if we are testing
+			return;
+		}
+
+		header( 'X-Safe-Redirect-Manager: true' );
+
+		// if we have a valid status code, then redirect with it
+		if ( in_array( $matched_redirect['status_code'], srm_get_valid_status_codes(), true ) ) {
+			wp_safe_redirect( $matched_redirect['redirect_to'], $matched_redirect['status_code'] );
+		} else {
+			wp_safe_redirect( $matched_redirect['redirect_to'] );
+		}
+
+		exit;
 	}
 
 	/**
