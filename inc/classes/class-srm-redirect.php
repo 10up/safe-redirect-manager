@@ -51,27 +51,19 @@ class SRM_Redirect {
 	}
 
 	/**
-	 * Check current url against redirects
+	 * Matches a redirect given a path.
 	 *
-	 * @since 1.8
+	 * @param string $requested_path The path to check redirects for.
+	 *
+	 * @return array|bool The redirect url. False if no redirect is found.
 	 */
-	public function maybe_redirect() {
-
-		// Don't redirect unless not on admin. If 404 filter enabled, require query is a 404.
-		if ( is_admin() || ( apply_filters( 'srm_redirect_only_on_404', false ) && ! is_404() ) ) {
-			return;
-		}
-
+	public function match_redirect( $requested_path ) {
 		$redirects = srm_get_redirects();
 
 		// If we have no redirects, there is no need to continue
 		if ( empty( $redirects ) ) {
-			return;
+			return false;
 		}
-
-		// get requested path and add a / before it
-		$requested_path = esc_url_raw( apply_filters( 'srm_requested_path', $_SERVER['REQUEST_URI'] ) );
-		$requested_path = untrailingslashit( stripslashes( $requested_path ) );
 
 		/**
 		 * If WordPress resides in a directory that is not the public root, we have to chop
@@ -169,25 +161,61 @@ class SRM_Redirect {
 
 				$sanitized_redirect_to = esc_url_raw( apply_filters( 'srm_redirect_to', $redirect_to ) );
 
-				do_action( 'srm_do_redirect', $requested_path, $sanitized_redirect_to, $status_code );
-
-				if ( defined( 'PHPUNIT_SRM_TESTSUITE' ) && PHPUNIT_SRM_TESTSUITE ) {
-					// Don't actually redirect if we are testing
-					return;
-				}
-
-				header( 'X-Safe-Redirect-Manager: true' );
-
-				// if we have a valid status code, then redirect with it
-				if ( in_array( $status_code, srm_get_valid_status_codes(), true ) ) {
-					wp_safe_redirect( $sanitized_redirect_to, $status_code );
-				} else {
-					wp_safe_redirect( $sanitized_redirect_to );
-				}
-
-				exit;
+				return [
+					'redirect_to'  => $sanitized_redirect_to,
+					'status_code'  => $status_code,
+					'enable_regex' => $enable_regex,
+				];
 			}
 		}
+
+		return false;
+	}
+
+	/**
+	 * Check current url against redirects
+	 *
+	 * @since 1.8
+	 */
+	public function maybe_redirect() {
+
+		// Don't redirect unless not on admin. If 404 filter enabled, require query is a 404.
+		if ( is_admin() || ( apply_filters( 'srm_redirect_only_on_404', false ) && ! is_404() ) ) {
+			return;
+		}
+
+		// get requested path and add a / before it
+		$requested_path = esc_url_raw( apply_filters( 'srm_requested_path', $_SERVER['REQUEST_URI'] ) );
+		$requested_path = untrailingslashit( stripslashes( $requested_path ) );
+
+		$matched_redirect = $this->match_redirect( $requested_path );
+
+		if ( empty( $matched_redirect ) ) {
+			return;
+		}
+
+		do_action(
+			'srm_do_redirect',
+			$requested_path,
+			$matched_redirect['redirect_to'],
+			$matched_redirect['status_code']
+		);
+
+		if ( defined( 'PHPUNIT_SRM_TESTSUITE' ) && PHPUNIT_SRM_TESTSUITE ) {
+			// Don't actually redirect if we are testing
+			return;
+		}
+
+		header( 'X-Safe-Redirect-Manager: true' );
+
+		// if we have a valid status code, then redirect with it
+		if ( in_array( $matched_redirect['status_code'], srm_get_valid_status_codes(), true ) ) {
+			wp_safe_redirect( $matched_redirect['redirect_to'], $matched_redirect['status_code'] );
+		} else {
+			wp_safe_redirect( $matched_redirect['redirect_to'] );
+		}
+
+		exit;
 	}
 
 	/**
