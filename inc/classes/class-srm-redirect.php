@@ -110,9 +110,9 @@ class SRM_Redirect {
 
 		if ( is_array( $parsed_requested_path ) ) {
 			$normalized_requested_path_no_query = '';
-			$requested_query_params = '';
+			$requested_query_params             = '';
 
-			if ( ! empty( $parsed_requested_path['path'] )  ){
+			if ( ! empty( $parsed_requested_path['path'] ) ) {
 				$normalized_requested_path_no_query = untrailingslashit( stripslashes( $parsed_requested_path['path'] ) );
 			}
 			if ( ! empty( $parsed_requested_path['query'] ) ) {
@@ -148,7 +148,7 @@ class SRM_Redirect {
 				// only compare query params if the $redirect_from value contains parameters
 				$match_query_params = apply_filters( 'srm_match_query_params', strpos( $redirect_from, '?' ) );
 
-				$to_match = ( ! $match_query_params && ! empty( $normalized_requested_path_no_query ) ) ? $normalized_requested_path_no_query : $normalized_requested_path;
+				$to_match     = ( ! $match_query_params && ! empty( $normalized_requested_path_no_query ) ) ? $normalized_requested_path_no_query : $normalized_requested_path;
 				$matched_path = ( $to_match === $redirect_from );
 
 				// check if the redirect_from ends in a wildcard
