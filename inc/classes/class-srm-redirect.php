@@ -99,12 +99,25 @@ class SRM_Redirect {
 		}
 
 		// normalise the request path with and without query strings, for comparison later
-		$requested_query_params = '';
+		$requested_query_params             = '';
 		$normalized_requested_path_no_query = false;
-		if (strpos($normalized_requested_path, "?")) {
-			$normalized_requested_path_no_query = substr($normalized_requested_path, 0, strpos($normalized_requested_path, "?"));
-			$normalized_requested_path_no_query = untrailingslashit( stripslashes( $normalized_requested_path_no_query ) );
-			$requested_query_params = substr($normalized_requested_path, strpos($normalized_requested_path, "?") + 1);
+
+		if ( function_exists( 'wp_parse_url' ) ) {
+			$parsed_requested_path = wp_parse_url( $normalized_requested_path );
+		} else {
+			$parsed_requested_path = parse_url( $normalized_requested_path );
+		}
+
+		if ( is_array( $parsed_requested_path ) ) {
+			$normalized_requested_path_no_query = '';
+			$requested_query_params = '';
+
+			if ( ! empty( $parsed_requested_path['path'] )  ){
+				$normalized_requested_path_no_query = untrailingslashit( stripslashes( $parsed_requested_path['path'] ) );
+			}
+			if ( ! empty( $parsed_requested_path['query'] ) ) {
+				$requested_query_params = $parsed_requested_path['query'];
+			}
 		}
 
 		foreach ( (array) $redirects as $redirect ) {
@@ -126,15 +139,16 @@ class SRM_Redirect {
 			// check if requested path is the same as the redirect from path
 			if ( $enable_regex ) {
 				$match_query_params = false;
-				$matched_path = preg_match( '@' . $redirect_from . '@' . $regex_flag, $requested_path );
+				$matched_path       = preg_match( '@' . $redirect_from . '@' . $regex_flag, $requested_path );
 			} else {
 				if ( $case_insensitive ) {
 					$redirect_from = strtolower( $redirect_from );
 				}
 
 				// only compare query params if the $redirect_from value contains parameters
-				$match_query_params = apply_filters('srm_match_query_params', strpos($redirect_from, "?"));
-				$to_match = (!$match_query_params && !empty($normalized_requested_path_no_query)) ?  $normalized_requested_path_no_query : $normalized_requested_path;
+				$match_query_params = apply_filters( 'srm_match_query_params', strpos( $redirect_from, '?' ) );
+
+				$to_match = ( ! $match_query_params && ! empty( $normalized_requested_path_no_query ) ) ? $normalized_requested_path_no_query : $normalized_requested_path;
 				$matched_path = ( $to_match === $redirect_from );
 
 				// check if the redirect_from ends in a wildcard
@@ -174,7 +188,7 @@ class SRM_Redirect {
 
 				// re-add the query params if they've not already been added by the wildcard
 				// query params are forwarded to allow for attribution and marketing params to be maintained
-				if (!$match_query_params && !empty($requested_query_params) && !strpos($redirect_to, "?")) {
+				if ( ! $match_query_params && ! empty( $requested_query_params ) && ! strpos( $redirect_to, '?' ) ) {
 					$redirect_to .= '?' . $requested_query_params;
 				}
 
