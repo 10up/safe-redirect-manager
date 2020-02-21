@@ -638,4 +638,23 @@ class SRMTestCore extends WP_UnitTestCase {
 		SRM_Redirect::factory()->maybe_redirect();
 		$this->assertFalse( $redirected, 'Expected that /noredirect/ would not redirect, but instead redirected to ' . $redirect_to );
 	}
+
+	/**
+	 * Tests the match redirect function
+	 *
+	 */
+	public function testMatchRedirect() {
+		$redirect_to            = '/gohere';
+		srm_create_redirect( '/', $redirect_to );
+
+		$matched_redirect = srm_match_redirect( '/' );
+
+		$this->assertTrue( $matched_redirect['redirect_to'] === $redirect_to );
+
+		srm_create_redirect( '/one-page', $redirect_to );
+
+		$matched_redirect = srm_match_redirect( '/one-page' );
+
+		$this->assertTrue( $matched_redirect['redirect_to'] === $redirect_to );
+	}
 }

@@ -16,7 +16,7 @@ WordPress mantra, decisions not options. Actions and filters make the plugin ver
 ## Installation
 
 Install the plugin in WordPress. You can download a
-[zip via Github](https://github.com/10up/safe-redirect-manager/archive/master.zip) and upload it using the WordPress
+[zip via GitHub](https://github.com/10up/safe-redirect-manager/archive/master.zip) and upload it using the WordPress
 plugin uploader ("Plugins" > "Add New" > "Upload Plugin").
 
 ## Configuration
@@ -27,7 +27,7 @@ Each redirect contains a few fields that you can utilize:
 
 #### "Redirect From"
 This should be a path relative to the root of your WordPress installation. When someone visits your site with a path
-that matches this one, a redirect will occur. If your site is located at ```http://example.com/wp/``` and you wanted to redirect `http://example.com/wp/about` to `http://example.com`, your "Redirect From" would be `/about`.
+that matches this one, a redirect will occur. If your site is located at `http://example.com/wp/` and you wanted to redirect `http://example.com/wp/about` to `http://example.com`, your "Redirect From" would be `/about`.
 
 Clicking the "Enable Regex" checkbox allows you to use regular expressions in your path. There are many
 [great tutorials](http://www.regular-expressions.info) on regular expressions.
