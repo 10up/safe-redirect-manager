@@ -91,7 +91,7 @@ class SRM_Redirect {
 
 		if ( $case_insensitive ) {
 			$regex_flag = 'i';
-			// normalized path is used for matching but not for replace
+			// Normalized path is used for matching but not for replace
 			$normalized_requested_path = strtolower( $requested_path );
 		} else {
 			$regex_flag                = '';
@@ -103,7 +103,7 @@ class SRM_Redirect {
 		} else {
 			$parsed_requested_path = parse_url( $normalized_requested_path );
 		}
-		// normalise the request path with and without query strings, for comparison later
+		// Normalize the request path with and without query strings, for comparison later
 		$requested_query_params = '';
 		if ( ! empty( $parsed_requested_path['query'] ) ) {
 			$requested_query_params = $parsed_requested_path['query'];
