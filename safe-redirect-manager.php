@@ -35,4 +35,4 @@ if ( defined( 'WP_CLI' ) && WP_CLI ) {
 }
 
 SRM_Post_Type::factory();
-add_action( 'init', 'SRM_Redirect::factory' );
+SRM_Redirect::factory();
