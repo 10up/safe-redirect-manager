@@ -59,7 +59,7 @@ so you shouldn't be serving stale redirects.
 By default redirect loop detection is disabled. To prevent redirect loops you can filter `srm_check_for_possible_redirect_loops`.
 
 ```php
-add_filter( 'my_srm_redirect_loop_filter', '__return_true' );
+add_filter( 'srm_check_for_possible_redirect_loops', '__return_true' );
 ```
 
 ## Development
