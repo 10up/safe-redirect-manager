@@ -62,6 +62,67 @@ By default redirect loop detection is disabled. To prevent redirect loops you ca
 add_filter( 'srm_check_for_possible_redirect_loops', '__return_true' );
 ```
 
+## CLI commands
+
+The following WP-CLI commands are supported by Safe Redirect Manager:
+
+* **`wp safe-redirect-manager list`**
+
+    List all of the currently configured redirects.
+
+* **`wp safe-redirect-manager create <from> <to> [<status-code>] [<enable-regex>] [<post-status>]`**
+
+    Create a redirect. `<from>` and `<to>` are required parameters.
+
+	* `<from>`: Redirect from path. Required.
+
+	* `<to>`: Redirect to path. Required.
+
+	* `<status-code>`: HTTP Status Code. Optional. Default to `302`.
+
+	* `<enable-regex>`: Whether to enable Regular expression. Optional. Default to `false`.
+
+	* `<post-status>`: The status of the redirect. Optional. Default to `publish`.
+
+	**Example:** `wp safe-redirect-manager create /about-us /contact-us 301`
+
+* **`wp safe-redirect-manager delete <id>`**
+
+    Delete a redirect by `<id>`.
+
+* **`wp safe-redirect-manager update-cache`**
+
+    Update the redirect cache.
+
+* **`wp safe-redirect-manager import <file> [--source=<source-column>] [--target=<target-column>] [--regex=<regex-column>] [--code=<code-column>]  [--order=<order-column>]`**
+
+    Imports redirects from CSV file.
+
+    * `<file>`: Path to one or more valid CSV file for import. This file should contain redirection from and to URLs, regex flag and HTTP redirection code. Here is the example table:
+
+        | source                     | target             | regex | code | order |
+        |----------------------------|--------------------|-------|------|-------|
+        | /legacy-url                | /new-url           | 0     | 301  | 0     |
+        | /category-1                | /new-category-slug | 0     | 302  | 1     |
+        | /tes?t/[0-9]+/path/[^/]+/? | /go/here           | 1     | 302  | 3     |
+        | ...                        | ...                | ...   | ...  | ...   |
+    
+        _You can also use exported redirects from "Redirection" plugin, which you can download here: /wp-admin/tools.php?page=redirection.php&sub=modules_
+
+    * `--source`: Header title for sources column mapping.
+
+    * `--target`: Header title for target column mapping.
+
+    * `--regex`: Header title for regex column mapping.
+
+    * `--code`: Header title for code column mapping.
+
+    * `--order`: Header title for order column mapping.
+
+* **`wp safe-redirect-manager import-htaccess <file>`**
+
+    Import .htaccess file redirects.
+
 ## Development
 
 #### Setup
