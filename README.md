@@ -96,7 +96,7 @@ The following WP-CLI commands are supported by Safe Redirect Manager:
 
 * **`wp safe-redirect-manager import <file> [--source=<source-column>] [--target=<target-column>] [--regex=<regex-column>] [--code=<code-column>]  [--order=<order-column>]`**
 
-    Imports redirects from CSV file.
+    Imports redirects from a CSV file.
 
     * `<file>`: Path to one or more valid CSV file for import. This file should contain redirection from and to URLs, regex flag and HTTP redirection code. Here is the example table:
 
@@ -109,9 +109,9 @@ The following WP-CLI commands are supported by Safe Redirect Manager:
     
         _You can also use exported redirects from "Redirection" plugin, which you can download here: /wp-admin/tools.php?page=redirection.php&sub=modules_
 
-    * `--source`: Header title for sources column mapping.
+    * `--source`: Header title for source ("from" URL) column mapping.
 
-    * `--target`: Header title for target column mapping.
+    * `--target`: Header title for target ("to" URL) column mapping.
 
     * `--regex`: Header title for regex column mapping.
 
