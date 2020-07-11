@@ -7,6 +7,9 @@
       "node_modules",
       "vendor"
     ],
+    "before_scripts" : [
+      "mv tests/wpa/plugins/* ../"
+    ],
     "enforce_clean_db": false,
     "environment_instructions":
     [
