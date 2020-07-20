@@ -109,18 +109,22 @@ function srm_get_valid_status_codes() {
  * @return array
  */
 function srm_get_valid_status_codes_data() {
-	return apply_filters(
-		'srm_valid_status_codes_data',
-		array(
-			301 => esc_html__( 'Moved Permanently', 'safe-redirect-manager' ),
-			302 => esc_html__( 'Found', 'safe-redirect-manager' ),
-			303 => esc_html__( 'See Other', 'safe-redirect-manager' ),
-			307 => esc_html__( 'Temporary Redirect', 'safe-redirect-manager' ),
-			403 => esc_html__( 'Forbidden', 'safe-redirect-manager' ),
-			404 => esc_html__( 'Not Found', 'safe-redirect-manager' ),
-			410 => esc_html__( 'Gone', 'safe-redirect-manager' ),
-		)
+	$status_codes = array(
+		301 => esc_html__( 'Moved Permanently', 'safe-redirect-manager' ),
+		302 => esc_html__( 'Found', 'safe-redirect-manager' ),
+		303 => esc_html__( 'See Other', 'safe-redirect-manager' ),
+		307 => esc_html__( 'Temporary Redirect', 'safe-redirect-manager' ),
+		403 => esc_html__( 'Forbidden', 'safe-redirect-manager' ),
+		404 => esc_html__( 'Not Found', 'safe-redirect-manager' ),
+		410 => esc_html__( 'Gone', 'safe-redirect-manager' ),
 	);
+
+	$additional_status_codes = apply_filters(
+		'srm_additional_status_codes',
+		array()
+	);
+
+	return $status_codes + array_diff_key( $additional_status_codes, $status_codes );
 }
 
 /**
