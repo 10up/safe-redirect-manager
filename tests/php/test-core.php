@@ -565,6 +565,29 @@ class SRMTestCore extends WP_UnitTestCase {
 	}
 
 	/**
+	 * Test a redirect rule with a wildcard that shouldn't match.
+	 */
+	public function testNoRedirectWildcardGeneralized() {
+		$_SERVER['REQUEST_URI'] = '/one-page/';
+		$redirected             = false;
+		$redirect_to            = '/gohere';
+
+		// Create redirect for testing.
+		srm_create_redirect( '/one/*', $redirect_to );
+		add_action(
+			'srm_do_redirect',
+			function( $requested_path, $redirected_to, $status_code ) use ( &$redirect_to, &$redirected, &$expected ) {
+					$redirected = true;
+			},
+			10,
+			3
+		);
+
+		SRM_Redirect::factory()->maybe_redirect();
+		$this->assertFalse( $redirected, 'Expected that /one-page/ would not redirect, but instead redirected to ' . $redirect_to );
+	}
+
+	/**
 	 * Test a URL that shouldn't redirect.
 	 */
 	public function testNoRedirect() {
