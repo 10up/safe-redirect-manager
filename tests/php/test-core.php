@@ -567,7 +567,7 @@ class SRMTestCore extends WP_UnitTestCase {
 	/**
 	 * Test a redirect rule with a wildcard that shouldn't match.
 	 */
-	public function testNoRedirectWildcardGeneralized() {
+	public function testNoRedirectWildcard() {
 		$_SERVER['REQUEST_URI'] = '/one-page/';
 		$redirected             = false;
 		$redirect_to            = '/gohere';
