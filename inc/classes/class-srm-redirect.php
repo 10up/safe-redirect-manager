@@ -105,9 +105,10 @@ class SRM_Redirect {
 				$redirect_from = '/'; // this only happens in the case where there is a redirect on the root
 			}
 
-			$redirect_to  = $redirect['redirect_to'];
-			$status_code  = $redirect['status_code'];
-			$enable_regex = ( isset( $redirect['enable_regex'] ) ) ? $redirect['enable_regex'] : false;
+			$redirect_to      = $redirect['redirect_to'];
+			$status_code      = $redirect['status_code'];
+			$enable_regex     = ( isset( $redirect['enable_regex'] ) ) ? $redirect['enable_regex'] : false;
+			$redirect_post_id = $redirect['ID'];
 
 			// check if the redirection destination is valid, otherwise just skip it
 			if ( empty( $redirect_to ) ) {
@@ -162,9 +163,10 @@ class SRM_Redirect {
 				$sanitized_redirect_to = esc_url_raw( apply_filters( 'srm_redirect_to', $redirect_to ) );
 
 				return [
-					'redirect_to'  => $sanitized_redirect_to,
-					'status_code'  => $status_code,
-					'enable_regex' => $enable_regex,
+					'redirect_to'      => $sanitized_redirect_to,
+					'status_code'      => $status_code,
+					'enable_regex'     => $enable_regex,
+					'redirect_post_id' => $redirect_post_id,
 				];
 			}
 		}
@@ -207,6 +209,7 @@ class SRM_Redirect {
 		}
 
 		header( 'X-Safe-Redirect-Manager: true' );
+		header( 'X-Safe-Redirect-Post-ID: ' . esc_attr( $matched_redirect['redirect_post_id'] ) );
 
 		// if we have a valid status code, then redirect with it
 		if ( in_array( $matched_redirect['status_code'], srm_get_valid_status_codes(), true ) ) {
