@@ -576,8 +576,8 @@ class SRMTestCore extends WP_UnitTestCase {
 		srm_create_redirect( '/one/*', $redirect_to );
 		add_action(
 			'srm_do_redirect',
-			function( $requested_path, $redirected_to, $status_code ) use ( &$redirect_to, &$redirected, &$expected ) {
-					$redirected = true;
+			function() use ( &$redirected ) {
+				$redirected = true;
 			},
 			10,
 			3
