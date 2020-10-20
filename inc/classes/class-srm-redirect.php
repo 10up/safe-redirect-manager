@@ -209,7 +209,7 @@ class SRM_Redirect {
 		}
 
 		header( 'X-Safe-Redirect-Manager: true' );
-		header( 'X-Safe-Redirect-Post-ID: ' . esc_attr( $matched_redirect['redirect_post_id'] ) );
+		header( 'X-Safe-Redirect-ID: ' . esc_attr( $matched_redirect['redirect_post_id'] ) );
 
 		// if we have a valid status code, then redirect with it
 		if ( in_array( $matched_redirect['status_code'], srm_get_valid_status_codes(), true ) ) {
