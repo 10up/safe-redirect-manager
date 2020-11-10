@@ -17,11 +17,20 @@ class SRM_Redirect {
 	private $whitelist_host;
 
 	/**
-	 * Initialize redirect listening
+	 * Setup hook.
 	 *
 	 * @since 1.8
 	 */
 	public function setup() {
+		add_action( 'init', array( $this, 'setup_redirect' ), 0 );
+	}
+
+	/**
+	 * Initialize redirect listening
+	 *
+	 * @since 1.9.4
+	 */
+	public function setup_redirect() {
 		/**
 		 * To only redirect on 404 pages, use:
 		 *   add_filter( 'srm_redirect_only_on_404', '__return_true' );
