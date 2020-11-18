@@ -244,6 +244,7 @@ class SRM_WP_CLI extends WP_CLI_Command {
 				'target' => 'target',
 				'regex'  => 'regex',
 				'code'   => 'code',
+				'order'  => 'order',
 			)
 		);
 
