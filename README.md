@@ -1,8 +1,8 @@
-# Safe Redirect Manager 
+# Safe Redirect Manager
 
 > A WordPress plugin to safely and easily manage your website's HTTP redirects.
 
-[![Support Level](https://img.shields.io/badge/support-active-green.svg)](#support-level) [![Build Status](https://travis-ci.org/10up/safe-redirect-manager.svg?branch=develop)](https://travis-ci.org/10up/safe-redirect-manager) [![Release Version](https://img.shields.io/github/release/10up/safe-redirect-manager.svg)](https://github.com/10up/safe-redirect-manager/releases/latest) ![WordPress tested up to version](https://img.shields.io/badge/WordPress-v5.4%20tested-success.svg) [![GPLv2 License](https://img.shields.io/github/license/10up/safe-redirect-manager.svg)](https://github.com/10up/safe-redirect-manager/blob/develop/LICENSE.md)
+[![Support Level](https://img.shields.io/badge/support-active-green.svg)](#support-level) [![Build Status](https://travis-ci.org/10up/safe-redirect-manager.svg?branch=develop)](https://travis-ci.org/10up/safe-redirect-manager) [![Release Version](https://img.shields.io/github/release/10up/safe-redirect-manager.svg)](https://github.com/10up/safe-redirect-manager/releases/latest) ![WordPress tested up to version](https://img.shields.io/badge/WordPress-v5.4.2%20tested-success.svg) [![GPLv2 License](https://img.shields.io/github/license/10up/safe-redirect-manager.svg)](https://github.com/10up/safe-redirect-manager/blob/develop/LICENSE.md)
 
 ## Purpose
 
@@ -106,7 +106,7 @@ The following WP-CLI commands are supported by Safe Redirect Manager:
         | /category-1                | /new-category-slug | 0     | 302  | 1     |
         | /tes?t/[0-9]+/path/[^/]+/? | /go/here           | 1     | 302  | 3     |
         | ...                        | ...                | ...   | ...  | ...   |
-    
+
         _You can also use exported redirects from "Redirection" plugin, which you can download here: /wp-admin/tools.php?page=redirection.php&sub=modules_
 
     * `--source`: Header title for source ("from" URL) column mapping.
