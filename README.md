@@ -54,12 +54,20 @@ so you shouldn't be serving stale redirects.
 `srm_max_redirects` that you can utilize to up this number.
 * "Redirect From" and requested paths are case insensitive by default.
 
-## Redirect loops
+## Filters
+### Redirect loops detection
 
 By default redirect loop detection is disabled. To prevent redirect loops you can filter `srm_check_for_possible_redirect_loops`.
 
 ```php
 add_filter( 'srm_check_for_possible_redirect_loops', '__return_true' );
+```
+
+### Only redirect if 404 occurs
+
+By default, SRM redirects every matched URL. To only redirect matched but not found URL (404 pages), use `srm_redirect_only_on_404`.
+```php
+add_filter( 'srm_redirect_only_on_404', '__return_true' );
 ```
 
 ## CLI commands
