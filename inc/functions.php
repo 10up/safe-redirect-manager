@@ -124,7 +124,7 @@ function srm_get_valid_status_codes_data() {
 		array()
 	);
 
-	return $status_codes + array_diff_key( $additional_status_codes, $status_codes );
+	return $status_codes + $additional_status_codes;
 }
 
 /**
