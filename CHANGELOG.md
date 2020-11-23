@@ -6,6 +6,7 @@ All notable changes to this project will be documented in this file, per [the Ke
 
 ## [1.10.0] - TBD
 ### Added
+- `410 Gone` status code to the list of HTTP status codes and `srm_additional_status_codes` to add additional status codes ([@dinhtungdu](https://github.com/dinhtungdu), [@helen](https://github.com/helen), [@PopVeKind](https://github.com/PopVeKind) via [#215](https://github.com/10up/safe-redirect-manager/pull/215)).
 - Option to ignore query parameters, previous behaviour still available via the new `srm_match_query_params` filter (props [@braders](https://github.com/braders), [@dinhtungdu](https://github.com/dinhtungdu) via [#196](https://github.com/10up/safe-redirect-manager/pull/196)).
 - Extracts redirect matching logic from `maybe_redirect` to `match_redirect` method, plus `srm_match_redirect` function to expose matching redirect logic to themes and plugins (props [@nicholasio](https://github.com/nicholasio), [@dinhtungdu](https://github.com/dinhtungdu) via [#198](https://github.com/10up/safe-redirect-manager/pull/198)).
 - Redirect Post ID to response headers where a redirect rule is invoked (props [@jamesmorrison](https://github.com/jamesmorrison), [@dinhtungdu](https://github.com/dinhtungdu) via [#218](https://github.com/10up/safe-redirect-manager/pull/218)).
