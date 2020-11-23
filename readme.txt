@@ -47,8 +47,10 @@ This should be a path (i.e. `/test`) or a URL (i.e. `http://example.com/wp/test`
 == Changelog ==
 
 = 1.10.0 =
+* **Added:** `410 Gone` status code to the list of HTTP status codes and `srm_additional_status_codes` to add additional status codes ([@dinhtungdu](https://profiles.wordpress.org/dinhtungdu/), [@helen](https://profiles.wordpress.org/helen), [@PopVeKind](https://profiles.wordpress.org/popvekind/)).
 * **Added:** Option to ignore query parameters, previous behaviour still available via the new `srm_match_query_params` filter (props [@bradleyt](https://profiles.wordpress.org/bradleyt/), [@dinhtungdu](https://profiles.wordpress.org/dinhtungdu/)).
 * **Added:** Extracts redirect matching logic from `maybe_redirect` to `match_redirect` method, plus `srm_match_redirect` function to expose matching redirect logic to themes and plugins (props [@nicholas_io](https://profiles.wordpress.org/nicholas_io/), [@dinhtungdu](https://profiles.wordpress.org/dinhtungdu/)).
+* **Added:** Redirect Post ID to response headers where a redirect rule is invoked (props [@jamesmorrison](https://profiles.wordpress.org/jamesmorrison/), [@dinhtungdu](https://profiles.wordpress.org/dinhtungdu/)).
 * **Added:** Banner and icon images (props [@lea10up](https://profiles.wordpress.org/lea10up/)).
 * **Added:** Documentation and unit test updates (props [@noplanman](https://profiles.wordpress.org/noplanman/), [@dinhtungdu](https://profiles.wordpress.org/dinhtungdu/), [@kevinbrands](https://profiles.wordpress.org/kevinbrands/), [@jeffpaul](https://profiles.wordpress.org/jeffpaul/), [@davidegreenwald](https://profiles.wordpress.org/davidegreenwald/), [@barryceelen](https://profiles.wordpress.org/barryceelen/)).
 * **Fixed:** Use proper hook for setting up `SRM_Redirect` (props [@dinhtungdu](https://profiles.wordpress.org/dinhtungdu/), [@icaleb](https://profiles.wordpress.org/icaleb/)).
