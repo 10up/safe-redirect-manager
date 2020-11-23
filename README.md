@@ -53,6 +53,7 @@ so you shouldn't be serving stale redirects.
 * By default the plugin only allows at most 250 redirects to prevent performance issues. There is a filter
 `srm_max_redirects` that you can utilize to up this number.
 * "Redirect From" and requested paths are case insensitive by default.
+* Developers can use `srm_additional_status_codes` filter to add status codes if needed.
 
 ## Filters
 

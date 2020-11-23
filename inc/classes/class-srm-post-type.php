@@ -30,14 +30,7 @@ class SRM_Post_Type {
 	 * @since 1.8
 	 */
 	public function setup() {
-		$this->status_code_labels = array(
-			301 => esc_html__( 'Moved Permanently', 'safe-redirect-manager' ),
-			302 => esc_html__( 'Found', 'safe-redirect-manager' ),
-			303 => esc_html__( 'See Other', 'safe-redirect-manager' ),
-			307 => esc_html__( 'Temporary Redirect', 'safe-redirect-manager' ),
-			403 => esc_html__( 'Forbidden', 'safe-redirect-manager' ),
-			404 => esc_html__( 'Not Found', 'safe-redirect-manager' ),
-		);
+		$this->status_code_labels = srm_get_valid_status_codes_data();
 
 		add_action( 'init', array( $this, 'action_register_post_types' ) );
 		add_action( 'admin_init', array( $this, 'init_search_filters' ) );
