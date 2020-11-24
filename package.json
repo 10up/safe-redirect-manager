@@ -9,7 +9,4 @@
     "type": "git",
     "url": "https://github.com/10up/safe-redirect-manager"
   },
-  "scripts": {
-    "makepot": "wpi18n makepot"
-  }
 }
