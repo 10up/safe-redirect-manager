@@ -1,8 +1,8 @@
 === Safe Redirect Manager ===
 Contributors: tlovett1, tollmanz, taylorde, 10up, jakemgold, danielbachhuber, VentureBeat
 Tags: http redirects, redirect manager, url redirection, safe http redirection, multisite redirects, redirects
-Requires at least: 3.1
-Tested up to: 5.4.2
+Requires at least: 4.6
+Tested up to: 5.5.3
 Stable tag: 1.10.0
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
@@ -17,7 +17,7 @@ Easily and safely manage your site's redirects the WordPress way. There are many
 
 == Installation ==
 
-Install the plugin in WordPress. You can download a [zip via GitHub](https://github.com/10up/safe-redirect-manager/archive/master.zip) and upload it using the WordPress plugin uploader ("Plugins" > "Add New" > "Upload Plugin").
+Install the plugin in WordPress. You can download a [zip via GitHub](https://github.com/10up/safe-redirect-manager/archive/trunk.zip) and upload it using the WordPress plugin uploader ("Plugins" > "Add New" > "Upload Plugin").
 
 == Configuration ==
 
