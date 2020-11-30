@@ -13,6 +13,7 @@
  * @package safe-redirect-manager
  */
 
+// Load helper functions and classes
 require_once dirname( __FILE__ ) . '/inc/functions.php';
 require_once dirname( __FILE__ ) . '/inc/classes/class-srm-post-type.php';
 require_once dirname( __FILE__ ) . '/inc/classes/class-srm-redirect.php';
