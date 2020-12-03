@@ -35,7 +35,7 @@ class BasicTest extends \WPAcceptance\PHPUnit\TestCase {
 	/**
 	 * Admin menu item shows
 	 */
-	public function testAdaminMenuItemShows() {
+	public function testAdminMenuItemShows() {
 		$I = $this->openBrowserPage();
 
 		$I->loginAs( 'admin' );
@@ -43,5 +43,20 @@ class BasicTest extends \WPAcceptance\PHPUnit\TestCase {
 		$I->moveTo( 'wp-admin/tools.php' );
 
 		$I->seeLink( 'Safe Redirect Manager' );
+	}
+
+	/**
+	 * @testdox If the user goes to Tools > Safe Redirect Manager, it should show the post list table of created redirect rules and the Create Redirect Rule link.
+	 */
+	public function testAdminPageContent() {
+		$I = $this->openBrowserPage();
+
+		$I->loginAs( 'admin' );
+
+		$I->moveTo( 'wp-admin/edit.php?post_type=redirect_rule' );
+
+		$I->seeText( 'Safe Redirect Manager' );
+
+		$I->seeLink( 'Create Redirect Rule' );
 	}
 }

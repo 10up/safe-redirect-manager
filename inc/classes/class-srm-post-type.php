@@ -30,14 +30,7 @@ class SRM_Post_Type {
 	 * @since 1.8
 	 */
 	public function setup() {
-		$this->status_code_labels = array(
-			301 => esc_html__( 'Moved Permanently', 'safe-redirect-manager' ),
-			302 => esc_html__( 'Found', 'safe-redirect-manager' ),
-			303 => esc_html__( 'See Other', 'safe-redirect-manager' ),
-			307 => esc_html__( 'Temporary Redirect', 'safe-redirect-manager' ),
-			403 => esc_html__( 'Forbidden', 'safe-redirect-manager' ),
-			404 => esc_html__( 'Not Found', 'safe-redirect-manager' ),
-		);
+		$this->status_code_labels = srm_get_valid_status_codes_data();
 
 		add_action( 'init', array( $this, 'action_register_post_types' ) );
 		add_action( 'admin_init', array( $this, 'init_search_filters' ) );
@@ -568,7 +561,7 @@ class SRM_Post_Type {
 			<input type="checkbox" name="srm_redirect_rule_from_regex" id="srm_redirect_rule_from_regex" <?php checked( true, (bool) $enable_regex ); ?> value="1" />
 			<label for="srm_redirect_rule_from_regex"><?php esc_html_e( 'Enable Regular Expressions (advanced)', 'safe-redirect-manager' ); ?></label>
 		</p>
-		<p class="description"><?php esc_html_e( 'This path should be relative to the root of this WordPress installation (or the sub-site, if you are running a multi-site). Appending a (*) wildcard character will match all requests with the base. Warning: Enabling regular expressions will disable wildcards and completely change the way the * symbol is interpretted.', 'safe-redirect-manager' ); ?></p>
+		<p class="description"><?php esc_html_e( 'This path should be relative to the root of this WordPress installation (or the sub-site, if you are running a multi-site). Appending a (*) wildcard character will match all requests with the base. Warning: Enabling regular expressions will disable wildcards and completely change the way the * symbol is interpreted.', 'safe-redirect-manager' ); ?></p>
 
 		<p>
 			<label for="srm_redirect_rule_to"><strong><?php esc_html_e( '* Redirect To:', 'safe-redirect-manager' ); ?></strong></label><br />

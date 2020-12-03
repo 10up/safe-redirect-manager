@@ -1,8 +1,8 @@
-# Safe Redirect Manager 
+# Safe Redirect Manager
 
 > A WordPress plugin to safely and easily manage your website's HTTP redirects.
 
-[![Support Level](https://img.shields.io/badge/support-active-green.svg)](#support-level) [![Build Status](https://travis-ci.org/10up/safe-redirect-manager.svg?branch=develop)](https://travis-ci.org/10up/safe-redirect-manager) [![Release Version](https://img.shields.io/github/release/10up/safe-redirect-manager.svg)](https://github.com/10up/safe-redirect-manager/releases/latest) ![WordPress tested up to version](https://img.shields.io/badge/WordPress-v5.3%20tested-success.svg) [![GPLv2 License](https://img.shields.io/github/license/10up/safe-redirect-manager.svg)](https://github.com/10up/safe-redirect-manager/blob/develop/LICENSE.md)
+[![Support Level](https://img.shields.io/badge/support-active-green.svg)](#support-level) [![Build Status](https://travis-ci.org/10up/safe-redirect-manager.svg?branch=develop)](https://travis-ci.org/10up/safe-redirect-manager) [![Release Version](https://img.shields.io/github/release/10up/safe-redirect-manager.svg)](https://github.com/10up/safe-redirect-manager/releases/latest) ![WordPress tested up to version](https://img.shields.io/badge/WordPress-v5.5.3%20tested-success.svg) [![GPLv2 License](https://img.shields.io/github/license/10up/safe-redirect-manager.svg)](https://github.com/10up/safe-redirect-manager/blob/develop/LICENSE.md)
 
 ## Purpose
 
@@ -16,7 +16,7 @@ WordPress mantra, decisions not options. Actions and filters make the plugin ver
 ## Installation
 
 Install the plugin in WordPress. You can download a
-[zip via Github](https://github.com/10up/safe-redirect-manager/archive/master.zip) and upload it using the WordPress
+[zip via GitHub](https://github.com/10up/safe-redirect-manager/archive/master.zip) and upload it using the WordPress
 plugin uploader ("Plugins" > "Add New" > "Upload Plugin").
 
 ## Configuration
@@ -27,7 +27,7 @@ Each redirect contains a few fields that you can utilize:
 
 #### "Redirect From"
 This should be a path relative to the root of your WordPress installation. When someone visits your site with a path
-that matches this one, a redirect will occur. If your site is located at ```http://example.com/wp/``` and you wanted to redirect `http://example.com/wp/about` to `http://example.com`, your "Redirect From" would be `/about`.
+that matches this one, a redirect will occur. If your site is located at `http://example.com/wp/` and you wanted to redirect `http://example.com/wp/about` to `http://example.com`, your "Redirect From" would be `/about`.
 
 Clicking the "Enable Regex" checkbox allows you to use regular expressions in your path. There are many
 [great tutorials](http://www.regular-expressions.info) on regular expressions.
@@ -53,14 +53,86 @@ so you shouldn't be serving stale redirects.
 * By default the plugin only allows at most 250 redirects to prevent performance issues. There is a filter
 `srm_max_redirects` that you can utilize to up this number.
 * "Redirect From" and requested paths are case insensitive by default.
+* Developers can use `srm_additional_status_codes` filter to add status codes if needed.
 
-## Redirect loops
+## Filters
+
+### Redirect loops detection
 
 By default redirect loop detection is disabled. To prevent redirect loops you can filter `srm_check_for_possible_redirect_loops`.
 
 ```php
-add_filter( 'my_srm_redirect_loop_filter', '__return_true' );
+add_filter( 'srm_check_for_possible_redirect_loops', '__return_true' );
 ```
+
+### Only redirect if 404 occurs
+
+By default every matched URL is redirected. To only redirect matched but not found URLs (i.e., 404 pages), use `srm_redirect_only_on_404`.
+
+```php
+add_filter( 'srm_redirect_only_on_404', '__return_true' );
+```
+
+## CLI commands
+
+The following WP-CLI commands are supported by Safe Redirect Manager:
+
+* **`wp safe-redirect-manager list`**
+
+    List all of the currently configured redirects.
+
+* **`wp safe-redirect-manager create <from> <to> [<status-code>] [<enable-regex>] [<post-status>]`**
+
+    Create a redirect. `<from>` and `<to>` are required parameters.
+
+	* `<from>`: Redirect from path. Required.
+
+	* `<to>`: Redirect to path. Required.
+
+	* `<status-code>`: HTTP Status Code. Optional. Default to `302`.
+
+	* `<enable-regex>`: Whether to enable Regular expression. Optional. Default to `false`.
+
+	* `<post-status>`: The status of the redirect. Optional. Default to `publish`.
+
+	**Example:** `wp safe-redirect-manager create /about-us /contact-us 301`
+
+* **`wp safe-redirect-manager delete <id>`**
+
+    Delete a redirect by `<id>`.
+
+* **`wp safe-redirect-manager update-cache`**
+
+    Update the redirect cache.
+
+* **`wp safe-redirect-manager import <file> [--source=<source-column>] [--target=<target-column>] [--regex=<regex-column>] [--code=<code-column>]  [--order=<order-column>]`**
+
+    Imports redirects from a CSV file.
+
+    * `<file>`: Path to one or more valid CSV file for import. This file should contain redirection from and to URLs, regex flag and HTTP redirection code. Here is the example table:
+
+        | source                     | target             | regex | code | order |
+        |----------------------------|--------------------|-------|------|-------|
+        | /legacy-url                | /new-url           | 0     | 301  | 0     |
+        | /category-1                | /new-category-slug | 0     | 302  | 1     |
+        | /tes?t/[0-9]+/path/[^/]+/? | /go/here           | 1     | 302  | 3     |
+        | ...                        | ...                | ...   | ...  | ...   |
+
+        _You can also use exported redirects from "Redirection" plugin, which you can download here: /wp-admin/tools.php?page=redirection.php&sub=modules_
+
+    * `--source`: Header title for source ("from" URL) column mapping.
+
+    * `--target`: Header title for target ("to" URL) column mapping.
+
+    * `--regex`: Header title for regex column mapping.
+
+    * `--code`: Header title for code column mapping.
+
+    * `--order`: Header title for order column mapping.
+
+* **`wp safe-redirect-manager import-htaccess <file>`**
+
+    Import .htaccess file redirects.
 
 ## Development
 

@@ -1,12 +1,12 @@
 === Safe Redirect Manager ===
 Contributors: tlovett1, tollmanz, taylorde, 10up, jakemgold, danielbachhuber, VentureBeat
 Tags: http redirects, redirect manager, url redirection, safe http redirection, multisite redirects, redirects
-Requires at least: 3.1
-Tested up to: 5.3
-Stable tag: 1.9.3
+Requires at least: 4.6
+Tested up to: 5.5.3
+Stable tag: 1.10.0
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
- 
+
 Safely and easily manage your website's HTTP redirects.
 
 == Description ==
@@ -17,7 +17,7 @@ Easily and safely manage your site's redirects the WordPress way. There are many
 
 == Installation ==
 
-Install the plugin in WordPress. You can download a [zip via Github](https://github.com/10up/safe-redirect-manager/archive/master.zip) and upload it using the WordPress plugin uploader ("Plugins" > "Add New" > "Upload Plugin").
+Install the plugin in WordPress. You can download a [zip via GitHub](https://github.com/10up/safe-redirect-manager/archive/trunk.zip) and upload it using the WordPress plugin uploader ("Plugins" > "Add New" > "Upload Plugin").
 
 == Configuration ==
 
@@ -26,47 +26,47 @@ There are no overarching settings for this plugin. To manage redirects, navigate
 Each redirect contains a few fields that you can utilize:
 
 === "Redirect From" ===
-This should be a path relative to the root of your WordPress installation. When someone visits your site with a path
-that matches this one, a redirect will occur. If your site is located at `http://example.com/wp/`` and you wanted to redirect `http://example.com/wp/about` to `http://example.com`, your "Redirect From" would be `/about`.
+This should be a path relative to the root of your WordPress installation. When someone visits your site with a path that matches this one, a redirect will occur. If your site is located at `http://example.com/wp/` and you wanted to redirect `http://example.com/wp/about` to `http://example.com`, your "Redirect From" would be `/about`.
 
-Clicking the "Enable Regex" checkbox allows you to use regular expressions in your path. There are many
-[great tutorials](http://www.regular-expressions.info) on regular expressions.
+Clicking the "Enable Regex" checkbox allows you to use regular expressions in your path. There are many [great tutorials](http://www.regular-expressions.info) on regular expressions.
 
-You can also use wildcards in your "Redirect From" paths. By adding an `*` at the end of a URL, your redirect will
-match any request that starts with your "Redirect From". Wildcards support replacements. This means if you have a
-wildcard in your from path that matches a string, you can have that string replace a wildcard character in your
-"Redirect To" path. For example, if your "Redirect From" is `/test/*`, your "Redirect To" is
-`http://google.com/*`, and the requested path is `/test/string`, the user would be redirect to `http://google.com/string`.
+You can also use wildcards in your "Redirect From" paths. By adding an `*` at the end of a URL, your redirect will match any request that starts with your "Redirect From". Wildcards support replacements. This means if you have a wildcard in your from path that matches a string, you can have that string replace a wildcard character in your "Redirect To" path. For example, if your "Redirect From" is `/test/*`, your "Redirect To" is `http://google.com/*`, and the requested path is `/test/string`, the user would be redirect to `http://google.com/string`.
 
 === "Redirect To" ===
-This should be a path (i.e. `/test`) or a URL (i.e. `http://example.com/wp/test`). If a requested path matches
-"Redirect From", they will be redirected here. "Redirect To" supports wildcard and regular expression replacements.
+This should be a path (i.e. `/test`) or a URL (i.e. `http://example.com/wp/test`). If a requested path matches "Redirect From", they will be redirected here. "Redirect To" supports wildcard and regular expression replacements.
 
 === "HTTP Status Code" ===
-[HTTP status codes](http://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html) are numbers that contain information about
-a request (i.e. whether it was successful, unauthorized, not found, etc). You should almost always use either 302 (temporarily moved) or 301 (permanently moved).
+[HTTP status codes](http://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html) are numbers that contain information about a request (i.e. whether it was successful, unauthorized, not found, etc). You should almost always use either 302 (temporarily moved) or 301 (permanently moved).
 
 *Note:*
 
-* Redirects are cached using the Transients API. Cache busts occur when redirects are added, updated, and deleted
-so you shouldn't be serving stale redirects.
-* By default the plugin only allows at most 250 redirects to prevent performance issues. There is a filter
-`srm_max_redirects` that you can utilize to up this number.
+* Redirects are cached using the Transients API. Cache busts occur when redirects are added, updated, and deleted so you shouldn't be serving stale redirects.
+* By default the plugin only allows at most 250 redirects to prevent performance issues. There is a filter `srm_max_redirects` that you can utilize to up this number.
 * "Redirect From" and requested paths are case insensitive by default.
+* Developers can use `srm_additional_status_codes` filter to add status codes if needed.
 
 == Changelog ==
 
+= 1.10.0 =
+* **Added:** `410 Gone` status code to the list of HTTP status codes and `srm_additional_status_codes` to add additional status codes ([@dinhtungdu](https://profiles.wordpress.org/dinhtungdu/), [@helen](https://profiles.wordpress.org/helen), [@PopVeKind](https://profiles.wordpress.org/popvekind/)).
+* **Added:** Option to ignore query parameters, previous behaviour still available via the new `srm_match_query_params` filter (props [@bradleyt](https://profiles.wordpress.org/bradleyt/), [@dinhtungdu](https://profiles.wordpress.org/dinhtungdu/)).
+* **Added:** Extracts redirect matching logic from `maybe_redirect` to `match_redirect` method, plus `srm_match_redirect` function to expose matching redirect logic to themes and plugins (props [@nicholas_io](https://profiles.wordpress.org/nicholas_io/), [@dinhtungdu](https://profiles.wordpress.org/dinhtungdu/)).
+* **Added:** Redirect Post ID to response headers where a redirect rule is invoked (props [@jamesmorrison](https://profiles.wordpress.org/jamesmorrison/), [@dinhtungdu](https://profiles.wordpress.org/dinhtungdu/)).
+* **Added:** Banner and icon images (props [@lea10up](https://profiles.wordpress.org/lea10up/)).
+* **Added:** Documentation and unit test updates (props [@noplanman](https://profiles.wordpress.org/noplanman/), [@dinhtungdu](https://profiles.wordpress.org/dinhtungdu/), [@kevinbrands](https://profiles.wordpress.org/kevinbrands/), [@jeffpaul](https://profiles.wordpress.org/jeffpaul/), [@davidegreenwald](https://profiles.wordpress.org/davidegreenwald/), [@barryceelen](https://profiles.wordpress.org/barryceelen/)).
+* **Fixed:** Use proper hook for setting up `SRM_Redirect` (props [@dinhtungdu](https://profiles.wordpress.org/dinhtungdu/), [@icaleb](https://profiles.wordpress.org/icaleb/)).
+* **Fixed:** Regression related to wildcard matching (props [@amyevans](https://github.com/amyevans), [@dinhtungdu](https://profiles.wordpress.org/dinhtungdu/), [@jeffreybetts](https://github.com/jeffreybetts)).
+* **Fixed:** Missing `order` column in CSV import WP-CLI command (props [@barryceelen](https://profiles.wordpress.org/barryceelen/)).
+* **Security:** Bump `lodash` from 4.17.15 to 4.17.19 (props [@dependabot](https://github.com/dependabot)).
+
 = 1.9.3 =
-Changed
-* Allow for escaped values on `_redirect_rule_from`, useful when importing regex (props [@raymondware](https://profiles.wordpress.org/raymondware))
-* Check `current_user_can` cap later to prevent the notice being thrown during Jetpack sitemap cron event runs (props [@rebeccahum](https://profiles.wordpress.org/rebasaurus))
-* Updated tests and documentation (props [@adamsilverstein](https://profiles.wordpress.org/adamsilverstein), [@jeffpaul](https://profiles.wordpress.org/jeffpaul), [@helen](https://profiles.wordpress.org/helen))
-* Check correct meta field when updating notes (props [@lucymtc](https://profiles.wordpress.org/lucymtc), [@adamsilverstein](https://profiles.wordpress.org/adamsilverstein))
-* Bump WordPress version "tested up to" 5.3 (props [@jeffpaul](https://profiles.wordpress.org/jeffpaul))
-Fixed
-* Update the logic for wildcard matching to properly match URLs with query parameters (props [@adamsilverstein](https://profiles.wordpress.org/adamsilverstein), [@mslinnea](https://profiles.wordpress.org/linsoftware)
-Security
-* Bump lodash from 4.17.11 to 4.17.15 (props [@dependabot](https://github.com/dependabot))
+* **Changed:** Allow for escaped values on `_redirect_rule_from`, useful when importing regex (props [@raymondware](https://profiles.wordpress.org/raymondware)).
+* **Changed:** Check `current_user_can` cap later to prevent the notice being thrown during Jetpack sitemap cron event runs (props [@rebeccahum](https://profiles.wordpress.org/rebasaurus)).
+* **Changed:** Updated tests and documentation (props [@adamsilverstein](https://profiles.wordpress.org/adamsilverstein), [@jeffpaul](https://profiles.wordpress.org/jeffpaul), [@helen](https://profiles.wordpress.org/helen)).
+* **Changed:** Check correct meta field when updating notes (props [@lucymtc](https://profiles.wordpress.org/lucymtc), [@adamsilverstein](https://profiles.wordpress.org/adamsilverstein)).
+* **Changed:** Bump WordPress version "tested up to" 5.3 (props [@jeffpaul](https://profiles.wordpress.org/jeffpaul)).
+* **Fixed:** Update the logic for wildcard matching to properly match URLs with query parameters (props [@adamsilverstein](https://profiles.wordpress.org/adamsilverstein), [@mslinnea](https://profiles.wordpress.org/linsoftware).
+* **Security:** Bump lodash from 4.17.11 to 4.17.15 (props [@dependabot](https://github.com/dependabot)).
 
 = 1.9.2 =
 * Fix CLI list function name for PHP 5
@@ -156,7 +156,7 @@ Security
 * safe-redirect-manager.php - Globalize SRM class for use in themes/plugins/scripts. Added create_redirect method to make importing easier.
 
 = 1.2 =
-*   safe-redirect-manager.php - manage_options capabilitiy required to use redirect manager, remove checkbox column, hide view switcher, fix search feature, hide privacy stuff for bulk edit
+*   safe-redirect-manager.php - manage_options capability required to use redirect manager, remove checkbox column, hide view switcher, fix search feature, hide privacy stuff for bulk edit
 
 = 1.1 =
 *   safe-redirect-manager.php - plugin_url() used properly, is_plugin_page function

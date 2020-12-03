@@ -4,6 +4,23 @@ All notable changes to this project will be documented in this file, per [the Ke
 
 ## [Unreleased] - TBD
 
+## [1.10.0] - 2020-12-03
+### Added
+- `410 Gone` status code to the list of HTTP status codes and `srm_additional_status_codes` to add additional status codes ([@dinhtungdu](https://github.com/dinhtungdu), [@helen](https://github.com/helen), [@PopVeKind](https://github.com/PopVeKind) via [#215](https://github.com/10up/safe-redirect-manager/pull/215)).
+- Option to ignore query parameters, previous behaviour still available via the new `srm_match_query_params` filter (props [@braders](https://github.com/braders), [@dinhtungdu](https://github.com/dinhtungdu) via [#196](https://github.com/10up/safe-redirect-manager/pull/196)).
+- Extracts redirect matching logic from `maybe_redirect` to `match_redirect` method, plus `srm_match_redirect` function to expose matching redirect logic to themes and plugins (props [@nicholasio](https://github.com/nicholasio), [@dinhtungdu](https://github.com/dinhtungdu) via [#198](https://github.com/10up/safe-redirect-manager/pull/198)).
+- Redirect Post ID to response headers where a redirect rule is invoked (props [@jamesmorrison](https://github.com/jamesmorrison), [@dinhtungdu](https://github.com/dinhtungdu) via [#218](https://github.com/10up/safe-redirect-manager/pull/218)).
+- Banner and icon images (props [@lea10up](https://github.com/lea10up) via [#209](https://github.com/10up/safe-redirect-manager/pull/209)).
+- Documentation and unit test updates (props [@noplanman](https://github.com/noplanman), [@dinhtungdu](https://github.com/dinhtungdu), [@noesteijver](https://github.com/noesteijver), [@jeffpaul](https://github.com/jeffpaul), [@davidegreenwald](https://github.com/davidegreenwald), [@barryceelen](https://github.com/barryceelen) via [#195](https://github.com/10up/safe-redirect-manager/pull/195), [#200](https://github.com/10up/safe-redirect-manager/pull/200), [#207](https://github.com/10up/safe-redirect-manager/pull/207), [#210](https://github.com/10up/safe-redirect-manager/pull/210), [#211](https://github.com/10up/safe-redirect-manager/pull/211), [#213](https://github.com/10up/safe-redirect-manager/pull/213), [#219](https://github.com/10up/safe-redirect-manager/pull/219), [#224](https://github.com/10up/safe-redirect-manager/pull/224)).
+
+### Fixed
+- Use proper hook for setting up `SRM_Redirect` (props [@dinhtungdu](https://github.com/dinhtungdu), [@WPprodigy](https://github.com/WPprodigy) via [#203](https://github.com/10up/safe-redirect-manager/pull/203)).
+- Regression related to wildcard matching (props [@amyevans](https://github.com/amyevans), [@dinhtungdu](https://github.com/dinhtungdu), [@jeffreybetts](https://github.com/jeffreybetts) via [#217](https://github.com/10up/safe-redirect-manager/pull/217)).
+- Missing `order` column in CSV import WP-CLI command (props [@barryceelen](https://github.com/barryceelen) via [#220](https://github.com/10up/safe-redirect-manager/pull/220)).
+
+### Security
+- Bump `lodash` from 4.17.15 to 4.17.19 (props [@dependabot](https://github.com/dependabot) via [#214](https://github.com/10up/safe-redirect-manager/pull/214)).
+
 ## [1.9.3] - 2019-11-20
 ### Changed
 - Allow for escaped values on `_redirect_rule_from`, useful when importing regex (props [@raymondware](https://github.com/raymondware) via [#163](https://github.com/10up/safe-redirect-manager/pull/163))
@@ -161,7 +178,7 @@ All notable changes to this project will be documented in this file, per [the Ke
 
 ## [1.2] - 2012-09-01
 ### Added
-- `manage_options` capabilitiy required to use redirect manager
+- `manage_options` capability required to use redirect manager
 
 ### Changed
 - Hide view switcher
@@ -183,7 +200,8 @@ All notable changes to this project will be documented in this file, per [the Ke
 ## [1.0] - 2012-08-27
 - Plugin released
 
-[Unreleased]: https://github.com/10up/safe-redirect-manager/compare/master...develop
+[Unreleased]: https://github.com/10up/safe-redirect-manager/compare/trunk...develop
+[1.10.0]: https://github.com/10up/safe-redirect-manager/compare/1.9.3...1.10.0
 [1.9.3]: https://github.com/10up/safe-redirect-manager/compare/1.9.2...1.9.3
 [1.9.2]: https://github.com/10up/safe-redirect-manager/compare/1.9.1...1.9.2
 [1.9.1]: https://github.com/10up/safe-redirect-manager/compare/1.9...1.9.1

@@ -1,3 +1,4 @@
+/.git export-ignore
 /.github export-ignore
 /.wordpress-org export-ignore
 /bin export-ignore
@@ -9,12 +10,11 @@
 /.travis.yml export-ignore
 /CHANGELOG.md export-ignore
 /CODE_OF_CONDUCT.md export-ignore
+/composer.json export-ignore
+/composer.lock export-ignore
 /CONTRIBUTING.md export-ignore
 /CREDITS.md export-ignore
 /LICENSE.md export-ignore
-/README.md export-ignore
-/composer.json export-ignore
-/composer.lock export-ignore
 /package-lock.json export-ignore
 /package.json export-ignore
 /phpcs.xml export-ignore
