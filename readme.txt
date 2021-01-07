@@ -47,6 +47,9 @@ This should be a path (i.e. `/test`) or a URL (i.e. `http://example.com/wp/test`
 
 == Changelog ==
 
+= 1.10.1 =
+* **Fixed:** -Better handling of 404 scenarios via `srm_redirect_only_on_404` by updating where `maybe_redirect` hooks into from `parse_request` to `???` (props []()).
+
 = 1.10.0 =
 * **Added:** `410 Gone` status code to the list of HTTP status codes and `srm_additional_status_codes` to add additional status codes ([@dinhtungdu](https://profiles.wordpress.org/dinhtungdu/), [@helen](https://profiles.wordpress.org/helen), [@PopVeKind](https://profiles.wordpress.org/popvekind/)).
 * **Added:** Option to ignore query parameters, previous behaviour still available via the new `srm_match_query_params` filter (props [@bradleyt](https://profiles.wordpress.org/bradleyt/), [@dinhtungdu](https://profiles.wordpress.org/dinhtungdu/)).
