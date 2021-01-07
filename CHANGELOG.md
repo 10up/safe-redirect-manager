@@ -4,6 +4,10 @@ All notable changes to this project will be documented in this file, per [the Ke
 
 ## [Unreleased] - TBD
 
+## [1.10.1] - 2020-01-08
+### Fixed
+- Better handling of 404 scenarios via `srm_redirect_only_on_404` by updating where `maybe_redirect` hooks into from `parse_request` to `???` (props []() via [#229](https://github.com/10up/safe-redirect-manager/issues/229)).
+
 ## [1.10.0] - 2020-12-03
 ### Added
 - `410 Gone` status code to the list of HTTP status codes and `srm_additional_status_codes` to add additional status codes ([@dinhtungdu](https://github.com/dinhtungdu), [@helen](https://github.com/helen), [@PopVeKind](https://github.com/PopVeKind) via [#215](https://github.com/10up/safe-redirect-manager/pull/215)).
@@ -201,6 +205,7 @@ All notable changes to this project will be documented in this file, per [the Ke
 - Plugin released
 
 [Unreleased]: https://github.com/10up/safe-redirect-manager/compare/trunk...develop
+[1.10.1]: https://github.com/10up/safe-redirect-manager/compare/1.10.0...1.10.1
 [1.10.0]: https://github.com/10up/safe-redirect-manager/compare/1.9.3...1.10.0
 [1.9.3]: https://github.com/10up/safe-redirect-manager/compare/1.9.2...1.9.3
 [1.9.2]: https://github.com/10up/safe-redirect-manager/compare/1.9.1...1.9.2
