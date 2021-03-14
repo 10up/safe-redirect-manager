@@ -90,7 +90,7 @@ class SRM_Post_Type {
 	/**
 	 * Remove quick edit
 	 *
-	 * @param  array   $actions Array of actions
+	 * @param  array            $actions Array of actions
 	 * @param  int|WP_Post|null $post Post object
 	 * @since  1.8
 	 * @return array
