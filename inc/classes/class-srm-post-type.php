@@ -95,7 +95,7 @@ class SRM_Post_Type {
 	 * @since  1.8
 	 * @return array
 	 */
-	public function filter_disable_quick_edit( $actions = array(), $post = null ) {
+	public function filter_disable_quick_edit( $actions, $post ) {
 		if ( 'redirect_rule' === get_post_type( $post ) && isset( $actions['inline hide-if-no-js'] ) ) {
 			unset( $actions['inline hide-if-no-js'] );
 			unset( $actions['view'] );
