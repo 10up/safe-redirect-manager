@@ -3,6 +3,11 @@
 All notable changes to this project will be documented in this file, per [the Keep a Changelog standard](http://keepachangelog.com/).
 
 ## [Unreleased] - TBD
+### Changed
+- Bump WordPress version "tested up to" 5.7 (props [@jeffpaul](https://github.com/jeffpaul), [@ankitguptaindia](https://github.com/ankitguptaindia) via [#233](https://github.com/10up/safe-redirect-manager/pull/233), [#235](https://github.com/10up/safe-redirect-manager/pull/235)).
+
+### Fixed
+- Required parameter following optional deprecated message in PHP 8 (props [@vinkla](https://github.com/vinkla), [@dinhtungdu](https://github.com/dinhtungdu) via [#231](https://github.com/10up/safe-redirect-manager/pull/231)).
 
 ## [1.10.0] - 2020-12-03
 ### Added
