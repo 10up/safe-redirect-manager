@@ -28,6 +28,9 @@ class SRM_WP_CLI extends WP_CLI_Command {
 	 * : Show total redirects. Default to true.
 	 *
 	 * @subcommand list
+	 *
+	 * @param array $args       Array of arguments
+	 * @param array $assoc_args Array of options.
 	 */
 	public function cli_list( $args, $assoc_args ) {
 		$assoc_args = wp_parse_args(
@@ -54,7 +57,7 @@ class SRM_WP_CLI extends WP_CLI_Command {
 		$redirects = srm_get_redirects( array( 'post_status' => 'any' ), true );
 		$redirects = array_map(
 			function( &$item ) use ( $assoc_args ) {
-				if( 'table' === $assoc_args['format']) {
+				if ( 'table' === $assoc_args['format'] ) {
 					$item['enable_regex'] = $item['enable_regex'] ? 'true' : 'false';
 				} else {
 					$item['enable_regex'] = (bool) $item['enable_regex'];
@@ -67,7 +70,7 @@ class SRM_WP_CLI extends WP_CLI_Command {
 		$formatter = new \WP_CLI\Formatter( $assoc_args, $fields );
 		$formatter->display_items( $redirects );
 
-		if( ! empty( $assoc_args['show_total'] ) ) {
+		if ( ! empty( $assoc_args['show_total'] ) ) {
 			WP_CLI::line( 'Total of ' . count( $redirects ) . ' redirects.' );
 		}
 	}
