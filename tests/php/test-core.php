@@ -510,4 +510,175 @@ class SRMTestCore extends WP_UnitTestCase {
 		fclose( $tmp_file );
 	}
 
+	/**
+	 * Test a redirect rule that ends with a trailing slash followed by an asterisk.
+	 *
+	 * @since 1.9.3
+	 */
+	public function testWildcardRedirectWithSlash() {
+		$_SERVER['REQUEST_URI'] = '/one/';
+		$redirected			    = false;
+		$redirect_to			= '/gohere/';
+
+		// Create two redirects for testing.
+		srm_create_redirect( '/one/*', $redirect_to );
+		srm_create_redirect( '/two/', $redirect_to );
+		add_action(
+			'srm_do_redirect',
+			function( $requested_path, $redirected_to, $status_code ) use ( &$redirect_to, &$redirected ) {
+				if ( $redirected_to === $redirect_to ) {
+					$redirected = true;
+				}
+			},
+			10,
+			3
+		);
+		SRM_Redirect::factory()->maybe_redirect();
+		$this->assertTrue( $redirected, 'Expected that /one/ would redirect to /gohere/' );
+	}
+
+	/**
+	 * Test that the query params are attached to the new redirect.
+	 */
+	public function testWildcardRedirectWithQueryParams() {
+		$_SERVER['REQUEST_URI'] = '/one/?test=true';
+		$redirected             = false;
+		$redirect_to            = '/gohere/*';
+
+		// Create two redirects for testing.
+		srm_create_redirect( '/one/*', $redirect_to );
+		srm_create_redirect( '/two/', $redirect_to );
+		$expected = '/gohere/?test=true';
+		add_action(
+			'srm_do_redirect',
+			function( $requested_path, $redirected_to, $status_code ) use ( &$redirect_to, &$redirected, &$expected ) {
+				if ( $redirected_to === '/gohere/?test=true' ) {
+					$redirected = true;
+				}
+				$expected = $redirect_to;
+			},
+			10,
+			3
+		);
+		SRM_Redirect::factory()->maybe_redirect();
+		$this->assertTrue( $redirected, 'Expected that /one/?test=true would redirect to /gohere/?test=true but instead redirected to ' . $redirect_to );
+	}
+
+	/**
+	 * Test a redirect rule with a wildcard that shouldn't match.
+	 */
+	public function testNoRedirectWildcard() {
+		$_SERVER['REQUEST_URI'] = '/one-page/';
+		$redirected             = false;
+		$redirect_to            = '/gohere';
+
+		// Create redirect for testing.
+		srm_create_redirect( '/one/*', $redirect_to );
+		add_action(
+			'srm_do_redirect',
+			function() use ( &$redirected ) {
+				$redirected = true;
+			},
+			10,
+			3
+		);
+
+		SRM_Redirect::factory()->maybe_redirect();
+		$this->assertFalse( $redirected, 'Expected that /one-page/ would not redirect, but instead redirected to ' . $redirect_to );
+	}
+
+	/**
+	 * Test a URL that shouldn't redirect.
+	 */
+	public function testNoRedirect() {
+		$_SERVER['REQUEST_URI'] = '/noredirect/';
+		$redirected             = false;
+		$redirect_to            = '/gohere/*';
+
+		// Create two redirects for testing.
+		srm_create_redirect( '/one/*', $redirect_to );
+		srm_create_redirect( '/two/', $redirect_to );
+		add_action(
+			'srm_do_redirect',
+			function( $requested_path, $redirected_to, $status_code ) use ( &$redirect_to, &$redirected, &$expected ) {
+					$redirected = true;
+			},
+			10,
+			3
+		);
+		SRM_Redirect::factory()->maybe_redirect();
+		$this->assertFalse( $redirected, 'Expected that /noredirect/ would not redirect, but instead redirected to ' . $redirect_to );
+	}
+
+	/**
+	 * Tests the match redirect function
+	 *
+	 */
+	public function testMatchRedirect() {
+		$redirect_to            = '/gohere';
+		srm_create_redirect( '/', $redirect_to );
+
+		$matched_redirect = srm_match_redirect( '/' );
+
+		$this->assertTrue( $matched_redirect['redirect_to'] === $redirect_to );
+
+		srm_create_redirect( '/one-page', $redirect_to );
+
+		$matched_redirect = srm_match_redirect( '/one-page' );
+
+		$this->assertTrue( $matched_redirect['redirect_to'] === $redirect_to );
+	}
+
+	/**
+	 * Test that the query params are attached to the new redirect.
+	 */
+	public function testRedirectWithQueryParams() {
+		$_SERVER['REQUEST_URI'] = '/one/?test=true';
+		$redirected             = false;
+		$redirect_to            = '/gohere/';
+
+		srm_create_redirect( '/one/', $redirect_to );
+		$expected = '/gohere/?test=true';
+		add_action(
+			'srm_do_redirect',
+			function( $requested_path, $redirected_to, $status_code ) use ( &$redirect_to, &$redirected, &$expected ) {
+				if ( $redirected_to === '/gohere/?test=true' ) {
+					$redirected = true;
+				}
+				$expected = $redirect_to;
+			},
+			10,
+			3
+		);
+
+		SRM_Redirect::factory()->maybe_redirect();
+		$this->assertTrue( $redirected, 'Expected that /one/?test=true would redirect to /gohere/?test=true but instead redirected to ' . $redirect_to );
+	}
+
+	/**
+	 * Test that the query params are attached to the new redirect.
+	 */
+	public function testMatchQueryParamsFilter() {
+		$_SERVER['REQUEST_URI'] = '/one/?test=true';
+		$redirected             = false;
+		$redirect_to            = '/gohere/';
+
+		add_filter('srm_match_query_params', '__return_true');
+
+		srm_create_redirect( '/one/', $redirect_to );
+		add_action(
+			'srm_do_redirect',
+			function( $requested_path, $redirected_to, $status_code ) use ( &$redirect_to, &$redirected, &$expected ) {
+				$redirected = true;
+			},
+			10,
+			3
+		);
+
+		SRM_Redirect::factory()->maybe_redirect();
+		$this->assertFalse( $redirected, 'Expected that /noredirect/ would not redirect, but instead redirected to ' . $redirect_to );
+
+		remove_filter('srm_match_query_params', '__return_true');
+	}
+
 }
