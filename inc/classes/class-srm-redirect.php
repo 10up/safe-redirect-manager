@@ -243,7 +243,61 @@ class SRM_Redirect {
 
 		// if we have a valid status code, then redirect with it
 		if ( in_array( $matched_redirect['status_code'], srm_get_valid_status_codes(), true ) ) {
-			wp_safe_redirect( $matched_redirect['redirect_to'], $matched_redirect['status_code'] );
+			if ( $matched_redirect['status_code'] > 399 ) {
+				$location = $matched_redirect['redirect_to'];
+				$status = $matched_redirect['status_code'];
+				/**
+                 * Filters the redirect location.
+                 *
+                 * @since 2.1.0
+                 *
+                 * @param string $location The path or URL to redirect to.
+                 * @param int    $status   The HTTP response status code to use.
+                 */
+                $location = apply_filters( 'wp_redirect', $location, $status );
+
+                /**
+                 * Filters the redirect HTTP response status code to use.
+                 *
+                 * @since 2.3.0
+                 *
+                 * @param int    $status   The HTTP response status code to use.
+                 * @param string $location The path or URL to redirect to.
+                 */
+                $status = apply_filters( 'wp_redirect_status', $status, $location );
+
+                if ( ! $location ) {
+                        return false;
+                }
+
+
+                $location = wp_sanitize_redirect( $location );
+
+                if ( ! $is_IIS && 'cgi-fcgi' !== PHP_SAPI ) {
+                        status_header( $status ); // This causes problems on IIS and some FastCGI setups.
+                }
+
+                /**
+                 * Filters the X-Redirect-By header.
+                 *
+                 * Allows applications to identify themselves when they're doing a redirect.
+                 *
+                 * @since 5.1.0
+                 *
+                 * @param string $x_redirect_by The application doing the redirect.
+                 * @param int    $status        Status code to use.
+                 * @param string $location      The path to redirect to.
+                 */
+                $x_redirect_by = apply_filters( 'x_redirect_by', $x_redirect_by, $status, $location );
+                if ( is_string( $x_redirect_by ) ) {
+                        header( "X-Redirect-By: $x_redirect_by" );
+                }
+
+                header( "Location: $location", true, $status );
+	
+			} else {
+				wp_safe_redirect( $matched_redirect['redirect_to'], $matched_redirect['status_code'] );	
+			}
 		} else {
 			wp_safe_redirect( $matched_redirect['redirect_to'] );
 		}
