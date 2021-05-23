@@ -14,8 +14,9 @@
  * @return array $redirects An array of redirects
  */
 function srm_get_redirects( $args = array(), $hard = false ) {
-
-	$redirects = get_transient( '_srm_redirects' );
+	$default_max_redirects = srm_get_max_redirects();
+	$transient_key         = '_srm_redirects_' . $default_max_redirects;
+	$redirects             = get_transient( $transient_key );
 
 	if ( $hard || false === $redirects ) {
 
@@ -24,8 +25,6 @@ function srm_get_redirects( $args = array(), $hard = false ) {
 		$posts_per_page = 100;
 
 		$i = 1;
-
-		$default_max_redirects = apply_filters( 'srm_max_redirects', 250 );
 
 		while ( true ) {
 			if ( count( $redirects ) >= $default_max_redirects ) {
@@ -72,7 +71,7 @@ function srm_get_redirects( $args = array(), $hard = false ) {
 
 		}
 
-		set_transient( '_srm_redirects', $redirects );
+		set_transient( $transient_key, $redirects );
 	}
 
 	return $redirects;
@@ -85,7 +84,7 @@ function srm_get_redirects( $args = array(), $hard = false ) {
  * @return bool
  */
 function srm_max_redirects_reached() {
-	$default_max_redirects = apply_filters( 'srm_max_redirects', 250 );
+	$default_max_redirects = srm_get_max_redirects();
 
 	$redirects = srm_get_redirects();
 
@@ -407,4 +406,14 @@ function srm_import_file( $file, $args ) {
  */
 function srm_match_redirect( $path ) {
 	return SRM_Redirect::factory()->match_redirect( $path );
+}
+
+/**
+ * Get maximum supported redirects.
+ *
+ * @since 2.0.0
+ * @return int
+ */
+function srm_get_max_redirects() {
+	return apply_filters( 'srm_max_redirects', 1000 );
 }
