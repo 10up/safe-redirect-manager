@@ -12,11 +12,39 @@ class SRM_WP_CLI extends WP_CLI_Command {
 
 
 	/**
-	 * List all of the currently configured redirects
+	 * List all of the currently configured redirects.
+	 * Available fields: 'ID', 'redirect_from', 'redirect_to', 'status_code', 'enable_regex', 'post_status'.
+	 *
+	 * [--field=<field>]
+	 * : Single field to dipslay, should be one of available fields.
+	 *
+	 * [--fields=<field1,field2>]
+	 * : Multiple fields to dipslay, should be a list of available fields.
+	 *
+	 * [--format=<format>]
+	 * : The command output format. Can be table, json, csv, yaml. Default to table.
+	 *
+	 * [--show_total=<bool>]
+	 * : Show total redirects. Default to true.
 	 *
 	 * @subcommand list
+	 *
+	 * @param array $args       Array of arguments
+	 * @param array $assoc_args Array of options.
 	 */
-	public function cli_list() {
+	public function cli_list( $args, $assoc_args ) {
+		$assoc_args = wp_parse_args(
+			$assoc_args,
+			[
+				'show_total' => true,
+				'format'     => 'table',
+			]
+		);
+
+		if ( 'false' === $assoc_args['show_total'] ) {
+			$assoc_args['show_total'] = false;
+		}
+
 		$fields = array(
 			'ID',
 			'redirect_from',
@@ -26,27 +54,25 @@ class SRM_WP_CLI extends WP_CLI_Command {
 			'post_status',
 		);
 
-		$table = new \cli\Table();
-		$table->setHeaders( $fields );
-
 		$redirects = srm_get_redirects( array( 'post_status' => 'any' ), true );
-
-		foreach ( $redirects as $redirect ) {
-			$line = array();
-			foreach ( $fields as $field ) {
-				if ( 'enable_regex' === $field ) {
-					$line[] = ( $redirect[ $field ] ) ? 'true' : 'false';
+		$redirects = array_map(
+			function( &$item ) use ( $assoc_args ) {
+				if ( 'table' === $assoc_args['format'] ) {
+					$item['enable_regex'] = $item['enable_regex'] ? 'true' : 'false';
 				} else {
-					$line[] = $redirect[ $field ];
+					$item['enable_regex'] = (bool) $item['enable_regex'];
 				}
-			}
+				return $item;
+			},
+			$redirects
+		);
 
-			$table->addRow( $line );
+		$formatter = new \WP_CLI\Formatter( $assoc_args, $fields );
+		$formatter->display_items( $redirects );
+
+		if ( ! empty( $assoc_args['show_total'] ) ) {
+			WP_CLI::line( 'Total of ' . count( $redirects ) . ' redirects.' );
 		}
-
-		$table->display();
-
-		WP_CLI::line( 'Total of ' . count( $redirects ) . ' redirects' );
 	}
 
 	/**
