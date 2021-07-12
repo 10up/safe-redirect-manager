@@ -124,8 +124,6 @@ class SRM_Redirect {
 			$requested_query_params = $parsed_requested_path['query'];
 		}
 
-		$normalized_requested_path_no_query = untrailingslashit( stripslashes( $parsed_requested_path['path'] ) );
-
 		foreach ( (array) $redirects as $redirect ) {
 
 			$redirect_from = untrailingslashit( $redirect['redirect_from'] );
