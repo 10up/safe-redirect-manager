@@ -415,5 +415,5 @@ function srm_match_redirect( $path ) {
  * @return int
  */
 function srm_get_max_redirects() {
-	return apply_filters( 'srm_max_redirects', 2 );
+	return apply_filters( 'srm_max_redirects', 1000 );
 }
