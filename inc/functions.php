@@ -71,7 +71,8 @@ function srm_get_redirects( $args = array(), $hard = false ) {
 
 		}
 
-		set_transient( $transient_key, $redirects );
+		// Set transient to 30 days to remove old transients if the max redirects changes.
+		set_transient( $transient_key, $redirects, 30 * DAY_IN_SECONDS );
 	}
 
 	return $redirects;
@@ -132,9 +133,8 @@ function srm_get_valid_status_codes_data() {
  * @since 1.8
  */
 function srm_flush_cache() {
-	delete_transient( '_srm_redirects' );
+	delete_transient( '_srm_redirects_' . srm_get_max_redirects() );
 }
-
 
 /**
  * Check for potential redirect loops or chains
@@ -415,5 +415,5 @@ function srm_match_redirect( $path ) {
  * @return int
  */
 function srm_get_max_redirects() {
-	return apply_filters( 'srm_max_redirects', 1000 );
+	return apply_filters( 'srm_max_redirects', 2 );
 }
