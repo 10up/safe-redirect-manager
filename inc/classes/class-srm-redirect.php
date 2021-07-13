@@ -221,6 +221,7 @@ class SRM_Redirect {
 		$requested_path = untrailingslashit( stripslashes( $requested_path ) );
 
 		$matched_redirect = $this->match_redirect( $requested_path );
+		$matched_redirect = $this->maybe_multisite( $requested_path, $matched_redirect );
 
 		if ( empty( $matched_redirect ) ) {
 			return;
@@ -249,6 +250,38 @@ class SRM_Redirect {
 		}
 
 		exit;
+	}
+
+	/**
+	 * Check against the main site if multisite enabled
+	 *
+	 * @param string $requested_path The path to check redirects for.
+	 * @param string $matched_redirect The matched already checked using current blog.
+	 *
+	 * @return array|bool The redirect url. False if no redirect is found.
+	 */
+	public function maybe_multisite( $requested_path, $matched_redirect ) {
+
+		if ( ! is_multisite() ) {
+			return $matched_redirect;
+		}
+
+		$blog_id      = get_current_blog_id();
+		$main_site_id = get_main_site_id();
+
+		// Check blog status
+		$is_archived  = get_blog_status( $blog_id, 'archived' );
+		$is_deleted   = get_blog_status( $blog_id, 'deleted' );
+		$is_spam      = get_blog_status( $blog_id, 'spam' );
+
+		// Switch to main site and check for redirects
+		if ( $main_site_id && ( $is_archived || $is_deleted || $is_spam  ) ) {
+			switch_to_blog( $main_site_id );
+				$matched_redirect = $this->match_redirect( $requested_path );
+			restore_current_blog();
+		}
+
+		return $matched_redirect;
 	}
 
 	/**
