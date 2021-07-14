@@ -275,7 +275,7 @@ class SRM_Redirect {
 		$is_spam      = get_blog_status( $blog_id, 'spam' );
 
 		// Switch to main site and check for redirects
-		if ( $main_site_id && ( $is_archived || $is_deleted || $is_spam  ) ) {
+		if ( $main_site_id && ( $is_archived || $is_deleted || $is_spam ) ) {
 			switch_to_blog( $main_site_id );
 				$matched_redirect = $this->match_redirect( $requested_path );
 			restore_current_blog();
