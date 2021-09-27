@@ -113,12 +113,16 @@ class SRM_Redirect {
 			$parsed_requested_path = parse_url( $normalized_requested_path );
 		}
 		// Normalize the request path with and without query strings, for comparison later
-		$requested_query_params = '';
+		$normalized_requested_path_no_query = '';
+		$requested_query_params             = '';
+
+		if ( ! empty( $parsed_requested_path['path'] ) ) {
+			$normalized_requested_path_no_query = untrailingslashit( stripslashes( $parsed_requested_path['path'] ) );
+		}
+
 		if ( ! empty( $parsed_requested_path['query'] ) ) {
 			$requested_query_params = $parsed_requested_path['query'];
 		}
-
-		$normalized_requested_path_no_query = untrailingslashit( stripslashes( $parsed_requested_path['path'] ) );
 
 		foreach ( (array) $redirects as $redirect ) {
 

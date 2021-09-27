@@ -19,5 +19,5 @@
   },
   "dependencies": {
     "node-wp-i18n": "^1.2.5"
-  },
+  }
 }
