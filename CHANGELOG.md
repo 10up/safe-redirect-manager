@@ -4,7 +4,7 @@ All notable changes to this project will be documented in this file, per [the Ke
 
 ## [Unreleased] - TBD
 
-## [1.10.1] - 2021-09-28
+## [1.10.1] - 2021-12-16
 ### Added
 - Formatting options to `wp safe-redirect-manager list` command (props [@dinhtungdu](https://github.com/dinhtungdu), [@TheLastCicada](https://github.com/TheLastCicada) via [#238](https://github.com/10up/safe-redirect-manager/pull/238)).
 
