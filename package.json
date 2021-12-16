@@ -1,12 +1,23 @@
 {
   "name": "safe-redirect-manager",
+  "version": "1.10.1",
   "description": "Easily and safely manage HTTP redirects.",
-  "dependencies": {
-    "node-wp-i18n": "^1.0.4"
+  "homepage": "https://github.com/10up/safe-redirect-manager",
+  "bugs": {
+    "url" : "https://github.com/10up/safe-redirect-manager/issues"
   },
-  "author": "10up",
+  "license": "GPL-2.0-or-later",
+  "author": {
+    "name": "10up",
+    "email": "opensource@10up.com",
+    "url": "https://10up.com",
+    "role": "developer"
+  },
   "repository": {
     "type": "git",
     "url": "https://github.com/10up/safe-redirect-manager"
   },
+  "dependencies": {
+    "node-wp-i18n": "^1.2.5"
+  }
 }

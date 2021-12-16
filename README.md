@@ -2,7 +2,7 @@
 
 > A WordPress plugin to safely and easily manage your website's HTTP redirects.
 
-[![Support Level](https://img.shields.io/badge/support-active-green.svg)](#support-level) [![Build Status](https://travis-ci.org/10up/safe-redirect-manager.svg?branch=develop)](https://travis-ci.org/10up/safe-redirect-manager) [![Release Version](https://img.shields.io/github/release/10up/safe-redirect-manager.svg)](https://github.com/10up/safe-redirect-manager/releases/latest) ![WordPress tested up to version](https://img.shields.io/badge/WordPress-v5.5.3%20tested-success.svg) [![GPLv2 License](https://img.shields.io/github/license/10up/safe-redirect-manager.svg)](https://github.com/10up/safe-redirect-manager/blob/develop/LICENSE.md)
+[![Support Level](https://img.shields.io/badge/support-active-green.svg)](#support-level) [![Build Status](https://travis-ci.org/10up/safe-redirect-manager.svg?branch=develop)](https://travis-ci.org/10up/safe-redirect-manager) [![Release Version](https://img.shields.io/github/release/10up/safe-redirect-manager.svg)](https://github.com/10up/safe-redirect-manager/releases/latest) ![WordPress tested up to version](https://img.shields.io/wordpress/plugin/tested/safe-redirect-manager?color=%2346B450&label=WordPress&logo=WordPress&logoColor=%230073AA) [![GPLv2 License](https://img.shields.io/github/license/10up/safe-redirect-manager.svg)](https://github.com/10up/safe-redirect-manager/blob/develop/LICENSE.md)
 
 ## Purpose
 
@@ -175,5 +175,5 @@ Please read [CODE_OF_CONDUCT.md](https://github.com/10up/safe-redirect-manager/b
 ## Like what you see?
 
 <p align="center">
-<a href="http://10up.com/contact/"><img src="https://10updotcom-wpengine.s3.amazonaws.com/uploads/2016/10/10up-Github-Banner.png" width="850"></a>
+<a href="http://10up.com/contact/"><img src="https://10up.com/uploads/2016/10/10up-Github-Banner.png" width="850"></a>
 </p>

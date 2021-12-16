@@ -1,11 +1,12 @@
 === Safe Redirect Manager ===
-Contributors: tlovett1, tollmanz, taylorde, 10up, jakemgold, danielbachhuber, VentureBeat
-Tags: http redirects, redirect manager, url redirection, safe http redirection, multisite redirects, redirects
+Contributors:      tlovett1, tollmanz, taylorde, 10up, jakemgold, danielbachhuber, VentureBeat
+Tags:              http redirects, redirect manager, url redirection, safe http redirection, multisite redirects, redirects
 Requires at least: 4.6
-Tested up to: 5.8
-Stable tag: 1.10.0
-License: GPLv2 or later
-License URI: http://www.gnu.org/licenses/gpl-2.0.html
+Tested up to:      5.8
+Requires PHP:      
+Stable tag:        1.10.1
+License:           GPLv2 or later
+License URI:       http://www.gnu.org/licenses/gpl-2.0.html
 
 Safely and easily manage your website's HTTP redirects.
 
@@ -46,6 +47,16 @@ This should be a path (i.e. `/test`) or a URL (i.e. `http://example.com/wp/test`
 * Developers can use `srm_additional_status_codes` filter to add status codes if needed.
 
 == Changelog ==
+
+= 1.10.1 =
+* **Added:** Formatting options to `wp safe-redirect-manager list` command (props [@dinhtungdu](https://profiles.wordpress.org/dinhtungdu/), [@TheLastCicada](https://profiles.wordpress.org/thelastcicada/)).
+* **Changed:** Increased redirect limits from 250 to 1,000 (props [@sultann](https://profiles.wordpress.org/manikmist09/), [@dinhtungdu](https://profiles.wordpress.org/dinhtungdu/), [@jilltilt](https://github.com/jilltilt), [@yeevy](https://github.com/yeevy)).
+* **Changed:** Bump WordPress version "tested up to" 5.8 (props [@jeffpaul](https://profiles.wordpress.org/jeffpaul/), [@ankitguptaindia](https://profiles.wordpress.org/ankit-k-gupta/), [@phpbits](https://profiles.wordpress.org/phpbits/)).
+* **Fixed:** Required parameter following optional deprecated message in PHP 8 (props [@vinkla](https://profiles.wordpress.org/vinkla/), [@dinhtungdu](https://profiles.wordpress.org/dinhtungdu/)).
+* **Fixed:** Edge case when redirecting a URL with parameters where `$parsed_requested_path['path']` does not always exist (props [@dinhtungdu](https://profiles.wordpress.org/dinhtungdu/), [@davidmondok](https://profiles.wordpress.org/davidmondok/)).
+* **Fixed:** Formatting fix to prevent npm install error (props [@phpbits](https://profiles.wordpress.org/phpbits/)).
+* **Security:** Bump `minimist` from 0.0.8 to 1.2.5 (props [@dependabot](https://github.com/dependabot)).
+* **Security:** Bump `lodash` from 4.17.19 to 4.17.21 (props [@dependabot](https://github.com/dependabot)).
 
 = 1.10.0 =
 * **Added:** `410 Gone` status code to the list of HTTP status codes and `srm_additional_status_codes` to add additional status codes ([@dinhtungdu](https://profiles.wordpress.org/dinhtungdu/), [@helen](https://profiles.wordpress.org/helen), [@PopVeKind](https://profiles.wordpress.org/popvekind/)).
