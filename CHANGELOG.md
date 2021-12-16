@@ -3,11 +3,23 @@
 All notable changes to this project will be documented in this file, per [the Keep a Changelog standard](http://keepachangelog.com/).
 
 ## [Unreleased] - TBD
+
+## [1.10.1] - 2021-09-28
+### Added
+- Formatting options to `wp safe-redirect-manager list` command (props [@dinhtungdu](https://github.com/dinhtungdu), [@TheLastCicada](https://github.com/TheLastCicada) via [#238](https://github.com/10up/safe-redirect-manager/pull/238)).
+
 ### Changed
-- Bump WordPress version "tested up to" 5.7 (props [@jeffpaul](https://github.com/jeffpaul), [@ankitguptaindia](https://github.com/ankitguptaindia) via [#233](https://github.com/10up/safe-redirect-manager/pull/233), [#235](https://github.com/10up/safe-redirect-manager/pull/235)).
+- Increased redirect limits from 250 to 1,000 (props [@sultann](https://github.com/sultann), [@dinhtungdu](https://github.com/dinhtungdu), [@jilltilt](https://github.com/jilltilt), [@yeevy](https://github.com/yeevy) via [#242](https://github.com/10up/safe-redirect-manager/pull/242)).
+- Bump WordPress version "tested up to" 5.8 (props [@jeffpaul](https://github.com/jeffpaul), [@ankitguptaindia](https://github.com/ankitguptaindia), [@phpbits](https://github.com/phpbits) via [#233](https://github.com/10up/safe-redirect-manager/pull/233), [#235](https://github.com/10up/safe-redirect-manager/pull/235), [#252](https://github.com/10up/safe-redirect-manager/pull/252)).
 
 ### Fixed
 - Required parameter following optional deprecated message in PHP 8 (props [@vinkla](https://github.com/vinkla), [@dinhtungdu](https://github.com/dinhtungdu) via [#231](https://github.com/10up/safe-redirect-manager/pull/231)).
+- Edge case when redirecting a URL with parameters where `$parsed_requested_path['path']` does not always exist (props [@dinhtungdu](https://github.com/dinhtungdu), [@davidmondok](https://github.com/davidmondok) via [#246](https://github.com/10up/safe-redirect-manager/pull/246), [#247](https://github.com/10up/safe-redirect-manager/pull/247)).
+- Formatting fix to prevent npm install error (props [@phpbits](https://github.com/phpbits) via [#249](https://github.com/10up/safe-redirect-manager/pull/249)).
+
+### Security
+- Bump `minimist` from 0.0.8 to 1.2.5 (props [@dependabot](https://github.com/dependabot) via [#250](https://github.com/10up/safe-redirect-manager/pull/250)).
+- Bump `lodash` from 4.17.19 to 4.17.21 (props [@dependabot](https://github.com/dependabot) via [#251](https://github.com/10up/safe-redirect-manager/pull/251)).
 
 ## [1.10.0] - 2020-12-03
 ### Added
@@ -206,6 +218,7 @@ All notable changes to this project will be documented in this file, per [the Ke
 - Plugin released
 
 [Unreleased]: https://github.com/10up/safe-redirect-manager/compare/trunk...develop
+[1.10.1]: https://github.com/10up/safe-redirect-manager/compare/1.10.0...1.10.1
 [1.10.0]: https://github.com/10up/safe-redirect-manager/compare/1.9.3...1.10.0
 [1.9.3]: https://github.com/10up/safe-redirect-manager/compare/1.9.2...1.9.3
 [1.9.2]: https://github.com/10up/safe-redirect-manager/compare/1.9.1...1.9.2
