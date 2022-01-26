@@ -42,7 +42,7 @@ This should be a path (i.e. `/test`) or a URL (i.e. `http://example.com/wp/test`
 *Note:*
 
 * Redirects are cached using the Transients API. Cache busts occur when redirects are added, updated, and deleted so you shouldn't be serving stale redirects.
-* By default the plugin only allows at most 250 redirects to prevent performance issues. There is a filter `srm_max_redirects` that you can utilize to up this number.
+* By default the plugin only allows at most 1000 redirects to prevent performance issues. There is a filter `srm_max_redirects` that you can utilize to up this number.
 * "Redirect From" and requested paths are case insensitive by default.
 * Developers can use `srm_additional_status_codes` filter to add status codes if needed.
 
