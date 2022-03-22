@@ -19,12 +19,6 @@ jobs:
       uses: actions/checkout@v2
     - name: Install dependencies
       run: npm install
-    - name: Composer (optional)
-      run: composer install
-      continue-on-error: true
-    - name: Build (optional)
-      run: npm run build
-      continue-on-error: true
     - name: Set the core version
       run: ./tests/bin/set-core-version.js ${{ matrix.core.version }}
     - name: Set up WP environment
