@@ -1,8 +1,4 @@
 describe("Test redirect rules", () => {
-	beforeEach(() => {
-		cy.login();
-	});
-
 	after(() => {
 		cy.deleteRedirectRules();
 	});

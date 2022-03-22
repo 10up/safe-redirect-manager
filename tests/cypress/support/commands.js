@@ -24,9 +24,17 @@
 // -- This will overwrite an existing command --
 // Cypress.Commands.overwrite('visit', (originalFn, url, options) => { ... })
 
+Cypress.Commands.add( 'visitAdminPage', ( page = 'index.php' ) => {
+	cy.login();
+	if ( page.includes( 'http' ) ) {
+		cy.visit( page );
+	} else {
+		cy.visit( `/wp-admin/${ page.replace( /^\/|\/$/g, '' ) }` );
+	}
+});
 
 Cypress.Commands.add('createRedirectRule', (from, to, notes = '', regex = false ) => {
-	cy.visit('/wp-admin/post-new.php?post_type=redirect_rule');
+	cy.visitAdminPage('post-new.php?post_type=redirect_rule');
 
 	cy.get('#srm_redirect_rule_from').click().clear().type(from);
 	cy.get('#srm_redirect_rule_to').click().clear().type(to);
@@ -41,7 +49,7 @@ Cypress.Commands.add('createRedirectRule', (from, to, notes = '', regex = false 
 });
 
 Cypress.Commands.add('deleteRedirectRules', () => {
-	cy.visit('/wp-admin/edit.php?post_type=redirect_rule');
+	cy.visitAdminPage('edit.php?post_type=redirect_rule');
 	cy.get('#cb-select-all-1').check();
 	cy.get('#bulk-action-selector-top').select('trash');
 	cy.get('#doaction').click();
