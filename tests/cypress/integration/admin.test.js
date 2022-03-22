@@ -23,7 +23,7 @@ describe( 'Admin can login and make sure plugin is activated', () => {
 		cy.visit('/wp-admin/edit.php?post_type=redirect_rule');
 
 		// Check Heading and create link.
-		cy.get('#wpbody h1.wp-heading-inline').contains('Safe Redirect Manager');
+		cy.get('#wpbody h1').contains('Safe Redirect Manager');
 		cy.get('#wpbody a.page-title-action').should('have.text', 'Create Redirect Rule');
 	});
 });
