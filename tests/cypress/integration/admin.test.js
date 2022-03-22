@@ -8,7 +8,7 @@ describe("Admin can login and make sure plugin is activated", () => {
 	});
 
 	it('Can see "Safe Redirect Manager" menu item under Tools menu', () => {
-		cy.visitAdminPage("/");
+		cy.visitAdminPage("tools.php");
 
 		// Check menu item under Tools menu.
 		cy.get("#menu-tools ul.wp-submenu li")

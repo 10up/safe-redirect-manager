@@ -6,6 +6,5 @@
   "videosFolder": "tests/cypress/videos",
   "downloadsFolder": "tests/cypress/downloads",
   "supportFile": "tests/cypress/support/index.js",
-  "defaultCommandTimeout": 10000,
   "video": false
 }

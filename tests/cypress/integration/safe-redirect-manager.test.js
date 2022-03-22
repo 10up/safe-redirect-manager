@@ -1,14 +1,10 @@
 describe("Test redirect rules", () => {
-	after(() => {
-		cy.deleteRedirectRules();
-	});
-
-	it("Can create a rule", () => {
+	it("Can create a redirect rule", () => {
 		// Test Create Rule.
 		cy.createRedirectRule("/test", "/test2", "sample rule note");
 
 		// Validate created rule in list table.
-		cy.visit("/wp-admin/edit.php?post_type=redirect_rule");
+		cy.visitAdminPage("edit.php?post_type=redirect_rule");
 		cy.get("#the-list td.title a").first().should("have.text", "/test");
 		cy.get("#the-list td.srm_redirect_rule_to")
 			.first()
