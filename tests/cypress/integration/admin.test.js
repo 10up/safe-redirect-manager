@@ -6,9 +6,9 @@ describe("Admin can login and make sure plugin is activated", () => {
 	it("Can activate plugin if it is deactivated", () => {
 		cy.visit("/wp-admin/plugins.php");
 
-		cy.get("#deactivate-safe-redirect-manager").click();
-		cy.get("#activate-safe-redirect-manager").click();
-		cy.get("#deactivate-safe-redirect-manager").should("be.visible");
+		cy.get('[aria-label="Deactivate Safe Redirect Manager"]').click();
+		cy.get('[aria-label="Activate Safe Redirect Manager"]').click();
+		cy.get('[aria-label="Deactivate Safe Redirect Manager"]').should("be.visible");
 	});
 
 	it('Can see "Safe Redirect Manager" menu item under Tools menu', () => {
