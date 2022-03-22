@@ -12,7 +12,7 @@ jobs:
       matrix:
         core:
           - {name: 'WP latest', version: 'latest'}
-          - {name: 'WP minimum', version: 'WordPress/WordPress#4.9'}
+          - {name: 'WP minimum', version: 'WordPress/WordPress#4.6'}
           - {name: 'WP trunk', version: 'WordPress/WordPress#master'}
     steps:
     - name: Checkout
