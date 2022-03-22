@@ -23,3 +23,26 @@
 //
 // -- This will overwrite an existing command --
 // Cypress.Commands.overwrite('visit', (originalFn, url, options) => { ... })
+
+
+Cypress.Commands.add('createRedirectRule', (from, to, notes = '', regex = false ) => {
+	cy.visit('/wp-admin/post-new.php?post_type=redirect_rule');
+
+	cy.get('#srm_redirect_rule_from').click().clear().type(from);
+	cy.get('#srm_redirect_rule_to').click().clear().type(to);
+	cy.get('#srm_redirect_rule_notes').click().clear().type(notes);
+
+	if ( regex ) {
+		cy.get('#srm_redirect_rule_from_regex').check();
+	}
+
+	cy.get('#publish').click();
+	cy.get( '.updated' ).should( 'be.visible' );
+});
+
+Cypress.Commands.add('deleteRedirectRules', () => {
+	cy.visit('/wp-admin/edit.php?post_type=redirect_rule');
+	cy.get('#cb-select-all-1').check();
+	cy.get('#bulk-action-selector-top').select('trash');
+	cy.get('#doaction').click();
+});
