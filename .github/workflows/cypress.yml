@@ -25,9 +25,9 @@ jobs:
       run: npm run env:start
     - name: Test
       run: npm run cypress:run
-	- name: Upload artifacts
-	  uses: actions/upload-artifact@v2.3.0
-	  if: failure()
-	  with:
-	   	name: 'Cypress artifacts'
-		path: tests/cypress/videos/
+    - name: Upload artifacts
+      uses: actions/upload-artifact@v2.3.0
+      if: failure()
+      with:
+        name: 'Cypress artifacts'
+        path: tests/cypress/videos/
