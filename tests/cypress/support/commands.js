@@ -26,6 +26,7 @@
 
 Cypress.Commands.add( 'visitAdminPage', ( page = 'index.php' ) => {
 	cy.login();
+	cy.url().should("include", "/wp-admin");
 	if ( page.includes( 'http' ) ) {
 		cy.visit( page );
 	} else {
@@ -46,11 +47,4 @@ Cypress.Commands.add('createRedirectRule', (from, to, notes = '', regex = false 
 
 	cy.get('#publish').click();
 	cy.get( '.updated' ).should( 'be.visible' );
-});
-
-Cypress.Commands.add('deleteRedirectRules', () => {
-	cy.visitAdminPage('edit.php?post_type=redirect_rule');
-	cy.get('#cb-select-all-1').check();
-	cy.get('#bulk-action-selector-top').select('trash');
-	cy.get('#doaction').click();
 });
