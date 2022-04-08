@@ -18,9 +18,17 @@
     "lint": [
       "phpcs ."
     ],
+    "phpcs:compat": [
+      "phpcs . --standard=PHPCompatibilityWP --runtime-set testVersion 7.0-"
+    ],
     "lint-fix": [
       "phpcbf ."
     ]
   },
-  "minimum-stability": "dev"
+  "minimum-stability": "dev",
+  "config": {
+    "allow-plugins": {
+      "dealerdirect/phpcodesniffer-composer-installer": true
+    }
+  }
 }
