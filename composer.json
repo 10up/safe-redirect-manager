@@ -9,9 +9,8 @@
     }
   ],
   "require-dev": {
-    "phpunit/phpunit": "~7.5",
+    "phpunit/phpunit": "9.4.4",
     "10up/phpcs-composer": "dev-master",
-    "10up/wpacceptance": "dev-master",
     "yoast/phpunit-polyfills": "^1.0.3"
   },
   "scripts": {
@@ -19,7 +18,7 @@
       "phpcs ."
     ],
     "phpcs:compat": [
-      "phpcs . --standard=PHPCompatibilityWP --runtime-set testVersion 7.0-"
+      "phpcs . --standard=PHPCompatibilityWP --extensions=php --runtime-set testVersion 7.0-"
     ],
     "lint-fix": [
       "phpcbf ."
