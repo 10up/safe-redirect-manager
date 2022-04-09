@@ -33,7 +33,7 @@ jobs:
         tools: composer:v2
 
     - name: Install dependencies
-      run: composer update -W
+      run: composer install
 
     - name: Setup WP Tests
       run: bash bin/install-wp-tests.sh wordpress_test root '' 127.0.0.1

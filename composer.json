@@ -9,7 +9,6 @@
     }
   ],
   "require-dev": {
-    "phpunit/phpunit": "9.4.4",
     "10up/phpcs-composer": "dev-master",
     "yoast/phpunit-polyfills": "^1.0.3"
   },
