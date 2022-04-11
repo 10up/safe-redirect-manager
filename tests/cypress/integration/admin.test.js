@@ -1,5 +1,5 @@
 describe('Admin can login and make sure plugin is activated', () => {
-	beforeEach(() => {
+	before(() => {
 		cy.login();
 	});
 

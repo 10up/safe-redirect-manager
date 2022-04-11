@@ -17,3 +17,9 @@ import '@10up/cypress-wp-utils';
 
 // Import commands.js using ES2015 syntax:
 import './commands';
+
+beforeEach(() => {
+	Cypress.Cookies.defaults({
+		preserve: /^wordpress.*?/,
+	});
+});
