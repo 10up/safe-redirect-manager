@@ -23,19 +23,8 @@
 //
 // -- This will overwrite an existing command --
 // Cypress.Commands.overwrite('visit', (originalFn, url, options) => { ... })
-
-Cypress.Commands.add( 'visitAdminPage', ( page = 'index.php' ) => {
-	cy.login();
-	cy.url().should("include", "/wp-admin");
-	if ( page.includes( 'http' ) ) {
-		cy.visit( page );
-	} else {
-		cy.visit( `/wp-admin/${ page.replace( /^\/|\/$/g, '' ) }` );
-	}
-});
-
 Cypress.Commands.add('createRedirectRule', (from, to, notes = '', regex = false ) => {
-	cy.visitAdminPage('post-new.php?post_type=redirect_rule');
+	cy.visit('/wp-admin/post-new.php?post_type=redirect_rule');
 
 	cy.get('#srm_redirect_rule_from').click().clear().type(from);
 	cy.get('#srm_redirect_rule_to').click().clear().type(to);
