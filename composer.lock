@@ -401,6 +401,7 @@
                     "src/"
                 ]
             },
+            "type": "phpcodesniffer-standard",
             "notification-url": "https://packagist.org/downloads/",
             "license": [
                 "BSD-3-Clause"
@@ -1441,6 +1442,9 @@
             "require-dev": {
                 "phpunit/phpunit": "^9.3"
             },
+            "require-dev": {
+                "phpunit/phpunit": "^7.0"
+            },
             "type": "library",
             "extra": {
                 "branch-alias": {
@@ -1514,6 +1518,9 @@
             "require-dev": {
                 "phpunit/phpunit": "^9.3"
             },
+            "bin": [
+                "phpunit"
+            ],
             "type": "library",
             "extra": {
                 "branch-alias": {
@@ -1700,6 +1707,10 @@
             "require-dev": {
                 "ext-mbstring": "*",
                 "phpunit/phpunit": "^9.3"
+            },
+            "require-dev": {
+                "phpunit/phpunit": "^7.5 || ^8.0",
+                "symfony/process": "^2 || ^3.3 || ^4"
             },
             "type": "library",
             "extra": {
@@ -2072,7 +2083,6 @@
             "require-dev": {
                 "phpunit/phpunit": "^9.0"
             },
-            "default-branch": true,
             "type": "library",
             "extra": {
                 "branch-alias": {
