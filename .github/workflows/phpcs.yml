@@ -1,4 +1,4 @@
-name: Linting
+name: PHPCS
 
 on:
   push:
@@ -16,15 +16,16 @@ jobs:
     steps:
     - name: Checkout
       uses: actions/checkout@v2
+
     - name: Set PHP version
       uses: shivammathur/setup-php@v2
       with:
-        php-version: '7.2'
+        php-version: '7.4'
         coverage: none
-        tools: composer:v1
+        tools: composer:v2
+
     - name: composer install
       run: composer install
-    - name: PHPCS check
-      uses: chekalsky/phpcs-action@v1
-      with:
-        phpcs_bin_path: './vendor/bin/phpcs .'
+
+    - name: Run PHPCS
+      run: composer run lint
