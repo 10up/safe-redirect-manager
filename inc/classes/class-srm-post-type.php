@@ -253,7 +253,7 @@ class SRM_Post_Type {
 				?>
 				<div class="notice notice-error is-dismissible">
 					<p>
-						<?php esc_html_e( 'Safe Redirect Manager Error: Duplicate redirection rule found. You can modify below rule instead of adding new one.', 'safe-redirect-manager' ); ?>
+						<?php esc_html_e( 'Safe Redirect Manager Error: Cannot create rule - duplicate redirection rule found. You can modify the existing rule below.', 'safe-redirect-manager' ); ?>
 					</p>
 				</div>
 				<?php
@@ -270,7 +270,7 @@ class SRM_Post_Type {
 				} elseif ( ! current_user_can( 'delete_post', $duplicate_redirect_rule ) ) {
 
 					$should_delete = false;
-					$error         = __( 'You don\'t have enough permission to delete duplicate redirect rule, please contact your administrator!', 'safe-redirect-manager' );
+					$error         = __( 'You don\'t have permission to delete the duplicate redirect rule, please contact your administrator!', 'safe-redirect-manager' );
 				}
 
 				if ( $should_delete ) {
@@ -486,7 +486,7 @@ class SRM_Post_Type {
 			 */
 			srm_flush_cache();
 
-			add_filter( 'redirect_post_location', array( $this, 'add_notice_query_var' ), 99, 2 );
+			add_filter( 'redirect_post_location', [ $this, 'add_notice_query_var' ], 99, 2 );
 		}
 	}
 
@@ -500,7 +500,7 @@ class SRM_Post_Type {
 	 */
 	public function add_notice_query_var( $location, $post_id ) {
 
-		remove_filter( 'redirect_post_location', array( $this, 'add_notice_query_var' ), 99 );
+		remove_filter( 'redirect_post_location', [ $this, 'add_notice_query_var' ], 99 );
 
 		// If post ID is empty, bail out.
 		if ( empty( $post_id ) ) {
@@ -547,10 +547,10 @@ class SRM_Post_Type {
 		}
 
 		$location = add_query_arg(
-			array(
+			[
 				'duplicate-redirect-rule' => $post_id,
 				'_wpnonce'                => wp_create_nonce( 'delete-duplicate-redirect-rule' ),
-			),
+			],
 			get_edit_post_link( $existing_post_id, 'edit' )
 		);
 
