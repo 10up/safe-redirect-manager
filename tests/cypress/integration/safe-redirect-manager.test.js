@@ -65,7 +65,7 @@ describe('Test redirect rules', () => {
 		cy.url().should('include', '/hello-world');
 	});
 
-	it.skip('Can redirect a wildcard rule request', () => {
+	it('Can redirect a wildcard rule request', () => {
 		// no leading slash, no trailing slash
 		cy.createRedirectRule('test*', 'sample-page', 'Wildcard rule note (no leading slash, no trailing slash)');
 		cy.visit('/test-1');
