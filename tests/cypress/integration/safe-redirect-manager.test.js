@@ -19,13 +19,49 @@ describe('Test redirect rules', () => {
 	});
 
 	it('Can redirect a simple rule request', () => {
+		// no leading slash, no trailing slash
 		cy.createRedirectRule(
-			'/first-blog',
-			'/hello-world',
-			'Simple rule note'
+			'first-blog',
+			'hello-world',
+			'Simple rule note (no leading slash, no trailing slash)'
 		);
-
 		cy.visit('/first-blog');
+		cy.url().should('include', '/hello-world');
+		cy.visit('/first-blog/');
+		cy.url().should('include', '/hello-world');
+
+
+		// leading slash, no trailing slash
+		cy.createRedirectRule(
+			'/first-blog-2',
+			'/hello-world',
+			'Simple rule note (leading slash, no trailing slash)'
+		);
+		cy.visit('/first-blog-2');
+		cy.url().should('include', '/hello-world');
+		cy.visit('/first-blog-2/');
+		cy.url().should('include', '/hello-world');
+
+		// no leading slash, trailing slash
+		cy.createRedirectRule(
+			'first-blog-3/',
+			'hello-world/',
+			'Simple rule note (no leading slash, trailing slash)'
+		);
+		cy.visit('/first-blog-3');
+		cy.url().should('include', '/hello-world');
+		cy.visit('/first-blog-3/');
+		cy.url().should('include', '/hello-world');
+
+		// leading slash, trailing slash
+		cy.createRedirectRule(
+			'/first-blog-4/',
+			'/hello-world/',
+			'Simple rule note (leading slash, trailing slash)'
+		);
+		cy.visit('/first-blog-4');
+		cy.url().should('include', '/hello-world');
+		cy.visit('/first-blog-4/');
 		cy.url().should('include', '/hello-world');
 	});
 
