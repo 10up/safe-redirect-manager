@@ -65,10 +65,33 @@ describe('Test redirect rules', () => {
 		cy.url().should('include', '/hello-world');
 	});
 
-	it('Can redirect a wildcard rule request', () => {
-		cy.createRedirectRule('/test*', '/sample-page', 'Wildcard rule note');
-
+	it.skip('Can redirect a wildcard rule request', () => {
+		// no leading slash, no trailing slash
+		cy.createRedirectRule('test*', 'sample-page', 'Wildcard rule note (no leading slash, no trailing slash)');
 		cy.visit('/test-1');
+		cy.url().should('include', '/sample-page');
+		cy.visit('/test-1/');
+		cy.url().should('include', '/sample-page');
+
+		// leading slash, no trailing slash
+		cy.createRedirectRule('/2-test*', '/sample-page', 'Wildcard rule note (leading slash, no trailing slash)');
+		cy.visit('/2-test-1');
+		cy.url().should('include', '/sample-page');
+		cy.visit('/2-test-1/');
+		cy.url().should('include', '/sample-page');
+
+		// no leading slash, trailing slash
+		cy.createRedirectRule('3-test*/', 'sample-page/', 'Wildcard rule note (no leading slash, trailing slash)');
+		cy.visit('/3-test-1');
+		cy.url().should('include', '/sample-page');
+		cy.visit('/3-test-1/');
+		cy.url().should('include', '/sample-page');
+
+		// leading slash, trailing slash
+		cy.createRedirectRule('/4-test*/', '/sample-page/', 'Wildcard rule note (leading slash, trailing slash)');
+		cy.visit('/4-test-1');
+		cy.url().should('include', '/sample-page');
+		cy.visit('/4-test-1/');
 		cy.url().should('include', '/sample-page');
 	});
 
