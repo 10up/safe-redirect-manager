@@ -29,3 +29,13 @@ jobs:
       run: npm run env:start
     - name: Test
       run: npm run cypress:run
+    - name: Upload artifacts
+      uses: actions/upload-artifact@v2
+      if: failure()
+      with:
+        name: cypress-artifact-safe-redirect-manager
+        retention-days: 7
+        path: |
+          ${{ github.workspace }}/tests/cypress/screenshots/
+          ${{ github.workspace }}/tests/cypress/videos/
+          ${{ github.workspace }}/tests/cypress/logs/
