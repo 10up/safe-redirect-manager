@@ -48,8 +48,8 @@ class SRM_Post_Type {
 		add_action( 'admin_print_styles-post-new.php', array( $this, 'action_print_logo_css' ), 10, 1 );
 		add_filter( 'post_type_link', array( $this, 'filter_post_type_link' ), 10, 2 );
 		add_filter( 'default_hidden_columns', array( $this, 'filter_hidden_columns' ), 10, 1 );
-		add_action( 'admin_enqueue_scripts', array( $this, 'load_resources' ) );
-		add_action( 'wp_ajax_srm_validate_from_url', array( $this, 'srm_validate_from_url' ) );
+		add_action( 'admin_enqueue_scripts', array( $this, 'load_resources' ), 10, 0 );
+		add_action( 'wp_ajax_srm_validate_from_url', array( $this, 'srm_validate_from_url' ), 10, 0 );
 	}
 
 	/**
@@ -649,7 +649,15 @@ class SRM_Post_Type {
 	 */
 	public function load_resources() {
 		if ( 'redirect_rule' === get_post_type() ) {
-			wp_enqueue_script( 'redirectjs', plugin_dir_url( 'safe-redirect-manager/safe-redirect-manager.php' ) . 'assets/js/redirect.js', [ 'jquery' ], SRM_VERSION );
+			wp_enqueue_script( 'redirectjs', plugin_dir_url( 'safe-redirect-manager/safe-redirect-manager.php' ) . 'assets/js/redirect.js', array( 'jquery' ), SRM_VERSION );
+			wp_localize_script(
+				'redirectjs',
+				'redirectValidation',
+				array(
+					'urlError' => __( 'There are some issues validating the URL. Please try again.', 'safe-redirect-manager' ),
+					'fail'     => __( 'There is an existing redirect with the same Redirect From URL. You may <a href="%s">Edit</a> the redirect or try other `from` URL.', 'safe-redirect-manager' ),
+				)
+			);
 		}
 	}
 
@@ -668,15 +676,17 @@ class SRM_Post_Type {
 		$from = filter_input( INPUT_GET, 'from', FILTER_SANITIZE_STRING );
 		$existing_post_ids = new WP_Query(
 			[
-				'meta_key'       => '_redirect_rule_from',
-				'meta_value'     => $from,
-				'fields'         => 'ids',
-				'posts_per_page' => 1,
-				'no_found_rows'  => true,
-				'post_type'      => 'redirect_rule',
-				'post_status'    => 'publish',
-				'orderby'        => 'ID',
-				'order'          => 'ASC',
+				'meta_key'               => '_redirect_rule_from',
+				'meta_value'             => $from,
+				'fields'                 => 'ids',
+				'posts_per_page'         => 1,
+				'no_found_rows'          => true,
+				'post_type'              => 'redirect_rule',
+				'post_status'            => 'publish',
+				'orderby'                => 'ID',
+				'order'                  => 'ASC',
+				'update_post_meta_cache' => false,
+				'update_post_term_cache' => false,
 			]
 		);
 

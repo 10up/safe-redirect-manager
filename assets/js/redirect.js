@@ -17,9 +17,9 @@
 					$('#message').html( '' ).hide();
 					publishBtn.prop('disabled', false);
 				} else if ( '0' === data ) {
-					$('#message').html( '<p>There are some issues validating the URL. Please try again.</p>' ).show();
+					$('#message').html( `<p>${redirectValidation.urlError}</p>` ).show();
 				} else {
-					$('#message').html( '<p>There is an existing redirect with the same Redirect From URL. You may <a href="' + data + '">Edit</a> the redirect or try other from URL.</p>' ).show();
+					$('#message').html( `<p>${redirectValidation.fail.replace( '%s', data )}</p>` ).show();
 				}
 			});
 		});
