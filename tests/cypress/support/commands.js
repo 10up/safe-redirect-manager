@@ -37,3 +37,10 @@ Cypress.Commands.add('createRedirectRule', (from, to, notes = '', regex = false 
 	cy.get('#publish').click();
 	cy.get( '.updated' ).should( 'be.visible' );
 });
+
+Cypress.Commands.add('verifyRedirectRule', (from, to) => {
+	cy.visit(`/${from}`);
+	cy.url().should('include', to);
+	cy.visit(`/${from}/`);
+	cy.url().should('include', to);
+});
