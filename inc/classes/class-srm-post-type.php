@@ -674,6 +674,8 @@ class SRM_Post_Type {
 		}
 
 		$from = filter_input( INPUT_GET, 'from', FILTER_SANITIZE_STRING );
+		$from = '/' === substr( $from, 0, 1 ) ? $from : '/' . $from;
+
 		$existing_post_ids = new WP_Query(
 			[
 				'meta_key'               => '_redirect_rule_from',
