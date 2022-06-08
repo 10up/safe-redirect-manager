@@ -674,6 +674,14 @@ class SRM_Post_Type {
 		}
 
 		$from = filter_input( INPUT_GET, 'from', FILTER_SANITIZE_STRING );
+
+		/**
+		 * SRM treats '/sample-page' and 'sample-page' equally.
+		 * If the $from value does not start with a forward slash,
+		 * then we normalize it by adding one.
+		 */
+		$from = '/' === substr( $from, 0, 1 ) ? $from : '/' . $from;
+
 		$existing_post_ids = new WP_Query(
 			[
 				'meta_key'               => '_redirect_rule_from',
