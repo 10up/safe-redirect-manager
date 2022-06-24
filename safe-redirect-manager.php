@@ -1,14 +1,16 @@
 <?php
 /**
- * Plugin Name: Safe Redirect Manager
- * Plugin URI: https://wordpress.org/plugins/safe-redirect-manager
- * Description: Easily and safely manage HTTP redirects.
- * Author: 10up
- * Version: 1.11.0
- * Text Domain: safe-redirect-manager
- * Author URI: https://10up.com
- * License: GPLv2 or later
- * License URI: http://www.gnu.org/licenses/gpl-2.0.html
+ * Plugin Name:       Safe Redirect Manager
+ * Plugin URI:        https://wordpress.org/plugins/safe-redirect-manager
+ * Description:       Easily and safely manage HTTP redirects.
+ * Version:           1.11.0
+ * Requires at least: 4.6
+ * Requires PHP:      5.6
+ * Author:            10up
+ * Author URI:        https://10up.com
+ * License:           GPLv2 or later
+ * License URI:       http://www.gnu.org/licenses/gpl-2.0.html
+ * Text Domain:       safe-redirect-manager
  *
  * @package safe-redirect-manager
  */
