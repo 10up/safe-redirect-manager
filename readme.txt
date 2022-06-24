@@ -48,6 +48,17 @@ This should be a path (i.e. `/test`) or a URL (i.e. `http://example.com/wp/test`
 
 == Changelog ==
 
+= 1.11.0 =
+* **Added:** Detect duplicate rules for the same 'redirect from'. (props [@adamsilverstein](https://github.com/adamsilverstein), [@dhanendran](https://github.com/dhanendran), [@hrkhal](https://github.com/hrkhal), [@jeffpaul](https://github.com/jeffpaul), [@lukaspawlik](https://github.com/lukaspawlik), [@sanketio](https://github.com/sanketio), [@Sidsector9](https://github.com/Sidsector9))
+* **Added:** PHP 8 compatibility (props [@iamdharmesh](https://github.com/iamdharmesh), [@dkotter](https://github.com/dkotter))
+* **Added:** E2E Tests with Cypress (props [@iamdharmesh](https://github.com/iamdharmesh), [@Sidsector9](https://github.com/Sidsector9), [@dkotter](https://github.com/dkotter))
+* **Added:** Dependency security scanning. (props [@jeffpaul](https://github.com/jeffpaul), [@peterwilsoncc](https://github.com/peterwilsoncc))
+* **Changed:** Default number of redirects in readme files (props [@grappler](https://github.com/grappler))
+* **Changed:** Bump WordPress "tested up to" version 5.9. (props [@jeffpaul](https://github.com/jeffpaul), [@sudip-10up](https://github.com/sudip-10up))
+* **Changed:** Bump WordPress "tested up to" version 6.0. (props [@peterwilsoncc](https://github.com/peterwilsoncc), [@jeffpaul](https://github.com/jeffpaul))
+* **Fixed:** Unit tests by adding PHPUnit-Polyfills library. (props [@iamdharmesh](https://github.com/iamdharmesh), [@Sidsector9](https://github.com/Sidsector9))
+* **Security:** Bump `minimist` from 1.2.5 to 1.2.6 (props [@dependabot[bot]](https://github.com/apps/dependabot))
+
 = 1.10.1 =
 * **Added:** Formatting options to `wp safe-redirect-manager list` command (props [@dinhtungdu](https://profiles.wordpress.org/dinhtungdu/), [@TheLastCicada](https://profiles.wordpress.org/thelastcicada/)).
 * **Changed:** Increased redirect limits from 250 to 1,000 (props [@sultann](https://profiles.wordpress.org/manikmist09/), [@dinhtungdu](https://profiles.wordpress.org/dinhtungdu/), [@jilltilt](https://github.com/jilltilt), [@yeevy](https://github.com/yeevy)).

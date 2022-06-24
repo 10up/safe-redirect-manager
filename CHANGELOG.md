@@ -6,7 +6,7 @@ All notable changes to this project will be documented in this file, per [the Ke
 
 ## [1.11.0] - TBD
 ### Added
-- Detect duplicate rules for the same 'redirect from'. (props [@adamsilverstein](https://github.com/adamsilverstein), [@dhanendran](https://github.com/dhanendran), [@hrkhal](https://github.com/hrkhal), [@jeffpaul](https://github.com/jeffpaul), [@lukaspawlik](https://github.com/lukaspawlik), [@sanketio](https://github.com/sanketio), [@Sidsector9](https://github.com/Sidsector9)  via [#171](https://github.com/10up/safe-redirect-manager/pull/171))
+- Detect duplicate rules for the same 'redirect from'. (props [@adamsilverstein](https://github.com/adamsilverstein), [@dhanendran](https://github.com/dhanendran), [@hrkhal](https://github.com/hrkhal), [@jeffpaul](https://github.com/jeffpaul), [@lukaspawlik](https://github.com/lukaspawlik), [@sanketio](https://github.com/sanketio), [@Sidsector9](https://github.com/Sidsector9) via [#171](https://github.com/10up/safe-redirect-manager/pull/171))
 - PHP 8 compatibility (props [@iamdharmesh](https://github.com/iamdharmesh), [@dkotter](https://github.com/dkotter) via [#264](https://github.com/10up/safe-redirect-manager/pull/264))
 - E2E Tests with Cypress (props [@iamdharmesh](https://github.com/iamdharmesh), [@Sidsector9](https://github.com/Sidsector9), [@dkotter](https://github.com/dkotter) via [#262](https://github.com/10up/safe-redirect-manager/pull/262), [#273](https://github.com/10up/safe-redirect-manager/pull/273))
 - Dependency security scanning. (props [@jeffpaul](https://github.com/jeffpaul), [@peterwilsoncc](https://github.com/peterwilsoncc) via [#268](https://github.com/10up/safe-redirect-manager/pull/268))
