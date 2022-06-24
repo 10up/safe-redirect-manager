@@ -4,7 +4,7 @@
  * Plugin URI: https://wordpress.org/plugins/safe-redirect-manager
  * Description: Easily and safely manage HTTP redirects.
  * Author: 10up
- * Version: 1.10.1
+ * Version: 1.11.0
  * Text Domain: safe-redirect-manager
  * Author URI: https://10up.com
  * License: GPLv2 or later
@@ -18,7 +18,7 @@ require_once dirname( __FILE__ ) . '/inc/functions.php';
 require_once dirname( __FILE__ ) . '/inc/classes/class-srm-post-type.php';
 require_once dirname( __FILE__ ) . '/inc/classes/class-srm-redirect.php';
 
-define( 'SRM_VERSION', '1.10.1' );
+define( 'SRM_VERSION', '1.11.0' );
 
 if ( defined( 'WP_CLI' ) && WP_CLI ) {
 	require_once dirname( __FILE__ ) . '/inc/classes/class-srm-wp-cli.php';
