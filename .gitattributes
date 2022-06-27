@@ -18,5 +18,5 @@
 /package.json export-ignore
 /phpcs.xml export-ignore
 /phpunit.xml.dist export-ignore
-/run-wpacceptance.sh export-ignore
-/wpacceptance.json export-ignore
+/README.md export-ignore
+/.wp-env.json export-ignore

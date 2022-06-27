@@ -48,6 +48,8 @@ class SRM_Post_Type {
 		add_action( 'admin_print_styles-post-new.php', array( $this, 'action_print_logo_css' ), 10, 1 );
 		add_filter( 'post_type_link', array( $this, 'filter_post_type_link' ), 10, 2 );
 		add_filter( 'default_hidden_columns', array( $this, 'filter_hidden_columns' ), 10, 1 );
+		add_action( 'admin_enqueue_scripts', array( $this, 'load_resources' ), 10, 0 );
+		add_action( 'wp_ajax_srm_validate_from_url', array( $this, 'srm_validate_from_url' ), 10, 0 );
 	}
 
 	/**
@@ -555,6 +557,7 @@ class SRM_Post_Type {
 			$status_code = apply_filters( 'srm_default_direct_status', 302 );
 		}
 		?>
+		<div class="notice notice-error" id="message" style="display: none;"></div>
 		<p>
 			<label for="srm_redirect_rule_from"><strong><?php esc_html_e( '* Redirect From:', 'safe-redirect-manager' ); ?></strong></label><br />
 			<input type="text" name="srm_redirect_rule_from" id="srm_redirect_rule_from" value="<?php echo esc_attr( $redirect_from ); ?>" />
@@ -637,5 +640,73 @@ class SRM_Post_Type {
 		}
 
 		return $instance;
+	}
+
+	/**
+	 * Load scripts.
+	 *
+	 * @return void
+	 */
+	public function load_resources() {
+		if ( 'redirect_rule' === get_post_type() ) {
+			wp_enqueue_script( 'redirectjs', plugin_dir_url( 'safe-redirect-manager/safe-redirect-manager.php' ) . 'assets/js/redirect.js', array( 'jquery' ), SRM_VERSION );
+			wp_localize_script(
+				'redirectjs',
+				'redirectValidation',
+				array(
+					'urlError' => __( 'There are some issues validating the URL. Please try again.', 'safe-redirect-manager' ),
+					'fail'     => __( 'There is an existing redirect with the same Redirect From URL. You may <a href="%s">Edit</a> the redirect or try other `from` URL.', 'safe-redirect-manager' ),
+				)
+			);
+		}
+	}
+
+	/**
+	 * Validate whether the from URL already exists or not.
+	 *
+	 * @return void
+	 */
+	public function srm_validate_from_url() {
+		$_wpnonce = filter_input( INPUT_GET, '_wpnonce', FILTER_SANITIZE_STRING );
+		if ( ! wp_verify_nonce( $_wpnonce, 'srm-save-redirect-meta' ) ) {
+			echo 0;
+			die();
+		}
+
+		$from = filter_input( INPUT_GET, 'from', FILTER_SANITIZE_STRING );
+
+		/**
+		 * SRM treats '/sample-page' and 'sample-page' equally.
+		 * If the $from value does not start with a forward slash,
+		 * then we normalize it by adding one.
+		 */
+		$from = '/' === substr( $from, 0, 1 ) ? $from : '/' . $from;
+
+		$existing_post_ids = new WP_Query(
+			[
+				'meta_key'               => '_redirect_rule_from',
+				'meta_value'             => $from,
+				'fields'                 => 'ids',
+				'posts_per_page'         => 1,
+				'no_found_rows'          => true,
+				'post_type'              => 'redirect_rule',
+				'post_status'            => 'publish',
+				'orderby'                => 'ID',
+				'order'                  => 'ASC',
+				'update_post_meta_cache' => false,
+				'update_post_term_cache' => false,
+			]
+		);
+
+		// If no posts found, then bail out.
+		if ( empty( $existing_post_ids->posts ) ) {
+			echo 1;
+			die();
+		}
+
+		$existing_post_id = $existing_post_ids->posts[0];
+
+		echo esc_url( get_edit_post_link( $existing_post_id ) );
+		die();
 	}
 }
