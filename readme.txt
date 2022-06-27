@@ -1,10 +1,10 @@
 === Safe Redirect Manager ===
-Contributors:      tlovett1, tollmanz, taylorde, 10up, jakemgold, danielbachhuber, VentureBeat
+Contributors:      10up, tlovett1, tollmanz, taylorde, jakemgold, danielbachhuber, VentureBeat, jeffpaul
 Tags:              http redirects, redirect manager, url redirection, safe http redirection, multisite redirects, redirects
 Requires at least: 4.6
 Tested up to:      6.0
 Requires PHP:      5.6
-Stable tag:        1.10.1
+Stable tag:        1.11.0
 License:           GPLv2 or later
 License URI:       http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -48,7 +48,17 @@ This should be a path (i.e. `/test`) or a URL (i.e. `http://example.com/wp/test`
 
 == Changelog ==
 
-= 1.10.1 =
+= 1.11.0 - 2022-06-27 =
+* **Added:** Detect duplicate rules for the same 'redirect from' value (props [@adamsilverstein](https://github.com/adamsilverstein), [@dhanendran](https://github.com/dhanendran), [@hrkhal](https://github.com/hrkhal), [@jeffpaul](https://github.com/jeffpaul), [@lukaspawlik](https://github.com/lukaspawlik), [@sanketio](https://github.com/sanketio), [@Sidsector9](https://github.com/Sidsector9) via [#171](https://github.com/10up/safe-redirect-manager/pull/171)).
+* **Added:** PHP 8 compatibility (props [@iamdharmesh](https://github.com/iamdharmesh), [@dkotter](https://github.com/dkotter) via [#264](https://github.com/10up/safe-redirect-manager/pull/264)).
+* **Added:** E2E Tests with Cypress (props [@iamdharmesh](https://github.com/iamdharmesh), [@Sidsector9](https://github.com/Sidsector9), [@dkotter](https://github.com/dkotter) via [#262](https://github.com/10up/safe-redirect-manager/pull/262), [#273](https://github.com/10up/safe-redirect-manager/pull/273)).
+* **Added:** Dependency security scanning (props [@jeffpaul](https://github.com/jeffpaul), [@peterwilsoncc](https://github.com/peterwilsoncc) via [#268](https://github.com/10up/safe-redirect-manager/pull/268)).
+* **Changed:** Default number of redirects in readme files (props [@grappler](https://github.com/grappler) via [#259](https://github.com/10up/safe-redirect-manager/pull/259)).
+* **Changed:** Bump WordPress "tested up to" version 6.0 (props [@jeffpaul](https://github.com/jeffpaul), [@sudip-10up](https://github.com/sudip-10up), [@peterwilsoncc](https://github.com/peterwilsoncc) via [#260](https://github.com/10up/safe-redirect-manager/pull/260), [#270](https://github.com/10up/safe-redirect-manager/pull/270)).
+* **Fixed:** Unit tests by adding `PHPUnit-Polyfills` library (props [@iamdharmesh](https://github.com/iamdharmesh), [@Sidsector9](https://github.com/Sidsector9) via [#257](https://github.com/10up/safe-redirect-manager/pull/257)).
+* **Security:** Bump `minimist` from 1.2.5 to 1.2.6 (props [@dependabot](https://github.com/apps/dependabot) via [#265](https://github.com/10up/safe-redirect-manager/pull/265)).
+
+= 1.10.1 - 2021-12-16 =
 * **Added:** Formatting options to `wp safe-redirect-manager list` command (props [@dinhtungdu](https://profiles.wordpress.org/dinhtungdu/), [@TheLastCicada](https://profiles.wordpress.org/thelastcicada/)).
 * **Changed:** Increased redirect limits from 250 to 1,000 (props [@sultann](https://profiles.wordpress.org/manikmist09/), [@dinhtungdu](https://profiles.wordpress.org/dinhtungdu/), [@jilltilt](https://github.com/jilltilt), [@yeevy](https://github.com/yeevy)).
 * **Changed:** Bump WordPress version "tested up to" 5.8 (props [@jeffpaul](https://profiles.wordpress.org/jeffpaul/), [@ankitguptaindia](https://profiles.wordpress.org/ankit-k-gupta/), [@phpbits](https://profiles.wordpress.org/phpbits/)).
@@ -58,7 +68,7 @@ This should be a path (i.e. `/test`) or a URL (i.e. `http://example.com/wp/test`
 * **Security:** Bump `minimist` from 0.0.8 to 1.2.5 (props [@dependabot](https://github.com/dependabot)).
 * **Security:** Bump `lodash` from 4.17.19 to 4.17.21 (props [@dependabot](https://github.com/dependabot)).
 
-= 1.10.0 =
+= 1.10.0 - 2020-12-03 =
 * **Added:** `410 Gone` status code to the list of HTTP status codes and `srm_additional_status_codes` to add additional status codes ([@dinhtungdu](https://profiles.wordpress.org/dinhtungdu/), [@helen](https://profiles.wordpress.org/helen), [@PopVeKind](https://profiles.wordpress.org/popvekind/)).
 * **Added:** Option to ignore query parameters, previous behaviour still available via the new `srm_match_query_params` filter (props [@bradleyt](https://profiles.wordpress.org/bradleyt/), [@dinhtungdu](https://profiles.wordpress.org/dinhtungdu/)).
 * **Added:** Extracts redirect matching logic from `maybe_redirect` to `match_redirect` method, plus `srm_match_redirect` function to expose matching redirect logic to themes and plugins (props [@nicholas_io](https://profiles.wordpress.org/nicholas_io/), [@dinhtungdu](https://profiles.wordpress.org/dinhtungdu/)).
@@ -70,7 +80,7 @@ This should be a path (i.e. `/test`) or a URL (i.e. `http://example.com/wp/test`
 * **Fixed:** Missing `order` column in CSV import WP-CLI command (props [@barryceelen](https://profiles.wordpress.org/barryceelen/)).
 * **Security:** Bump `lodash` from 4.17.15 to 4.17.19 (props [@dependabot](https://github.com/dependabot)).
 
-= 1.9.3 =
+= 1.9.3 - 2019-11-20 =
 * **Changed:** Allow for escaped values on `_redirect_rule_from`, useful when importing regex (props [@raymondware](https://profiles.wordpress.org/raymondware)).
 * **Changed:** Check `current_user_can` cap later to prevent the notice being thrown during Jetpack sitemap cron event runs (props [@rebeccahum](https://profiles.wordpress.org/rebasaurus)).
 * **Changed:** Updated tests and documentation (props [@adamsilverstein](https://profiles.wordpress.org/adamsilverstein), [@jeffpaul](https://profiles.wordpress.org/jeffpaul), [@helen](https://profiles.wordpress.org/helen)).
@@ -79,98 +89,98 @@ This should be a path (i.e. `/test`) or a URL (i.e. `http://example.com/wp/test`
 * **Fixed:** Update the logic for wildcard matching to properly match URLs with query parameters (props [@adamsilverstein](https://profiles.wordpress.org/adamsilverstein), [@mslinnea](https://profiles.wordpress.org/linsoftware).
 * **Security:** Bump lodash from 4.17.11 to 4.17.15 (props [@dependabot](https://github.com/dependabot)).
 
-= 1.9.2 =
+= 1.9.2 - 2018-11-27 =
 * Fix CLI list function name for PHP 5
 
-= 1.9.1 =
+= 1.9.1 - 2018-11-26 =
 * Fix SQL injection bug opened up by SQL search functionality.
 
-= 1.9 =
+= 1.9 - 2018-04-03 =
 * Add redirect notes feature.
 * Fix PHP 7.2 errors
 * Instantiate classes in main file instead of individual files for improved testability.
 * Add filters for request path and redirect path
 * Add filter to only apply redirects on 404
 
-= 1.8 =
+= 1.8 - 2017-12-08 =
 * Improved escaping
 * Custom redirect capability
 * Code refactor
 * Fix root redirect in sub directory bug
 * Fix broken html
 
-= 1.7.8 (Dec. 16, 2015) =
+= 1.7.8 - 2015-12-16 =
 * Fix SQL injection bug and no search terms warning
 
-= 1.7.7 (Jun. 18, 2015) =
+= 1.7.7 - 2015-06-18 =
 * Make default redirect status filterable
 * Add composer.json
 * Fix delete capability on redirect post type
 
-= 1.7.6 (Feb. 13, 2015) =
+= 1.7.6 - 2015-02-13 =
 * Use home_url() instead of site_url(). Props [swalkinshaw](https://github.com/swalkinshaw)
 * Don't redirect if redirect to location is invalid. Props [vaurdan](https://github.com/vaurdan)
 * Redirection plugin importer. Props [eugene-manuilov](https://github.com/eugene-manuilov)
 
-= 1.7.5 (Sept. 9, 2014) =
+= 1.7.5 - 2014-09-09 =
 * Don't always lowercase matched parts in redirect to replace. Props[francescolaffi](https://github.com/francescolaffi)
 * Plugin icon/banner
 
-= 1.7.4 (Sept. 5, 2014) =
+= 1.7.4 - 2014-09-05 =
 * Fix case sensitivity redirection bug.
 * Add more unit tests
 
-= 1.7.3 (Aug. 26, 2014) =
+= 1.7.3 - 2014-08-26 =
 * Check if the global $wp_query is null before using get_query_var. Props [cmmarslender](https://github.com/cmmarslender)
 * Unit tests
 * Making _x translatable text work. Props [lucspe](https://github.com/lucspe)
 
-= 1.7.2 (Feb. 10, 2014) =
+= 1.7.2 - 2014-02-10 =
 * Added French translation. Props [jcbrebion](https://github.com/jcbrebion).
 * Bug fix: Don't perform redirects in the admin. Props [joshbetz](https://github.com/joshbetz).
 * Bug fix: Prevent duplicate GUIDs. Props [danblaker](https://github.com/danblaker).
 
-= 1.7.1 (Dec. 12, 2013) =
+= 1.7.1 - 2013-12-12 =
 * Add 307 redirect status code. Thanks [lgedeon](https://github.com/lgedeon)
 * Plugin textdomain should be loaded on init
 * Add status code labels to creation dropdown. Thanks Chancey Mathews
 
-= 1.7 (Apr. 6, 2013) =
+= 1.7 - 2013-04-06 =
 * Return redirect_from on get_permalink. Thanks [simonwheatley](https://github.com/simonwheatley)
 * Allow for regex replacement in from/to redirects
 * Add Slovak translation. Thanks [Branco Radenovich](http://webhostinggeeks.com/blog)
 * Notice fixed in filter_admin_title
 
-= 1.6 (Dec. 11, 2012) =
+= 1.6 - 2012-12-11 =
 * Bulk delete redirects from the Manage Redirects screen
 * wp-cli coverage including subcommands for creating, deleting, and listing redirects, and importing .htaccess files
 
-= 1.5 (Nov. 7 2012) =
+= 1.5 - 2012-11-07 =
 * Regular expressions allowed in redirects
 * New filter 'srm_registered_redirects' allows you to conditionally unset redirects based on context, user permissions, etc. Thanks [jtsternberg](https://github.com/jtsternberg) for the pull request.
 
-= 1.4.2 (Oct. 17, 2012) =
+= 1.4.2 - 2012-10-17 =
 * Disable redirect loop checking by default. You can filter srm_check_for_possible_redirect_loops to enable it.
 * Only return published redirects in update_redirect_cache. - bug fix
 
-= 1.4.1 (Oct. 11, 2012) =
+= 1.4.1 - 2012-10-11 =
 * Refresh cache after create_redirect call - bug fix
 * Refresh cache after save_post is called - bug fix
 * Chop off "pre-WP" path from requested path. This allows the plugin to work on WP installations in sub-directories - bug fix
 
-= 1.4 (Oct. 9, 2012) =
+= 1.4 - 2012-10-09 =
 * Use the '*' wildcard at the end of your match value to configure a wildcard redirect. Use the same symbol at the end of your redirect to value in order to have the matched value be appended to the end of the redirect. Thanks [prettyboymp](https://github.com/prettyboymp) for the pull request
 * Change default request-matching behavior to be case-insensitive. This can be modified using the 'srm_case_insensitive_redirects' filter.
 * Include an informational 'X-Safe-Redirect-Manager' header when a redirect occurs. Thanks [simonwheatley](https://github.com/simonwheatley) for the pull request
 
-= 1.3 =
+= 1.3 - 2012-09-19 =
 * safe-redirect-manager.php - Globalize SRM class for use in themes/plugins/scripts. Added create_redirect method to make importing easier.
 
-= 1.2 =
+= 1.2 - 2012-09-01 =
 *   safe-redirect-manager.php - manage_options capability required to use redirect manager, remove checkbox column, hide view switcher, fix search feature, hide privacy stuff for bulk edit
 
-= 1.1 =
+= 1.1 - 2012-08-28 =
 *   safe-redirect-manager.php - plugin_url() used properly, is_plugin_page function
 
-= 1.0 =
+= 1.0 - 2012-08-27 =
 *   Plugin released

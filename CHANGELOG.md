@@ -4,6 +4,23 @@ All notable changes to this project will be documented in this file, per [the Ke
 
 ## [Unreleased] - TBD
 
+## [1.11.0] - 2022-06-27
+### Added
+- Detect duplicate rules for the same 'redirect from' value (props [@adamsilverstein](https://github.com/adamsilverstein), [@dhanendran](https://github.com/dhanendran), [@hrkhal](https://github.com/hrkhal), [@jeffpaul](https://github.com/jeffpaul), [@lukaspawlik](https://github.com/lukaspawlik), [@sanketio](https://github.com/sanketio), [@Sidsector9](https://github.com/Sidsector9) via [#171](https://github.com/10up/safe-redirect-manager/pull/171)).
+- PHP 8 compatibility (props [@iamdharmesh](https://github.com/iamdharmesh), [@dkotter](https://github.com/dkotter) via [#264](https://github.com/10up/safe-redirect-manager/pull/264)).
+- E2E Tests with Cypress (props [@iamdharmesh](https://github.com/iamdharmesh), [@Sidsector9](https://github.com/Sidsector9), [@dkotter](https://github.com/dkotter) via [#262](https://github.com/10up/safe-redirect-manager/pull/262), [#273](https://github.com/10up/safe-redirect-manager/pull/273)).
+- Dependency security scanning (props [@jeffpaul](https://github.com/jeffpaul), [@peterwilsoncc](https://github.com/peterwilsoncc) via [#268](https://github.com/10up/safe-redirect-manager/pull/268)).
+
+### Changed
+- Default number of redirects in readme files (props [@grappler](https://github.com/grappler) via [#259](https://github.com/10up/safe-redirect-manager/pull/259)).
+- Bump WordPress "tested up to" version 6.0 (props [@jeffpaul](https://github.com/jeffpaul), [@sudip-10up](https://github.com/sudip-10up), [@peterwilsoncc](https://github.com/peterwilsoncc) via [#260](https://github.com/10up/safe-redirect-manager/pull/260), [#270](https://github.com/10up/safe-redirect-manager/pull/270)).
+
+### Fixed
+- Unit tests by adding `PHPUnit-Polyfills` library (props [@iamdharmesh](https://github.com/iamdharmesh), [@Sidsector9](https://github.com/Sidsector9) via [#257](https://github.com/10up/safe-redirect-manager/pull/257)).
+
+### Security
+- Bump `minimist` from 1.2.5 to 1.2.6 (props [@dependabot](https://github.com/apps/dependabot) via [#265](https://github.com/10up/safe-redirect-manager/pull/265)).
+
 ## [1.10.1] - 2021-12-16
 ### Added
 - Formatting options to `wp safe-redirect-manager list` command (props [@dinhtungdu](https://github.com/dinhtungdu), [@TheLastCicada](https://github.com/TheLastCicada) via [#238](https://github.com/10up/safe-redirect-manager/pull/238)).
@@ -218,6 +235,7 @@ All notable changes to this project will be documented in this file, per [the Ke
 - Plugin released
 
 [Unreleased]: https://github.com/10up/safe-redirect-manager/compare/trunk...develop
+[1.11.0]: https://github.com/10up/safe-redirect-manager/compare/1.10.1...1.11.0
 [1.10.1]: https://github.com/10up/safe-redirect-manager/compare/1.10.0...1.10.1
 [1.10.0]: https://github.com/10up/safe-redirect-manager/compare/1.9.3...1.10.0
 [1.9.3]: https://github.com/10up/safe-redirect-manager/compare/1.9.2...1.9.3
