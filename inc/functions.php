@@ -369,9 +369,10 @@ function srm_import_file( $file, $args ) {
 		$status_code   = ! empty( $rule[ $args['code'] ] ) ? $rule[ $args['code'] ] : 302;
 		$regex         = ! empty( $rule[ $args['regex'] ] ) ? filter_var( $rule[ $args['regex'] ], FILTER_VALIDATE_BOOLEAN ) : false;
 		$menu_order    = ! empty( $rule[ $args['order'] ] ) ? $rule[ $args['order'] ] : 0;
+		$notes         = ! empty( $rule[ $args['notes'] ] ) ? $rule[ $args['notes'] ] : '';
 
 		// import
-		$id = srm_create_redirect( $redirect_from, $redirect_to, $status_code, $regex, 'publish', $menu_order );
+		$id = srm_create_redirect( $redirect_from, $redirect_to, $status_code, $regex, 'publish', $menu_order, $notes );
 
 		if ( is_wp_error( $id ) ) {
 			$doing_wp_cli && WP_CLI::warning( $id );
