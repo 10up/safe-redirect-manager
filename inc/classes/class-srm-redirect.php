@@ -184,7 +184,7 @@ class SRM_Redirect {
 				}
 
 				// Allow for regex replacement in $redirect_to
-				if ( $enable_regex ) {
+				if ( $enable_regex && ! filter_var( $redirect_to, FILTER_VALIDATE_URL ) ) {
 					$redirect_to = preg_replace( '@' . $redirect_from . '@' . $regex_flag, $redirect_to, $requested_path );
 				}
 
