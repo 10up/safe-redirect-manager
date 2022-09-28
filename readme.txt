@@ -48,7 +48,7 @@ This should be a path (i.e. `/test`) or a URL (i.e. `http://example.com/wp/test`
 
 == Changelog ==
 
-= 1.11.1 - 2022-09-26 =
+= 1.11.1 - 2022-09-28 =
 * **Added:** Indicate plugin as the source of redirects (props [@peterwilsoncc](https://github.com/peterwilsoncc), [@Sidsector9](https://github.com/Sidsector9) via [#281](https://github.com/10up/safe-redirect-manager/pull/281)).
 
 = 1.11.0 - 2022-06-27 =
