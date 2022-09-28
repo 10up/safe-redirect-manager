@@ -245,13 +245,12 @@ class SRM_Redirect {
 		header( 'X-Safe-Redirect-Manager: true' );
 		header( 'X-Safe-Redirect-ID: ' . esc_attr( $matched_redirect['redirect_id'] ) );
 
-		// if we have a valid status code, then redirect with it
-		if ( in_array( $matched_redirect['status_code'], srm_get_valid_status_codes(), true ) ) {
-			wp_safe_redirect( $matched_redirect['redirect_to'], $matched_redirect['status_code'] );
-		} else {
-			wp_safe_redirect( $matched_redirect['redirect_to'] );
+		// Use default status code if an invalid value is set.
+		if ( ! in_array( $matched_redirect['status_code'], srm_get_valid_status_codes(), true ) ) {
+			$matched_redirect['status_code'] = apply_filters( 'srm_default_direct_status', 302 );
 		}
 
+		wp_safe_redirect( $matched_redirect['redirect_to'], $matched_redirect['status_code'], 'Safe Redirect Manager' );
 		exit;
 	}
 

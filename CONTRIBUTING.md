@@ -24,12 +24,12 @@ For more on how 10up writes and manages code, check out our [10up Engineering Be
 
 ## Workflow
 
-The `develop` branch is the development branch which means it contains the next version to be released.  `stable` contains the current latest release and `master` contains the corresponding stable development version.  Always work on the `develop` branch and open up PRs against `develop`.
+The `develop` branch is the development branch which means it contains the next version to be released.  `stable` contains the current latest release and `trunk` contains the corresponding stable development version.  Always work on the `develop` branch and open up PRs against `develop`.
 
 ## Release instructions
 
 1. Branch: Starting from `develop`, cut a release branch named `release/X.Y.Z` for your changes.
-1. Version bump: Bump the version number in `safe-redirect-manager.php`, `package-lock.json`, `package.json`, and `readme.txt` if it does not already reflect the version being released.
+1. Version bump: Bump the version number in `safe-redirect-manager.php`, `package-lock.json`, `package.json`, and `readme.txt` if it does not already reflect the version being released. In `safe-redirect-manager.php` update both the plugin "Version:" property and the plugin `SRM_VERSION` constant.
 1. Changelog: Add/update the changelog in both `readme.txt` and `CHANGELOG.md`.
 1. Props: Update `CREDITS.md` file with any new contributors, confirm maintainers are accurate.
 1. Readme updates: Make any other readme changes as necessary.  `README.md` is geared toward GitHub and `readme.txt` contains WordPress.org-specific content.  The two are slightly different.

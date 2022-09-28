@@ -16,7 +16,7 @@ WordPress mantra, decisions not options. Actions and filters make the plugin ver
 ## Installation
 
 Install the plugin in WordPress. You can download a
-[zip via GitHub](https://github.com/10up/safe-redirect-manager/archive/master.zip) and upload it using the WordPress
+[zip via GitHub](https://github.com/10up/safe-redirect-manager/archive/trunk.zip) and upload it using the WordPress
 plugin uploader ("Plugins" > "Add New" > "Upload Plugin").
 
 ## Configuration
