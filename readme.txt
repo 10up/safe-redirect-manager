@@ -4,7 +4,7 @@ Tags:              http redirects, redirect manager, url redirection, safe http 
 Requires at least: 4.6
 Tested up to:      6.0
 Requires PHP:      5.6
-Stable tag:        1.11.0
+Stable tag:        1.11.1
 License:           GPLv2 or later
 License URI:       http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -47,6 +47,9 @@ This should be a path (i.e. `/test`) or a URL (i.e. `http://example.com/wp/test`
 * Developers can use `srm_additional_status_codes` filter to add status codes if needed.
 
 == Changelog ==
+
+= 1.11.1 - 2022-09-26 =
+* **Added:** Indicate plugin as the source of redirects (props [@peterwilsoncc](https://github.com/peterwilsoncc), [@Sidsector9](https://github.com/Sidsector9) via [#281](https://github.com/10up/safe-redirect-manager/pull/281)).
 
 = 1.11.0 - 2022-06-27 =
 * **Added:** Detect duplicate rules for the same 'redirect from' value (props [@adamsilverstein](https://github.com/adamsilverstein), [@dhanendran](https://github.com/dhanendran), [@hrkhal](https://github.com/hrkhal), [@jeffpaul](https://github.com/jeffpaul), [@lukaspawlik](https://github.com/lukaspawlik), [@sanketio](https://github.com/sanketio), [@Sidsector9](https://github.com/Sidsector9) via [#171](https://github.com/10up/safe-redirect-manager/pull/171)).
