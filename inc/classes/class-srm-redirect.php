@@ -184,8 +184,9 @@ class SRM_Redirect {
 				}
 
 				// Allow for regex replacement in $redirect_to
-				if ( $enable_regex ) {
+				if ( $enable_regex && ! filter_var( $redirect_to, FILTER_VALIDATE_URL ) ) {
 					$redirect_to = preg_replace( '@' . $redirect_from . '@' . $regex_flag, $redirect_to, $requested_path );
+					$redirect_to = '/' . ltrim( $redirect_to, '/' );
 				}
 
 				// re-add the query params if they've not already been added by the wildcard
