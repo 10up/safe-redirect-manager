@@ -9,9 +9,8 @@
     }
   ],
   "require-dev": {
-    "phpunit/phpunit": "~7.5",
     "10up/phpcs-composer": "dev-master",
-    "10up/wpacceptance": "dev-master"
+    "yoast/phpunit-polyfills": "^1.0.3"
   },
   "scripts": {
     "lint": [
@@ -19,7 +18,13 @@
     ],
     "lint-fix": [
       "phpcbf ."
-    ]
+    ],
+    "phpcs:compat": "vendor/bin/phpcs safe-redirect-manager.php inc/ -p --standard=PHPCompatibilityWP --extensions=php --runtime-set testVersion 5.6-"
   },
-  "minimum-stability": "dev"
+  "minimum-stability": "dev",
+  "config": {
+    "allow-plugins": {
+      "dealerdirect/phpcodesniffer-composer-installer": true
+    }
+  }
 }

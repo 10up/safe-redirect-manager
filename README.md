@@ -2,7 +2,7 @@
 
 > A WordPress plugin to safely and easily manage your website's HTTP redirects.
 
-[![Support Level](https://img.shields.io/badge/support-active-green.svg)](#support-level) [![Build Status](https://travis-ci.org/10up/safe-redirect-manager.svg?branch=develop)](https://travis-ci.org/10up/safe-redirect-manager) [![Release Version](https://img.shields.io/github/release/10up/safe-redirect-manager.svg)](https://github.com/10up/safe-redirect-manager/releases/latest) ![WordPress tested up to version](https://img.shields.io/wordpress/plugin/tested/safe-redirect-manager?color=%2346B450&label=WordPress&logo=WordPress&logoColor=%230073AA) [![GPLv2 License](https://img.shields.io/github/license/10up/safe-redirect-manager.svg)](https://github.com/10up/safe-redirect-manager/blob/develop/LICENSE.md)
+[![Support Level](https://img.shields.io/badge/support-active-green.svg)](#support-level) [![PHPUnit](https://github.com/10up/safe-redirect-manager/actions/workflows/phpunit.yml/badge.svg)](https://github.com/10up/safe-redirect-manager/actions/workflows/phpunit.yml) [![PHPCS](https://github.com/10up/safe-redirect-manager/actions/workflows/phpcs.yml/badge.svg)](https://github.com/10up/safe-redirect-manager/actions/workflows/phpcs.yml) [![PHPCompatibility](https://github.com/10up/safe-redirect-manager/actions/workflows/php-compatibility.yml/badge.svg)](https://github.com/10up/safe-redirect-manager/actions/workflows/php-compatibility.yml) [![Release Version](https://img.shields.io/github/release/10up/safe-redirect-manager.svg)](https://github.com/10up/safe-redirect-manager/releases/latest) ![WordPress tested up to version](https://img.shields.io/wordpress/plugin/tested/safe-redirect-manager?color=%2346B450&label=WordPress&logo=WordPress&logoColor=%230073AA) [![GPLv2 License](https://img.shields.io/github/license/10up/safe-redirect-manager.svg)](https://github.com/10up/safe-redirect-manager/blob/develop/LICENSE.md)
 
 ## Purpose
 
@@ -16,7 +16,7 @@ WordPress mantra, decisions not options. Actions and filters make the plugin ver
 ## Installation
 
 Install the plugin in WordPress. You can download a
-[zip via GitHub](https://github.com/10up/safe-redirect-manager/archive/master.zip) and upload it using the WordPress
+[zip via GitHub](https://github.com/10up/safe-redirect-manager/archive/trunk.zip) and upload it using the WordPress
 plugin uploader ("Plugins" > "Add New" > "Upload Plugin").
 
 ## Configuration
@@ -50,7 +50,7 @@ a request (i.e. whether it was successful, unauthorized, not found, etc). You sh
 
 * Redirects are cached using the Transients API. Cache busts occur when redirects are added, updated, and deleted
 so you shouldn't be serving stale redirects.
-* By default the plugin only allows at most 250 redirects to prevent performance issues. There is a filter
+* By default the plugin only allows at most 1000 redirects to prevent performance issues. There is a filter
 `srm_max_redirects` that you can utilize to up this number.
 * "Redirect From" and requested paths are case insensitive by default.
 * Developers can use `srm_additional_status_codes` filter to add status codes if needed.
