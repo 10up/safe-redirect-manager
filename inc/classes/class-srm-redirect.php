@@ -31,6 +31,12 @@ class SRM_Redirect {
 	 * @since 1.9.4
 	 */
 	public function setup_redirect() {
+
+		/**
+		 * Multisite redirect checks.
+		 */
+		$this->multisite_checks();
+
 		/**
 		 * To only redirect on 404 pages, use:
 		 *   add_filter( 'srm_redirect_only_on_404', '__return_true' );
@@ -81,7 +87,7 @@ class SRM_Redirect {
 		if ( function_exists( 'wp_parse_url' ) ) {
 			$parsed_home_url = wp_parse_url( home_url() );
 		} else {
-			$parsed_home_url = parse_url( home_url() );
+			$parsed_home_url = parse_url( home_url() ); // phpcs:ignore
 		}
 
 		if ( isset( $parsed_home_url['path'] ) && '/' !== $parsed_home_url['path'] ) {
@@ -110,7 +116,7 @@ class SRM_Redirect {
 		if ( function_exists( 'wp_parse_url' ) ) {
 			$parsed_requested_path = wp_parse_url( $normalized_requested_path );
 		} else {
-			$parsed_requested_path = parse_url( $normalized_requested_path );
+			$parsed_requested_path = parse_url( $normalized_requested_path ); // phpcs:ignore
 		}
 		// Normalize the request path with and without query strings, for comparison later
 		$normalized_requested_path_no_query = '';
@@ -175,7 +181,7 @@ class SRM_Redirect {
 				if ( function_exists( 'wp_parse_url' ) ) {
 					$parsed_redirect = wp_parse_url( $redirect_to );
 				} else {
-					$parsed_redirect = parse_url( $redirect_to );
+					$parsed_redirect = parse_url( $redirect_to ); // phpcs:ignore
 				}
 
 				if ( is_array( $parsed_redirect ) && ! empty( $parsed_redirect['host'] ) ) {
@@ -222,9 +228,8 @@ class SRM_Redirect {
 		}
 
 		// get requested path and add a / before it
-		$requested_path = esc_url_raw( apply_filters( 'srm_requested_path', $_SERVER['REQUEST_URI'] ) );
-		$requested_path = untrailingslashit( stripslashes( $requested_path ) );
-
+		$requested_path   = esc_url_raw( apply_filters( 'srm_requested_path', $_SERVER['REQUEST_URI'] ) );
+		$requested_path   = untrailingslashit( stripslashes( $requested_path ) );
 		$matched_redirect = $this->match_redirect( $requested_path );
 
 		if ( empty( $matched_redirect ) ) {
@@ -253,6 +258,38 @@ class SRM_Redirect {
 
 		wp_safe_redirect( $matched_redirect['redirect_to'], $matched_redirect['status_code'], 'Safe Redirect Manager' );
 		exit;
+	}
+
+	/**
+	 * Check if on a multisite's subsite and its blog status,
+	 * in case of an archived, deleted or spam status, check main site's redirect rules.
+	 *
+	 * @return void
+	 */
+	public function multisite_checks() {
+		if ( is_multisite() && ! is_user_logged_in() ) {
+			$blog_id = get_current_blog_id();
+
+			if ( ! empty( $blog_id ) ) {
+				$blog_details = get_blog_details( $blog_id );
+
+				if (
+					! empty( $blog_details->archived )
+					|| ! empty( $blog_details->deleted )
+					|| ! empty( $blog_details->spam )
+				) {
+					$main_site_id = get_main_site_id();
+
+					if ( ! empty( $main_site_id ) ) {
+						switch_to_blog( $main_site_id );
+
+						$this->maybe_redirect();
+
+						switch_to_blog( $blog_id );
+					}
+				}
+			}
+		}
 	}
 
 	/**
