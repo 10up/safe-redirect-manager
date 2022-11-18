@@ -2,7 +2,7 @@
 Contributors:      10up, tlovett1, tollmanz, taylorde, jakemgold, danielbachhuber, VentureBeat, jeffpaul
 Tags:              http redirects, redirect manager, url redirection, safe http redirection, multisite redirects, redirects
 Requires at least: 4.6
-Tested up to:      6.0
+Tested up to:      6.1
 Requires PHP:      5.6
 Stable tag:        1.11.1
 License:           GPLv2 or later
