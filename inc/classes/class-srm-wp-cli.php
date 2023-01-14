@@ -289,4 +289,29 @@ class SRM_WP_CLI extends WP_CLI_Command {
 
 		WP_CLI::success( "All done! {$created} redirects were imported, {$skipped} were skipped" );
 	}
+
+	/**
+	 * Export redirects to CSV.
+	 *
+	 * ## EXAMPLE
+	 *
+	 *     wp safe-redirect-manager export --csv
+	 *
+	 * @since 1.11.2
+	 *
+	 * @todo Implement the main functionality
+	 *
+	 * @access public
+	 * @param array $args The format of the export.
+	 * @param array $assoc_args Additional args.
+	 */
+	public function export( $args, $assoc_args ) {
+		// TODO - WIP
+		$assoc_args = wp_parse_args(
+			$assoc_args,
+			[
+				'format' => 'csv',
+			]
+		);
+	}
 }
