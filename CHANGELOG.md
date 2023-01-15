@@ -4,6 +4,10 @@ All notable changes to this project will be documented in this file, per [the Ke
 
 ## [Unreleased] - TBD
 
+## [1.11.1] - 2022-09-28
+### Added
+- Indicate plugin as the source of redirects (props [@peterwilsoncc](https://github.com/peterwilsoncc), [@Sidsector9](https://github.com/Sidsector9) via [#281](https://github.com/10up/safe-redirect-manager/pull/281)).
+
 ## [1.11.0] - 2022-06-27
 ### Added
 - Detect duplicate rules for the same 'redirect from' value (props [@adamsilverstein](https://github.com/adamsilverstein), [@dhanendran](https://github.com/dhanendran), [@hrkhal](https://github.com/hrkhal), [@jeffpaul](https://github.com/jeffpaul), [@lukaspawlik](https://github.com/lukaspawlik), [@sanketio](https://github.com/sanketio), [@Sidsector9](https://github.com/Sidsector9) via [#171](https://github.com/10up/safe-redirect-manager/pull/171)).
@@ -235,6 +239,7 @@ All notable changes to this project will be documented in this file, per [the Ke
 - Plugin released
 
 [Unreleased]: https://github.com/10up/safe-redirect-manager/compare/trunk...develop
+[1.11.1]: https://github.com/10up/safe-redirect-manager/compare/1.11.0...1.11.1
 [1.11.0]: https://github.com/10up/safe-redirect-manager/compare/1.10.1...1.11.0
 [1.10.1]: https://github.com/10up/safe-redirect-manager/compare/1.10.0...1.10.1
 [1.10.0]: https://github.com/10up/safe-redirect-manager/compare/1.9.3...1.10.0
