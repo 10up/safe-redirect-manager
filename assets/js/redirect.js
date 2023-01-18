@@ -23,5 +23,24 @@
 				}
 			});
 		});
+
+		// Disable the 'Redirect To:' field a 4xx status code is set.
+		const statusSelect = $('#srm_redirect_rule_status_code');
+		const toRule = $('#srm_redirect_rule_to');
+		const disabledMessage = $('#srm_to_disabled_message');
+
+		statusSelect.change(maybeDisableToRule);
+		maybeDisableToRule();
+
+		function maybeDisableToRule() {
+			const status = Number.parseInt(statusSelect.val());
+			if ([403, 404, 410].includes(status)) {
+				toRule.prop('disabled', 'disabled');
+				disabledMessage.show();
+			} else {
+				toRule.prop('disabled', '');
+				disabledMessage.hide();
+			}
+		}
 	} );
 }( jQuery ) );
