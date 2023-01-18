@@ -108,5 +108,50 @@ describe('Test redirect rules', () => {
 			true
 		);
 		cy.verifyRedirectRule('blog-4/1', '/hello-world');
+
+		cy.createRedirectRule(
+			'/wildcard-403-test/(.*)/',
+			'',
+			'wildcard 403 rule note.',
+			true,
+			'403'
+		);
+		cy.verifyStatusCode('wildcard-403-test/1', 403);
+		cy.verifyEndpointDead('wildcard-403-test/1');
+	});
+
+	it('Can die with a 403 header', () => {
+		cy.createRedirectRule(
+			'/403-test',
+			'',
+			'403 rule note.',
+			false,
+			'403'
+		);
+		cy.verifyStatusCode('403-test', 403);
+		cy.verifyEndpointDead('403-test');
+	});
+
+	it('Can die with a 410 header', () => {
+		cy.createRedirectRule(
+			'/410-test',
+			'',
+			'410 rule note.',
+			false,
+			'410'
+		);
+		cy.verifyStatusCode('410-test', 410);
+		cy.verifyEndpointDead('410-test');
+	});
+
+	it('Can render a 404 page', () => {
+		cy.createRedirectRule(
+			'/404-test',
+			'',
+			'404 rule note.',
+			false,
+			'404'
+		);
+		cy.verifyStatusCode('404-test', 404);
 	});
 });
