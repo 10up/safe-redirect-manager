@@ -289,4 +289,107 @@ class SRM_WP_CLI extends WP_CLI_Command {
 
 		WP_CLI::success( "All done! {$created} redirects were imported, {$skipped} were skipped" );
 	}
+
+	/**
+	 * Create test redirects
+	 *
+	 * @param array $args Array of arguments
+	 * @subcommand create-test
+	 * @synopsis <number>
+	 */
+	public function create_test_redirects( $args ) {
+
+		$last_count = $args[0] + 1;
+		for ( $i = 1; $i < $last_count; ++$i ) {
+			$to    = sprintf( '/to-%d', $i );
+			$from  = sprintf( '/from-%d', $i );
+			$regex = false;
+
+			switch ( $i + 1 ) {
+				case 0 === $i % 6:
+					$to   .= '/(.*)/';
+					$regex = true;
+					break;
+				case 0 === $i % 5:
+					$to   .= '/(.*)';
+					$regex = true;
+					break;
+				case 0 === $i % 4:
+					$to .= '*/';
+					break;
+				case 0 === $i % 3:
+					$to .= '*';
+					break;
+				case 0 === $i % 2:
+					$to .= '/';
+					break;
+				default:
+					break;
+			}
+
+			wp_insert_post(
+				array(
+					'post_type'   => 'redirect_rule',
+					'post_status' => 'publish',
+					'post_title'  => 'Dynamically generated test redirect',
+					'meta_input'  => array(
+						'_redirect_rule_from'        => $to,
+						'_redirect_rule_to'          => $from,
+						'_redirect_rule_status_code' => 302,
+						'_redirect_rule_from_regex'  => $regex,
+						'_redirect_created_for_test' => true,
+					),
+				)
+			);
+
+			$num_created = $i + 1;
+			if ( 0 === $num_created % 100 ) {
+				WP_CLI::log( "Created {$num_created} rules" );
+			}
+		}
+
+		$final_count = $i - 1;
+		WP_CLI::success( "Created {$final_count} redirects. Run \"wp safe-redirect-manager delete-test\" to delete these tests" );
+
+	}
+
+	/**
+	 * Delete test redirects
+	 *
+	 * @subcommand delete-test
+	 */
+	public function delete_test_redirects() {
+
+		$num_deleted = 0;
+
+		while ( true ) {
+			$test_redirects = new WP_Query(
+				array(
+					'post_type'              => 'redirect_rule',
+					'post_status'            => 'publish',
+					'fields'                 => 'ids',
+					'no_found_rows'          => true,
+					'posts_per_page'         => 1000,
+					'update_post_term_cache' => false,
+					'meta_key'               => '_redirect_created_for_test',
+				)
+			);
+
+			if ( ! $test_redirects->have_posts() ) {
+				if ( 0 === $num_deleted ) {
+					WP_CLI::log( 'No test redirects to delete.' );
+				}
+				break;
+			}
+
+			foreach ( $test_redirects->posts as $test_redirect ) {
+				wp_delete_post( $test_redirect, true );
+				++$num_deleted;
+			}
+
+			WP_CLI::log( "Deleted {$num_deleted} test redirects." );
+		}
+
+		WP_CLI::success( "Successfully deleted {$num_deleted} test redirects." );
+	}
 }
