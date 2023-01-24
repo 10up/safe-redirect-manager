@@ -23,7 +23,7 @@
 //
 // -- This will overwrite an existing command --
 // Cypress.Commands.overwrite('visit', (originalFn, url, options) => { ... })
-Cypress.Commands.add('createRedirectRule', (from, to, notes = '', regex = false, status = '302' ) => {
+Cypress.Commands.add('createRedirectRule', (from, to, notes = '', regex = false, status = '302', message = '' ) => {
 	cy.visit('/wp-admin/post-new.php?post_type=redirect_rule');
 
 	cy.get('#srm_redirect_rule_from').click().clear().type(from);
@@ -35,6 +35,10 @@ Cypress.Commands.add('createRedirectRule', (from, to, notes = '', regex = false,
 
 	if ( regex ) {
 		cy.get('#srm_redirect_rule_from_regex').check();
+	}
+
+	if ('' !== message) {
+		cy.get('#srm_redirect_rule_message').click().clear().type(message);
 	}
 
 	cy.get('#publish').click();
@@ -53,7 +57,8 @@ Cypress.Commands.add('verifyStatusCode', (from, status) => {
 	cy.visit(`/${from}`, {failOnStatusCode: false});
 });
 
-Cypress.Commands.add('verifyEndpointDead', (from) => {
+Cypress.Commands.add('verifyEndpointDead', (from, message) => {
 	cy.visit(`/${from}/`, {failOnStatusCode: false});
 	cy.get('.wp-die-message').should('exist');
+	cy.get('.wp-die-message').contains(message);
 });

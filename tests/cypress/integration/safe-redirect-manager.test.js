@@ -114,10 +114,11 @@ describe('Test redirect rules', () => {
 			'',
 			'wildcard 403 rule note.',
 			true,
-			'403'
+			'403',
+			'Test message for a 403 wildcard'
 		);
 		cy.verifyStatusCode('wildcard-403-test/1', 403);
-		cy.verifyEndpointDead('wildcard-403-test/1');
+		cy.verifyEndpointDead('wildcard-403-test/1', 'Test message for a 403 wildcard');
 	});
 
 	it('Can die with a 403 header', () => {
@@ -126,10 +127,11 @@ describe('Test redirect rules', () => {
 			'',
 			'403 rule note.',
 			false,
-			'403'
+			'403',
+			'Test message for a 403'
 		);
 		cy.verifyStatusCode('403-test', 403);
-		cy.verifyEndpointDead('403-test');
+		cy.verifyEndpointDead('403-test', 'Test message for a 403');
 	});
 
 	it('Can die with a 410 header', () => {
@@ -138,10 +140,11 @@ describe('Test redirect rules', () => {
 			'',
 			'410 rule note.',
 			false,
-			'410'
+			'410',
+			'Test message for a 410'
 		);
 		cy.verifyStatusCode('410-test', 410);
-		cy.verifyEndpointDead('410-test');
+		cy.verifyEndpointDead('410-test', 'Test message for a 410');
 	});
 
 	it('Can render a 404 page', () => {

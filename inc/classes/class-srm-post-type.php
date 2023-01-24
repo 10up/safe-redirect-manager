@@ -431,6 +431,12 @@ class SRM_Post_Type {
 				delete_post_meta( $post_id, '_redirect_rule_status_code' );
 			}
 
+			if ( ! empty( $_POST['srm_redirect_rule_message'] ) ) {
+				update_post_meta( $post_id, '_redirect_rule_message', sanitize_text_field( $_POST['srm_redirect_rule_message'] ) );
+			} else {
+				delete_post_meta( $post_id, '_redirect_rule_message' );
+			}
+
 			if ( ! empty( $_POST['srm_redirect_rule_notes'] ) ) {
 				update_post_meta( $post_id, '_redirect_rule_notes', sanitize_text_field( $_POST['srm_redirect_rule_notes'] ) );
 			} else {
@@ -547,11 +553,12 @@ class SRM_Post_Type {
 	public function redirect_rule_metabox( $post ) {
 		wp_nonce_field( 'srm-save-redirect-meta', 'srm_redirect_nonce' );
 
-		$redirect_from  = get_post_meta( $post->ID, '_redirect_rule_from', true );
-		$redirect_to    = get_post_meta( $post->ID, '_redirect_rule_to', true );
-		$redirect_notes = get_post_meta( $post->ID, '_redirect_rule_notes', true );
-		$status_code    = get_post_meta( $post->ID, '_redirect_rule_status_code', true );
-		$enable_regex   = get_post_meta( $post->ID, '_redirect_rule_from_regex', true );
+		$redirect_from    = get_post_meta( $post->ID, '_redirect_rule_from', true );
+		$redirect_to      = get_post_meta( $post->ID, '_redirect_rule_to', true );
+		$redirect_notes   = get_post_meta( $post->ID, '_redirect_rule_notes', true );
+		$redirect_message = get_post_meta( $post->ID, '_redirect_rule_message', true );
+		$status_code      = get_post_meta( $post->ID, '_redirect_rule_status_code', true );
+		$enable_regex     = get_post_meta( $post->ID, '_redirect_rule_from_regex', true );
 
 		if ( empty( $status_code ) ) {
 			$status_code = apply_filters( 'srm_default_direct_status', 302 );
@@ -581,6 +588,12 @@ class SRM_Post_Type {
 				<?php endforeach; ?>
 			</select>
 			<em><?php esc_html_e( "If you don't know what this is, leave it as is.", 'safe-redirect-manager' ); ?></em>
+		</p>
+
+		<p id="srm_redirect_rule_message_container">
+			<label for="srm_redirect_rule_message"><strong><?php esc_html_e( 'Message:', 'safe-redirect-manager' ); ?></strong></label>
+			<textarea name="srm_redirect_rule_message" id="srm_redirect_rule_message" class="widefat"><?php echo esc_attr( $redirect_message); ?></textarea>
+			<em><?php esc_html_e( 'Optionally display a message to users when they navigate to a 403 or 410 endpoint.', 'safe-redirect-manager' ); ?></em>
 		</p>
 
 		<p>

@@ -24,7 +24,7 @@
 			});
 		});
 
-		// Disable the 'Redirect To:' field a 4xx status code is set.
+		// Disable the 'Redirect To:' field unless a 4xx status code is set.
 		const statusSelect = $('#srm_redirect_rule_status_code');
 		const toRule = $('#srm_redirect_rule_to');
 		const disabledMessage = $('#srm_to_disabled_message');
@@ -42,5 +42,24 @@
 				disabledMessage.hide();
 			}
 		}
+
+		// Disable and hide the 'Message' field unless 403 or 410 is selected.
+		const messageContainer = $('#srm_redirect_rule_message_container');
+		const message = $('#srm_redirect_rule_message');
+
+		statusSelect.change(maybeHideMessage);
+		maybeHideMessage();
+
+		function maybeHideMessage() {
+			const status = Number.parseInt(statusSelect.val());
+			if ([403, 410].includes(status)) {
+				message.prop('disabled', '');
+				messageContainer.show();
+			} else {
+				message.prop('disabled', 'disabled');
+				messageContainer.hide();
+			}
+		}
+
 	} );
 }( jQuery ) );

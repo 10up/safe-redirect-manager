@@ -141,9 +141,10 @@ class SRM_Redirect {
 			$status_code  = $redirect['status_code'];
 			$enable_regex = ( isset( $redirect['enable_regex'] ) ) ? $redirect['enable_regex'] : false;
 			$redirect_id  = $redirect['ID'];
+			$message      = $redirect['message'];
 
 			// check if the redirection destination is valid, otherwise just skip it (unless this is a 4xx request)
-			if ( empty( $redirect_to ) && 403 !== $status_code && 404 !== $status_code && 410 !== $status_code ) {
+			if ( empty( $redirect_to ) && ! in_array( $status_code, array( 403, 404, 410 ), true ) ) {
 				continue;
 			}
 
@@ -208,6 +209,7 @@ class SRM_Redirect {
 					'status_code'  => $status_code,
 					'enable_regex' => $enable_regex,
 					'redirect_id'  => $redirect_id,
+					'message'      => $message,
 				];
 			}
 		}
@@ -259,7 +261,7 @@ class SRM_Redirect {
 		// wp_safe_redirect only supports 'true' 3xx redirects; handle predefined 4xx here.
 		if ( 403 === $matched_redirect['status_code'] || 410 === $matched_redirect['status_code'] ) {
 			wp_die(
-				'',
+				esc_html( $matched_redirect['message'] ),
 				'',
 				$matched_redirect['status_code'] // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 			);
