@@ -58,12 +58,13 @@ function srm_get_redirects( $args = array(), $hard = false ) {
 				}
 
 				$redirects[] = array(
-					'ID'            => $redirect_id,
-					'post_status'   => get_post_status( $redirect_id ),
-					'redirect_from' => get_post_meta( $redirect_id, '_redirect_rule_from', true ),
-					'redirect_to'   => get_post_meta( $redirect_id, '_redirect_rule_to', true ),
-					'status_code'   => (int) get_post_meta( $redirect_id, '_redirect_rule_status_code', true ),
-					'enable_regex'  => (bool) get_post_meta( $redirect_id, '_redirect_rule_from_regex', true ),
+					'ID'                => $redirect_id,
+					'post_status'       => get_post_status( $redirect_id ),
+					'redirect_from'     => get_post_meta( $redirect_id, '_redirect_rule_from', true ),
+					'redirect_to'       => get_post_meta( $redirect_id, '_redirect_rule_to', true ),
+					'status_code'       => (int) get_post_meta( $redirect_id, '_redirect_rule_status_code', true ),
+					'enable_regex'      => (bool) get_post_meta( $redirect_id, '_redirect_rule_from_regex', true ),
+					'redirect_protocol' => get_post_meta( $redirect_id, '_redirect_protocol', true ),
 				);
 			}
 

@@ -431,6 +431,10 @@ class SRM_Post_Type {
 				delete_post_meta( $post_id, '_redirect_rule_status_code' );
 			}
 
+			if ( ! empty( $_POST['srm_redirect_protocol'] ) ) {
+				update_post_meta( $post_id, '_redirect_protocol', $_POST['srm_redirect_protocol'] );
+			}
+
 			if ( ! empty( $_POST['srm_redirect_rule_notes'] ) ) {
 				update_post_meta( $post_id, '_redirect_rule_notes', sanitize_text_field( $_POST['srm_redirect_rule_notes'] ) );
 			} else {
@@ -552,9 +556,14 @@ class SRM_Post_Type {
 		$redirect_notes = get_post_meta( $post->ID, '_redirect_rule_notes', true );
 		$status_code    = get_post_meta( $post->ID, '_redirect_rule_status_code', true );
 		$enable_regex   = get_post_meta( $post->ID, '_redirect_rule_from_regex', true );
+		$protocol       = get_post_meta( $post->ID, '_redirect_protocol', true );
 
 		if ( empty( $status_code ) ) {
 			$status_code = apply_filters( 'srm_default_direct_status', 302 );
+		}
+
+		if ( empty( $protocol ) ) {
+			$protocol = is_ssl() ? 'https' : 'http';
 		}
 		?>
 		<div class="notice notice-error" id="message" style="display: none;"></div>
@@ -573,13 +582,23 @@ class SRM_Post_Type {
 		<p class="description"><?php esc_html_e( 'This can be a URL or a path relative to the root of your website (not your WordPress installation). Ending with a (*) wildcard character will append the request match to the redirect.', 'safe-redirect-manager' ); ?></p>
 
 		<p>
-			<label for="srm_redirect_rule_status_code"><strong><?php esc_html_e( '* HTTP Status Code:', 'safe-redirect-manager' ); ?></strong></label>
+			<label for="srm_redirect_rule_status_code"><strong><?php esc_html_e( '* HTTP Status Code:', 'safe-redirect-manager' ); ?></strong></label><br/>
 			<select name="srm_redirect_rule_status_code" id="srm_redirect_rule_status_code">
 				<?php foreach ( srm_get_valid_status_codes() as $code ) : ?>
 					<option value="<?php echo esc_attr( $code ); ?>" <?php selected( $status_code, $code ); ?>><?php echo esc_html( $code . ' ' . $this->status_code_labels[ $code ] ); ?></option>
 				<?php endforeach; ?>
 			</select>
 			<em><?php esc_html_e( "If you don't know what this is, leave it as is.", 'safe-redirect-manager' ); ?></em>
+		</p>
+
+		<p>
+			<label><strong><?php esc_html_e( 'Redirect Protocol:', 'safe-redirect-manager' ); ?></strong></label><br/>
+			<label>
+				<input type="radio" name="srm_redirect_protocol" value="http" <?php checked( $protocol, 'http' ); ?>/> http
+			</label>&nbsp;
+			<label>
+				<input type="radio" name="srm_redirect_protocol" value="https" <?php checked( $protocol, 'https' ); ?>/> https
+			</label>
 		</p>
 
 		<p>
