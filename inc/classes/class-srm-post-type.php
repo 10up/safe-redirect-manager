@@ -592,7 +592,7 @@ class SRM_Post_Type {
 
 		<p id="srm_redirect_rule_message_container">
 			<label for="srm_redirect_rule_message"><strong><?php esc_html_e( 'Message:', 'safe-redirect-manager' ); ?></strong></label>
-			<textarea name="srm_redirect_rule_message" id="srm_redirect_rule_message" class="widefat"><?php echo esc_attr( $redirect_message); ?></textarea>
+			<textarea name="srm_redirect_rule_message" id="srm_redirect_rule_message" class="widefat"><?php echo esc_attr( $redirect_message ); ?></textarea>
 			<em><?php esc_html_e( 'Optionally display a message to users when they navigate to a 403 or 410 endpoint.', 'safe-redirect-manager' ); ?></em>
 		</p>
 
