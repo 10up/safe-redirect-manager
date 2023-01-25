@@ -307,21 +307,21 @@ class SRM_WP_CLI extends WP_CLI_Command {
 
 			switch ( $i + 1 ) {
 				case 0 === $i % 6:
-					$to   .= '/(.*)/';
+					$from   .= '/(.*)/';
 					$regex = true;
 					break;
 				case 0 === $i % 5:
-					$to   .= '/(.*)';
+					$from   .= '/(.*)';
 					$regex = true;
 					break;
 				case 0 === $i % 4:
-					$to .= '*/';
+					$from .= '*/';
 					break;
 				case 0 === $i % 3:
-					$to .= '*';
+					$from .= '*';
 					break;
 				case 0 === $i % 2:
-					$to .= '/';
+					$from .= '/';
 					break;
 				default:
 					break;
