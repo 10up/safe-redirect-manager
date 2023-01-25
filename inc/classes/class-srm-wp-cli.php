@@ -333,8 +333,8 @@ class SRM_WP_CLI extends WP_CLI_Command {
 					'post_status' => 'publish',
 					'post_title'  => 'Dynamically generated test redirect',
 					'meta_input'  => array(
-						'_redirect_rule_from'        => $to,
-						'_redirect_rule_to'          => $from,
+						'_redirect_rule_from'        => $from,
+						'_redirect_rule_to'          => $to,
 						'_redirect_rule_status_code' => 302,
 						'_redirect_rule_from_regex'  => $regex,
 						'_redirect_created_for_test' => true,
