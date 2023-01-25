@@ -301,8 +301,8 @@ class SRM_WP_CLI extends WP_CLI_Command {
 
 		$last_count = $args[0] + 1;
 		for ( $i = 1; $i < $last_count; ++$i ) {
-			$to    = sprintf( '/to-%d', $i );
-			$from  = sprintf( '/from-%d', $i );
+			$to    = sprintf( '/%d-to', $i );
+			$from  = sprintf( '/%d-from', $i );
 			$regex = false;
 
 			switch ( $i + 1 ) {
