@@ -124,7 +124,15 @@ function srm_get_valid_status_codes_data() {
 		array()
 	);
 
-	return $status_codes + $additional_status_codes;
+	if ( empty( $additional_status_codes ) ) {
+		return $status_codes;
+	}
+
+	$status_code_array  = $status_codes + $additional_status_codes;
+
+	ksort( $status_code_array, SORT_NUMERIC );
+
+	return $status_code_array;
 }
 
 /**
