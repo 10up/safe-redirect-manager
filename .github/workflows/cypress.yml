@@ -10,7 +10,7 @@ on:
       - develop
 jobs:
   build: 
-    uses: 10up/safe-redirect-manager/.github/workflows/build-release-zip.yml@fix/296 # TODO: Update this to develop branch.
+    uses: 10up/safe-redirect-manager/.github/workflows/build-release-zip.yml@develop
   cypress:
     needs: build
     name: ${{ matrix.core.name }}
