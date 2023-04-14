@@ -198,11 +198,12 @@ function srm_check_for_possible_redirect_loops() {
  * @param bool   $enable_regex Whether to enable regex or not
  * @param string $post_status Post status
  * @param int    $menu_order Menu order
+ * @param string $notes Notes
  * @since 1.8
  * @uses wp_insert_post, update_post_meta
  * @return int|WP_Error
  */
-function srm_create_redirect( $redirect_from, $redirect_to, $status_code = 302, $enable_regex = false, $post_status = 'publish', $menu_order = 0 ) {
+function srm_create_redirect( $redirect_from, $redirect_to, $status_code = 302, $enable_regex = false, $post_status = 'publish', $menu_order = 0, $notes = '' ) {
 	global $wpdb;
 
 	$sanitized_redirect_from = srm_sanitize_redirect_from( $redirect_from );
@@ -211,6 +212,7 @@ function srm_create_redirect( $redirect_from, $redirect_to, $status_code = 302, 
 	$sanitized_enable_regex  = (bool) $enable_regex;
 	$sanitized_post_status   = sanitize_key( $post_status );
 	$sanitized_menu_order    = absint( $menu_order );
+	$sanitized_notes         = sanitize_text_field( $notes );
 
 	// check and make sure no parameters are empty or invalid after sanitation
 	if ( empty( $sanitized_redirect_from ) || empty( $sanitized_redirect_to ) ) {
@@ -245,6 +247,7 @@ function srm_create_redirect( $redirect_from, $redirect_to, $status_code = 302, 
 	update_post_meta( $post_id, '_redirect_rule_to', $sanitized_redirect_to );
 	update_post_meta( $post_id, '_redirect_rule_status_code', $sanitized_status_code );
 	update_post_meta( $post_id, '_redirect_rule_from_regex', $sanitized_enable_regex );
+	update_post_meta( $post_id, '_redirect_rule_notes', $sanitized_notes );
 
 	// We need to update the cache after creating this redirect
 	srm_flush_cache();
@@ -366,9 +369,10 @@ function srm_import_file( $file, $args ) {
 		$status_code   = ! empty( $rule[ $args['code'] ] ) ? $rule[ $args['code'] ] : 302;
 		$regex         = ! empty( $rule[ $args['regex'] ] ) ? filter_var( $rule[ $args['regex'] ], FILTER_VALIDATE_BOOLEAN ) : false;
 		$menu_order    = ! empty( $rule[ $args['order'] ] ) ? $rule[ $args['order'] ] : 0;
+		$notes         = ! empty( $rule[ $args['notes'] ] ) ? $rule[ $args['notes'] ] : '';
 
 		// import
-		$id = srm_create_redirect( $redirect_from, $redirect_to, $status_code, $regex, 'publish', $menu_order );
+		$id = srm_create_redirect( $redirect_from, $redirect_to, $status_code, $regex, 'publish', $menu_order, $notes );
 
 		if ( is_wp_error( $id ) ) {
 			$doing_wp_cli && WP_CLI::warning( $id );
