@@ -24,7 +24,7 @@
 			});
 		});
 
-		// Disable the 'Redirect To:' field unless a 4xx status code is set.
+		// Disable the 'Redirect To:' field if a 4xx status code is set.
 		const statusSelect = $('#srm_redirect_rule_status_code');
 		const toRule = $('#srm_redirect_rule_to');
 		const disabledMessage = $('#srm_to_disabled_message');
