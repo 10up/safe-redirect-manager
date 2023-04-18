@@ -30,8 +30,7 @@ class SRM_Post_Type {
 	 * @since 1.8
 	 */
 	public function setup() {
-		$this->status_code_labels = srm_get_valid_status_codes_data();
-
+		add_action( 'init', array( $this, 'init_properties' ) );
 		add_action( 'init', array( $this, 'action_register_post_types' ) );
 		add_action( 'admin_init', array( $this, 'init_search_filters' ) );
 		add_action( 'save_post', array( $this, 'action_save_post' ) );
@@ -50,6 +49,15 @@ class SRM_Post_Type {
 		add_filter( 'default_hidden_columns', array( $this, 'filter_hidden_columns' ), 10, 1 );
 		add_action( 'admin_enqueue_scripts', array( $this, 'load_resources' ), 10, 0 );
 		add_action( 'wp_ajax_srm_validate_from_url', array( $this, 'srm_validate_from_url' ), 10, 0 );
+	}
+
+	/**
+	 * Initialises class properties.
+	 *
+	 * @since 2.0.0
+	 */
+	public function init_properties() {
+		$this->status_code_labels = srm_get_valid_status_codes_data();
 	}
 
 	/**
