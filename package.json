@@ -18,6 +18,7 @@
     "url": "https://github.com/10up/safe-redirect-manager"
   },
   "dependencies": {
+    "cypress-mochawesome-reporter": "^3.4.0",
     "node-wp-i18n": "^1.2.5"
   },
   "scripts": {

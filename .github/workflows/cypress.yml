@@ -51,13 +51,17 @@ jobs:
       run: npm run env:start
     - name: Test
       run: npm run cypress:run
-    - name: Upload artifacts
-      uses: actions/upload-artifact@v2
-      if: failure()
-      with:
-        name: cypress-artifact-safe-redirect-manager
-        retention-days: 7
-        path: |
-          ${{ github.workspace }}/tests/cypress/screenshots/
-          ${{ github.workspace }}/tests/cypress/videos/
-          ${{ github.workspace }}/tests/cypress/logs/
+    - name: Update summary
+        run: |
+          npx mochawesome-merge ./tests/cypress/reports/*.json -o tests/cypress/reports/mochawesome.json
+          rm -rf ./tests/cypress/reports/mochawesome-*.json
+          npx mochawesome-json-to-md -p ./tests/cypress/reports/mochawesome.json -o ./tests/cypress/reports/mochawesome.md
+          npx mochawesome-report-generator tests/cypress/reports/mochawesome.json -o tests/cypress/reports/
+          cat ./tests/cypress/reports/mochawesome.md >> $GITHUB_STEP_SUMMARY
+    - name: Make artifacts available
+        uses: actions/upload-artifact@v3
+        if: failure()
+            ${{ github.workspace }}/tests/cypress/screenshots/
+            ${{ github.workspace }}/tests/cypress/videos/
+            ${{ github.workspace }}/tests/cypress/logs/
+            ${{ github.workspace }}/tests/cypress/reports/
