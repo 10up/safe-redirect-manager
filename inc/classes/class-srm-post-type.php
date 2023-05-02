@@ -230,10 +230,17 @@ class SRM_Post_Type {
 		if ( $this->is_plugin_page() ) {
 
 			/**
+			 * Filter whether possible redirect loop checking is enabled or not
+			 * 
+			 * @return bool
+			 */
+			$possible_loop = apply_filters( 'srm_check_for_possible_redirect_loops', false );
+
+			/**
 			 * check_for_possible_redirect_loops() runs in best case Theta(n^2) so if you have 100 redirects, this method
 			 * will be running slow. Let's disable it by default.
 			 */
-			if ( apply_filters( 'srm_check_for_possible_redirect_loops', false ) ) {
+			if ( $possible_loop ) {
 				if ( srm_check_for_possible_redirect_loops() ) {
 					?>
 					<div class="updated">
@@ -242,6 +249,7 @@ class SRM_Post_Type {
 					<?php
 				}
 			}
+
 			if ( srm_max_redirects_reached() ) {
 
 				if ( 'post-new.php' === $hook_suffix ) {
@@ -474,6 +482,11 @@ class SRM_Post_Type {
 			$role->add_cap( $redirect_capability );
 		}
 
+		/**
+		 * Filter the capability to manage redirects
+		 * 
+		 * @return string
+		 */
 		return apply_filters( 'srm_restrict_to_capability', $redirect_capability );
 	}
 
@@ -562,6 +575,11 @@ class SRM_Post_Type {
 		$enable_regex   = get_post_meta( $post->ID, '_redirect_rule_from_regex', true );
 
 		if ( empty( $status_code ) ) {
+			/**
+			 * Filter the default status code to redirect with
+			 * 
+			 * @return int
+			 */
 			$status_code = apply_filters( 'srm_default_direct_status', 302 );
 		}
 		?>

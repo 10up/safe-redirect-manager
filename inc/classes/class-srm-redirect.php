@@ -38,8 +38,9 @@ class SRM_Redirect {
 		$this->multisite_checks();
 
 		/**
-		 * To only redirect on 404 pages, use:
-		 *   add_filter( 'srm_redirect_only_on_404', '__return_true' );
+		 * Filter whether to only redirect on 404 pages
+		 * 
+		 * @return bool
 		 */
 		if ( apply_filters( 'srm_redirect_only_on_404', false ) ) {
 			add_action( 'template_redirect', array( $this, 'maybe_redirect' ), 0 );
@@ -98,10 +99,18 @@ class SRM_Redirect {
 			$requested_path = '/';
 		}
 
-		// Allow redirects to be filtered
+		/**
+		 * Filter registered redirects
+		 * 
+		 * @return array
+		 */
 		$redirects = apply_filters( 'srm_registered_redirects', $redirects, $requested_path );
 
-		// Allow for case insensitive redirects
+		/**
+		 * Filter whether to allow case sensitive redirects
+		 * 
+		 * @return array
+		 */
 		$case_insensitive = apply_filters( 'srm_case_insensitive_redirects', true );
 
 		if ( $case_insensitive ) {
@@ -156,7 +165,11 @@ class SRM_Redirect {
 					$redirect_from = strtolower( $redirect_from );
 				}
 
-				// only compare query params if the $redirect_from value contains parameters
+				/**
+				 * Filter whether to compare only query params if the $redirect_from value contains parameters
+				 * 
+				 * @return int
+				 */
 				$match_query_params = apply_filters( 'srm_match_query_params', strpos( $redirect_from, '?' ) );
 
 				$to_match     = ( ! $match_query_params && ! empty( $normalized_requested_path_no_query ) ) ? $normalized_requested_path_no_query : $normalized_requested_path;
@@ -201,7 +214,13 @@ class SRM_Redirect {
 					$redirect_to .= '?' . $requested_query_params;
 				}
 
-				$sanitized_redirect_to = esc_url_raw( apply_filters( 'srm_redirect_to', $redirect_to ) );
+				/**
+				 * Filter the url to redirect to
+				 * 
+				 * @return string
+				 */
+				$filterd_redirect_to   = apply_filters( 'srm_redirect_to', $redirect_to );
+				$sanitized_redirect_to = esc_url_raw( $filterd_redirect_to );
 
 				return [
 					'redirect_to'  => $sanitized_redirect_to,
@@ -222,12 +241,20 @@ class SRM_Redirect {
 	 */
 	public function maybe_redirect() {
 
-		// Don't redirect unless not on admin. If 404 filter enabled, require query is a 404.
+		/**
+		 * Don't redirect unless not on admin or (404 filter enabled and require query is a 404).
+		 * 
+		 * @return bool
+		 */
 		if ( is_admin() || ( apply_filters( 'srm_redirect_only_on_404', false ) && ! is_404() ) ) {
 			return;
 		}
 
-		// get requested path and add a / before it
+		/**
+		 * Get requested path and add a forward slash before it
+		 * 
+		 * @return string
+		 */
 		$requested_path   = esc_url_raw( apply_filters( 'srm_requested_path', $_SERVER['REQUEST_URI'] ) );
 		$requested_path   = untrailingslashit( stripslashes( $requested_path ) );
 		$matched_redirect = $this->match_redirect( $requested_path );
@@ -253,6 +280,11 @@ class SRM_Redirect {
 
 		// Use default status code if an invalid value is set.
 		if ( ! in_array( $matched_redirect['status_code'], srm_get_valid_status_codes(), true ) ) {
+			/**
+			 * Default status code to redirect with
+			 * 
+			 * @return int
+			 */
 			$matched_redirect['status_code'] = apply_filters( 'srm_default_direct_status', 302 );
 		}
 

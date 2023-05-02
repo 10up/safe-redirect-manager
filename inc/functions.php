@@ -99,6 +99,11 @@ function srm_max_redirects_reached() {
  * @return array
  */
 function srm_get_valid_status_codes() {
+	/**
+	 * Filter valid status codes to redirect with
+	 * 
+	 * @return array
+	 */
 	return apply_filters( 'srm_valid_status_codes', array_keys( srm_get_valid_status_codes_data() ) );
 }
 
@@ -119,6 +124,11 @@ function srm_get_valid_status_codes_data() {
 		410 => esc_html__( 'Gone', 'safe-redirect-manager' ),
 	);
 
+	/**
+	 * Filter additional status codes to redirect with
+	 * 
+	 * @return array
+	 */
 	$additional_status_codes = apply_filters(
 		'srm_additional_status_codes',
 		array()
@@ -340,7 +350,11 @@ function srm_import_file( $file, $args ) {
 	$close_handle = false;
 	$doing_wp_cli = defined( 'WP_CLI' ) && WP_CLI;
 
-	// filter arguments
+	/**
+	 * Filter import file arguments
+	 * 
+	 * @return array
+	 */
 	$args = apply_filters( 'srm_import_file_args', $args );
 
 	// enable line endings auto detection
@@ -427,5 +441,10 @@ function srm_match_redirect( $path ) {
  * @return int
  */
 function srm_get_max_redirects() {
+	/**
+	 * Filter maximum supported redirects.
+	 * 
+	 * @return int
+	 */
 	return apply_filters( 'srm_max_redirects', 1000 );
 }
