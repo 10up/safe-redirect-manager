@@ -101,7 +101,7 @@ function srm_max_redirects_reached() {
 function srm_get_valid_status_codes() {
 	/**
 	 * Filter valid status codes to redirect with
-	 * 
+	 *
 	 * @return array
 	 */
 	return apply_filters( 'srm_valid_status_codes', array_keys( srm_get_valid_status_codes_data() ) );
@@ -126,7 +126,7 @@ function srm_get_valid_status_codes_data() {
 
 	/**
 	 * Filter additional status codes to redirect with
-	 * 
+	 *
 	 * @return array
 	 */
 	$additional_status_codes = apply_filters(
@@ -138,7 +138,7 @@ function srm_get_valid_status_codes_data() {
 		return $status_codes;
 	}
 
-	$status_code_array  = $status_codes + $additional_status_codes;
+	$status_code_array = $status_codes + $additional_status_codes;
 
 	ksort( $status_code_array, SORT_NUMERIC );
 
@@ -352,7 +352,7 @@ function srm_import_file( $file, $args ) {
 
 	/**
 	 * Filter import file arguments
-	 * 
+	 *
 	 * @return array
 	 */
 	$args = apply_filters( 'srm_import_file_args', $args );
@@ -443,7 +443,7 @@ function srm_match_redirect( $path ) {
 function srm_get_max_redirects() {
 	/**
 	 * Filter maximum supported redirects.
-	 * 
+	 *
 	 * @return int
 	 */
 	return apply_filters( 'srm_max_redirects', 1000 );

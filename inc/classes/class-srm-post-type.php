@@ -231,7 +231,7 @@ class SRM_Post_Type {
 
 			/**
 			 * Filter whether possible redirect loop checking is enabled or not
-			 * 
+			 *
 			 * @return bool
 			 */
 			$possible_loop = apply_filters( 'srm_check_for_possible_redirect_loops', false );
@@ -484,7 +484,7 @@ class SRM_Post_Type {
 
 		/**
 		 * Filter the capability to manage redirects
-		 * 
+		 *
 		 * @return string
 		 */
 		return apply_filters( 'srm_restrict_to_capability', $redirect_capability );
@@ -577,7 +577,7 @@ class SRM_Post_Type {
 		if ( empty( $status_code ) ) {
 			/**
 			 * Filter the default status code to redirect with
-			 * 
+			 *
 			 * @return int
 			 */
 			$status_code = apply_filters( 'srm_default_direct_status', 302 );

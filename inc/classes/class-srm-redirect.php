@@ -39,7 +39,7 @@ class SRM_Redirect {
 
 		/**
 		 * Filter whether to only redirect on 404 pages
-		 * 
+		 *
 		 * @return bool
 		 */
 		if ( apply_filters( 'srm_redirect_only_on_404', false ) ) {
@@ -101,14 +101,14 @@ class SRM_Redirect {
 
 		/**
 		 * Filter registered redirects
-		 * 
+		 *
 		 * @return array
 		 */
 		$redirects = apply_filters( 'srm_registered_redirects', $redirects, $requested_path );
 
 		/**
 		 * Filter whether to allow case sensitive redirects
-		 * 
+		 *
 		 * @return array
 		 */
 		$case_insensitive = apply_filters( 'srm_case_insensitive_redirects', true );
@@ -167,7 +167,7 @@ class SRM_Redirect {
 
 				/**
 				 * Filter whether to compare only query params if the $redirect_from value contains parameters
-				 * 
+				 *
 				 * @return int
 				 */
 				$match_query_params = apply_filters( 'srm_match_query_params', strpos( $redirect_from, '?' ) );
@@ -216,7 +216,7 @@ class SRM_Redirect {
 
 				/**
 				 * Filter the url to redirect to
-				 * 
+				 *
 				 * @return string
 				 */
 				$filterd_redirect_to   = apply_filters( 'srm_redirect_to', $redirect_to );
@@ -243,7 +243,7 @@ class SRM_Redirect {
 
 		/**
 		 * Don't redirect unless not on admin or (404 filter enabled and require query is a 404).
-		 * 
+		 *
 		 * @return bool
 		 */
 		if ( is_admin() || ( apply_filters( 'srm_redirect_only_on_404', false ) && ! is_404() ) ) {
@@ -252,7 +252,7 @@ class SRM_Redirect {
 
 		/**
 		 * Get requested path and add a forward slash before it
-		 * 
+		 *
 		 * @return string
 		 */
 		$requested_path   = esc_url_raw( apply_filters( 'srm_requested_path', $_SERVER['REQUEST_URI'] ) );
@@ -282,7 +282,7 @@ class SRM_Redirect {
 		if ( ! in_array( $matched_redirect['status_code'], srm_get_valid_status_codes(), true ) ) {
 			/**
 			 * Default status code to redirect with
-			 * 
+			 *
 			 * @return int
 			 */
 			$matched_redirect['status_code'] = apply_filters( 'srm_default_direct_status', 302 );
