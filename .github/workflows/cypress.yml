@@ -9,7 +9,7 @@ on:
     branches:
       - develop
 jobs:
-  build: 
+  build:
     uses: 10up/safe-redirect-manager/.github/workflows/build-release-zip.yml@develop
   cypress:
     needs: build
@@ -45,13 +45,14 @@ jobs:
         key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('**/package-lock.json') }}
     - name: Install dependencies
       run: npm install
-    - name: Set the core version and plugins config 
+    - name: Set the core version and plugins config
       run: ./tests/bin/set-wp-config.js --core=${{ matrix.core.version }} --plugins=./${{ github.event.repository.name }}
     - name: Set up WP environment
       run: npm run env:start
     - name: Test
       run: npm run cypress:run
     - name: Update summary
+      if: always()
       run: |
           npx mochawesome-merge ./tests/cypress/reports/*.json -o tests/cypress/reports/mochawesome.json
           rm -rf ./tests/cypress/reports/mochawesome-*.json
