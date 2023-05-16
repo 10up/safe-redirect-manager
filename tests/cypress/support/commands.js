@@ -23,15 +23,22 @@
 //
 // -- This will overwrite an existing command --
 // Cypress.Commands.overwrite('visit', (originalFn, url, options) => { ... })
-Cypress.Commands.add('createRedirectRule', (from, to, notes = '', regex = false ) => {
+Cypress.Commands.add('createRedirectRule', (from, to, notes = '', regex = false, status = '302', message = '' ) => {
 	cy.visit('/wp-admin/post-new.php?post_type=redirect_rule');
 
 	cy.get('#srm_redirect_rule_from').click().clear().type(from);
-	cy.get('#srm_redirect_rule_to').click().clear().type(to);
+	if (to !== '') {
+		cy.get('#srm_redirect_rule_to').click().clear().type(to);
+	}
+	cy.get('#srm_redirect_rule_status_code').select(status);
 	cy.get('#srm_redirect_rule_notes').click().clear().type(notes);
 
 	if ( regex ) {
 		cy.get('#srm_redirect_rule_from_regex').check();
+	}
+
+	if ('' !== message) {
+		cy.get('#srm_redirect_rule_message').click().clear().type(message);
 	}
 
 	cy.get('#publish').click();
@@ -43,4 +50,15 @@ Cypress.Commands.add('verifyRedirectRule', (from, to) => {
 	cy.url().should('include', to);
 	cy.visit(`/${from}/`);
 	cy.url().should('include', to);
+});
+
+Cypress.Commands.add('verifyStatusCode', (from, status) => {
+	cy.request({url: `/${from}`, failOnStatusCode: false}).its('status').should('equal', status);
+	cy.visit(`/${from}`, {failOnStatusCode: false});
+});
+
+Cypress.Commands.add('verifyEndpointDead', (from, message) => {
+	cy.visit(`/${from}/`, {failOnStatusCode: false});
+	cy.get('.wp-die-message').should('exist');
+	cy.get('.wp-die-message').contains(message);
 });

@@ -54,6 +54,8 @@ so you shouldn't be serving stale redirects.
 `srm_max_redirects` that you can utilize to up this number.
 * "Redirect From" and requested paths are case insensitive by default.
 * Developers can use `srm_additional_status_codes` filter to add status codes if needed.
+* Rules set with 403 and 410 status codes are handled by applying the HTTP status code and render the default WordPress `wp_die` screen with an optional message.
+* Rules set with a 404 status code will apply the status code and render the 404 template.
 
 ## Filters
 

@@ -439,6 +439,12 @@ class SRM_Post_Type {
 				delete_post_meta( $post_id, '_redirect_rule_status_code' );
 			}
 
+			if ( ! empty( $_POST['srm_redirect_rule_message'] ) ) {
+				update_post_meta( $post_id, '_redirect_rule_message', sanitize_text_field( $_POST['srm_redirect_rule_message'] ) );
+			} else {
+				delete_post_meta( $post_id, '_redirect_rule_message' );
+			}
+
 			if ( ! empty( $_POST['srm_redirect_rule_notes'] ) ) {
 				update_post_meta( $post_id, '_redirect_rule_notes', sanitize_text_field( $_POST['srm_redirect_rule_notes'] ) );
 			} else {
@@ -555,11 +561,12 @@ class SRM_Post_Type {
 	public function redirect_rule_metabox( $post ) {
 		wp_nonce_field( 'srm-save-redirect-meta', 'srm_redirect_nonce' );
 
-		$redirect_from  = get_post_meta( $post->ID, '_redirect_rule_from', true );
-		$redirect_to    = get_post_meta( $post->ID, '_redirect_rule_to', true );
-		$redirect_notes = get_post_meta( $post->ID, '_redirect_rule_notes', true );
-		$status_code    = get_post_meta( $post->ID, '_redirect_rule_status_code', true );
-		$enable_regex   = get_post_meta( $post->ID, '_redirect_rule_from_regex', true );
+		$redirect_from    = get_post_meta( $post->ID, '_redirect_rule_from', true );
+		$redirect_to      = get_post_meta( $post->ID, '_redirect_rule_to', true );
+		$redirect_notes   = get_post_meta( $post->ID, '_redirect_rule_notes', true );
+		$redirect_message = get_post_meta( $post->ID, '_redirect_rule_message', true );
+		$status_code      = get_post_meta( $post->ID, '_redirect_rule_status_code', true );
+		$enable_regex     = get_post_meta( $post->ID, '_redirect_rule_from_regex', true );
 
 		if ( empty( $status_code ) ) {
 			$status_code = apply_filters( 'srm_default_direct_status', 302 );
@@ -578,6 +585,7 @@ class SRM_Post_Type {
 			<label for="srm_redirect_rule_to"><strong><?php esc_html_e( '* Redirect To:', 'safe-redirect-manager' ); ?></strong></label><br />
 			<input class="widefat" type="text" name="srm_redirect_rule_to" id="srm_redirect_rule_to" value="<?php echo esc_attr( $redirect_to ); ?>" />
 		</p>
+		<p class="description" id="srm_to_disabled_message" style="display:none;"><em><?php esc_html_e( 'The "Redirect to" value doesn\'t apply for 4xx error codes.', 'safe-redirect-manager' ); ?></em></p>
 		<p class="description"><?php esc_html_e( 'This can be a URL or a path relative to the root of your website (not your WordPress installation). Ending with a (*) wildcard character will append the request match to the redirect.', 'safe-redirect-manager' ); ?></p>
 
 		<p>
@@ -590,9 +598,15 @@ class SRM_Post_Type {
 			<em><?php esc_html_e( "If you don't know what this is, leave it as is.", 'safe-redirect-manager' ); ?></em>
 		</p>
 
+		<p id="srm_redirect_rule_message_container">
+			<label for="srm_redirect_rule_message"><strong><?php esc_html_e( 'Message:', 'safe-redirect-manager' ); ?></strong></label>
+			<textarea name="srm_redirect_rule_message" id="srm_redirect_rule_message" class="widefat"><?php echo esc_textarea( $redirect_message ); ?></textarea>
+			<em><?php esc_html_e( 'Optionally display a message to users when they navigate to a 403 or 410 endpoint.', 'safe-redirect-manager' ); ?></em>
+		</p>
+
 		<p>
 			<label for="srm_redirect_rule_notes"><strong><?php esc_html_e( 'Notes:', 'safe-redirect-manager' ); ?></strong></label>
-			<textarea name="srm_redirect_rule_notes" id="srm_redirect_rule_notes" class="widefat"><?php echo esc_attr( $redirect_notes ); ?></textarea>
+			<textarea name="srm_redirect_rule_notes" id="srm_redirect_rule_notes" class="widefat"><?php echo esc_textarea( $redirect_notes ); ?></textarea>
 			<em><?php esc_html_e( 'Optionally leave notes on this redirect e.g. why was it created.', 'safe-redirect-manager' ); ?></em>
 		</p>
 		<?php
