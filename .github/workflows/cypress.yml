@@ -43,10 +43,10 @@ jobs:
           ~/.cache
           ~/.npm
         key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('**/package-lock.json') }}
-    - name: Install dependencies
-      uses: actions/setup-node@v3
+    - uses: actions/setup-node@v3
       with:
         node-version-file: '.nvmrc'
+    - name: Install dependencies
       run: npm install
     - name: Set the core version and plugins config
       run: ./tests/bin/set-wp-config.js --core=${{ matrix.core.version }} --plugins=./${{ github.event.repository.name }}
