@@ -31,6 +31,12 @@ class SRM_Redirect {
 	 * @since 1.9.4
 	 */
 	public function setup_redirect() {
+
+		/**
+		 * Multisite redirect checks.
+		 */
+		$this->multisite_checks();
+
 		/**
 		 * To only redirect on 404 pages, use:
 		 *   add_filter( 'srm_redirect_only_on_404', '__return_true' );
@@ -81,7 +87,7 @@ class SRM_Redirect {
 		if ( function_exists( 'wp_parse_url' ) ) {
 			$parsed_home_url = wp_parse_url( home_url() );
 		} else {
-			$parsed_home_url = parse_url( home_url() );
+			$parsed_home_url = parse_url( home_url() ); // phpcs:ignore
 		}
 
 		if ( isset( $parsed_home_url['path'] ) && '/' !== $parsed_home_url['path'] ) {
@@ -110,7 +116,7 @@ class SRM_Redirect {
 		if ( function_exists( 'wp_parse_url' ) ) {
 			$parsed_requested_path = wp_parse_url( $normalized_requested_path );
 		} else {
-			$parsed_requested_path = parse_url( $normalized_requested_path );
+			$parsed_requested_path = parse_url( $normalized_requested_path ); // phpcs:ignore
 		}
 		// Normalize the request path with and without query strings, for comparison later
 		$normalized_requested_path_no_query = '';
@@ -135,9 +141,10 @@ class SRM_Redirect {
 			$status_code  = $redirect['status_code'];
 			$enable_regex = ( isset( $redirect['enable_regex'] ) ) ? $redirect['enable_regex'] : false;
 			$redirect_id  = $redirect['ID'];
+			$message      = $redirect['message'];
 
-			// check if the redirection destination is valid, otherwise just skip it
-			if ( empty( $redirect_to ) ) {
+			// check if the redirection destination is valid, otherwise just skip it (unless this is a 4xx request)
+			if ( empty( $redirect_to ) && ! in_array( $status_code, array( 403, 404, 410 ), true ) ) {
 				continue;
 			}
 
@@ -175,7 +182,7 @@ class SRM_Redirect {
 				if ( function_exists( 'wp_parse_url' ) ) {
 					$parsed_redirect = wp_parse_url( $redirect_to );
 				} else {
-					$parsed_redirect = parse_url( $redirect_to );
+					$parsed_redirect = parse_url( $redirect_to ); // phpcs:ignore
 				}
 
 				if ( is_array( $parsed_redirect ) && ! empty( $parsed_redirect['host'] ) ) {
@@ -184,8 +191,9 @@ class SRM_Redirect {
 				}
 
 				// Allow for regex replacement in $redirect_to
-				if ( $enable_regex ) {
+				if ( $enable_regex && ! filter_var( $redirect_to, FILTER_VALIDATE_URL ) ) {
 					$redirect_to = preg_replace( '@' . $redirect_from . '@' . $regex_flag, $redirect_to, $requested_path );
+					$redirect_to = '/' . ltrim( $redirect_to, '/' );
 				}
 
 				// re-add the query params if they've not already been added by the wildcard
@@ -201,6 +209,7 @@ class SRM_Redirect {
 					'status_code'  => $status_code,
 					'enable_regex' => $enable_regex,
 					'redirect_id'  => $redirect_id,
+					'message'      => $message,
 				];
 			}
 		}
@@ -221,9 +230,8 @@ class SRM_Redirect {
 		}
 
 		// get requested path and add a / before it
-		$requested_path = esc_url_raw( apply_filters( 'srm_requested_path', $_SERVER['REQUEST_URI'] ) );
-		$requested_path = untrailingslashit( stripslashes( $requested_path ) );
-
+		$requested_path   = esc_url_raw( apply_filters( 'srm_requested_path', $_SERVER['REQUEST_URI'] ) );
+		$requested_path   = untrailingslashit( stripslashes( $requested_path ) );
 		$matched_redirect = $this->match_redirect( $requested_path );
 
 		if ( empty( $matched_redirect ) ) {
@@ -250,8 +258,63 @@ class SRM_Redirect {
 			$matched_redirect['status_code'] = apply_filters( 'srm_default_direct_status', 302 );
 		}
 
+		// wp_safe_redirect only supports 'true' 3xx redirects; handle predefined 4xx here.
+		if ( 403 === $matched_redirect['status_code'] || 410 === $matched_redirect['status_code'] ) {
+			wp_die(
+				esc_html( $matched_redirect['message'] ),
+				'',
+				$matched_redirect['status_code'] // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+			);
+			return;
+		}
+
+		if ( 404 === $matched_redirect['status_code'] ) {
+			/**
+			 * We must do this manually and not rely on $wp_query->handle_404()
+			 * to prevent default "Plain" permalinks from "soft 404"-ing
+			 */
+			global $wp_query;
+			$wp_query->set_404();
+			status_header( 404 );
+			nocache_headers();
+			include_once get_query_template( '404' );
+			return;
+		}
+
 		wp_safe_redirect( $matched_redirect['redirect_to'], $matched_redirect['status_code'], 'Safe Redirect Manager' );
 		exit;
+	}
+
+	/**
+	 * Check if on a multisite's subsite and its blog status,
+	 * in case of an archived, deleted or spam status, check main site's redirect rules.
+	 *
+	 * @return void
+	 */
+	public function multisite_checks() {
+		if ( is_multisite() && ! is_user_logged_in() ) {
+			$blog_id = get_current_blog_id();
+
+			if ( ! empty( $blog_id ) ) {
+				$blog_details = get_blog_details( $blog_id );
+
+				if (
+					! empty( $blog_details->archived )
+					|| ! empty( $blog_details->deleted )
+					|| ! empty( $blog_details->spam )
+				) {
+					$main_site_id = get_main_site_id();
+
+					if ( ! empty( $main_site_id ) ) {
+						switch_to_blog( $main_site_id );
+
+						$this->maybe_redirect();
+
+						switch_to_blog( $blog_id );
+					}
+				}
+			}
+		}
 	}
 
 	/**

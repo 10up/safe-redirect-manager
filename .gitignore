@@ -4,5 +4,6 @@ artifacts
 tests/cypress/downloads
 tests/cypress/screenshots
 tests/cypress/videos
+tests/cypress/reports
 .wp-env.override.json
 .phpunit.result.cache
