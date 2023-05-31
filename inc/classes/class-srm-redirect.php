@@ -141,7 +141,7 @@ class SRM_Redirect {
 			$status_code  = $redirect['status_code'];
 			$enable_regex = ( isset( $redirect['enable_regex'] ) ) ? $redirect['enable_regex'] : false;
 			$redirect_id  = $redirect['ID'];
-			$message      = $redirect['message'];
+			$message      = $redirect['message'] ?? '';
 
 			// check if the redirection destination is valid, otherwise just skip it (unless this is a 4xx request)
 			if ( empty( $redirect_to ) && ! in_array( $status_code, array( 403, 404, 410 ), true ) ) {
