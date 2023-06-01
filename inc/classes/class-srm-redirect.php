@@ -150,9 +150,10 @@ class SRM_Redirect {
 			$status_code  = $redirect['status_code'];
 			$enable_regex = ( isset( $redirect['enable_regex'] ) ) ? $redirect['enable_regex'] : false;
 			$redirect_id  = $redirect['ID'];
+			$message      = $redirect['message'] ?? '';
 
-			// check if the redirection destination is valid, otherwise just skip it
-			if ( empty( $redirect_to ) ) {
+			// check if the redirection destination is valid, otherwise just skip it (unless this is a 4xx request)
+			if ( empty( $redirect_to ) && ! in_array( $status_code, array( 403, 404, 410 ), true ) ) {
 				continue;
 			}
 
@@ -227,6 +228,7 @@ class SRM_Redirect {
 					'status_code'  => $status_code,
 					'enable_regex' => $enable_regex,
 					'redirect_id'  => $redirect_id,
+					'message'      => $message,
 				];
 			}
 		}
@@ -286,6 +288,29 @@ class SRM_Redirect {
 			 * @return int
 			 */
 			$matched_redirect['status_code'] = apply_filters( 'srm_default_direct_status', 302 );
+		}
+
+		// wp_safe_redirect only supports 'true' 3xx redirects; handle predefined 4xx here.
+		if ( 403 === $matched_redirect['status_code'] || 410 === $matched_redirect['status_code'] ) {
+			wp_die(
+				esc_html( $matched_redirect['message'] ),
+				'',
+				$matched_redirect['status_code'] // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+			);
+			return;
+		}
+
+		if ( 404 === $matched_redirect['status_code'] ) {
+			/**
+			 * We must do this manually and not rely on $wp_query->handle_404()
+			 * to prevent default "Plain" permalinks from "soft 404"-ing
+			 */
+			global $wp_query;
+			$wp_query->set_404();
+			status_header( 404 );
+			nocache_headers();
+			include_once get_query_template( '404' );
+			return;
 		}
 
 		wp_safe_redirect( $matched_redirect['redirect_to'], $matched_redirect['status_code'], 'Safe Redirect Manager' );
