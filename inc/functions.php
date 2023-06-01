@@ -130,7 +130,7 @@ function srm_get_valid_status_codes_data() {
 		return $status_codes;
 	}
 
-	$status_code_array  = $status_codes + $additional_status_codes;
+	$status_code_array = $status_codes + $additional_status_codes;
 
 	ksort( $status_code_array, SORT_NUMERIC );
 

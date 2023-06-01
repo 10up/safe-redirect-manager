@@ -148,7 +148,7 @@ class SRM_Redirect {
 			$status_code  = $redirect['status_code'];
 			$enable_regex = ( isset( $redirect['enable_regex'] ) ) ? $redirect['enable_regex'] : false;
 			$redirect_id  = $redirect['ID'];
-			$force_https  = ! empty( $redirect['force_https'] ) && $redirect['force_https'] == true;
+			$force_https  = ! empty( $redirect['force_https'] ) && true == $redirect['force_https'];
 			$message      = $redirect['message'] ?? '';
 
 			// check if the redirection destination is valid, otherwise just skip it (unless this is a 4xx request)
@@ -307,11 +307,10 @@ class SRM_Redirect {
 	 * @return string Modified URL to redirect to
 	 */
 	public function modify_redirect_protocol( $url ) {
-		
 		if ( empty( $this->matched_redirect ) || ! $this->matched_redirect['force_https'] ) {
 			return $url;
 		}
-		
+
 		// Convert relative path to absolute URL before applying protocol
 		if ( ! ( strpos( $url, 'http' ) === 0 ) ) {
 			$url = home_url( $url );
@@ -320,7 +319,7 @@ class SRM_Redirect {
 		$http     = 'http://';
 		$position = strpos( $url, $http );
 
-		if ( $position === 0 ) {
+		if ( 0 === $position ) {
 			$url = substr_replace( $url, 'https://', $position, strlen( $http ) );
 		}
 
