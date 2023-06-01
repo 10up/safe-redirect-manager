@@ -439,8 +439,10 @@ class SRM_Post_Type {
 				delete_post_meta( $post_id, '_redirect_rule_status_code' );
 			}
 
-			if ( ! empty( $_POST['srm_redirect_protocol'] ) ) {
-				update_post_meta( $post_id, '_redirect_protocol', $_POST['srm_redirect_protocol'] );
+			if ( ! empty( $_POST['srm_force_https'] ) ) {
+				update_post_meta( $post_id, '_force_https', true );
+			} else {
+				delete_post_meta( $post_id, '_force_https' );
 			}
 
 			if ( ! empty( $_POST['srm_redirect_rule_message'] ) ) {
@@ -570,16 +572,13 @@ class SRM_Post_Type {
 		$redirect_notes   = get_post_meta( $post->ID, '_redirect_rule_notes', true );
 		$status_code      = get_post_meta( $post->ID, '_redirect_rule_status_code', true );
 		$enable_regex     = get_post_meta( $post->ID, '_redirect_rule_from_regex', true );
-		$protocol         = get_post_meta( $post->ID, '_redirect_protocol', true );
+		$force_https      = get_post_meta( $post->ID, '_force_https', true );
 		$redirect_message = get_post_meta( $post->ID, '_redirect_rule_message', true );
 
 		if ( empty( $status_code ) ) {
 			$status_code = apply_filters( 'srm_default_direct_status', 302 );
 		}
 
-		if ( empty( $protocol ) ) {
-			$protocol = is_ssl() ? 'https' : 'http';
-		}
 		?>
 		<div class="notice notice-error" id="message" style="display: none;"></div>
 		<p>
@@ -616,10 +615,7 @@ class SRM_Post_Type {
 		<p>
 			<label><strong><?php esc_html_e( 'Redirect Protocol:', 'safe-redirect-manager' ); ?></strong></label><br/>
 			<label>
-				<input type="radio" name="srm_redirect_protocol" value="http" <?php checked( $protocol, 'http' ); ?>/> http
-			</label>&nbsp;
-			<label>
-				<input type="radio" name="srm_redirect_protocol" value="https" <?php checked( $protocol, 'https' ); ?>/> https
+				<input type="checkbox" name="srm_force_https" value="1" <?php checked( $force_https, true ); ?>/> Force https
 			</label>
 		</p>
 
