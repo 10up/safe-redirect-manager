@@ -7,7 +7,7 @@ All notable changes to this project will be documented in this file, per [the Ke
 ## [2.0.1] - 2023-06-01
 ### Fixed
 - Ensure our E2E tests run (props [@Sidsector9](https://github.com/Sidsector9), [@iamdharmesh](https://github.com/iamdharmesh) via [#318](https://github.com/10up/safe-redirect-manager/pull/318)).
-- Ensure the `message` array key exists before we use it (props [@dkotter](https://github.com/dkotter), [@ocean90](https://github.com/ocean90), [@peterwilsoncc](https://github.com/peterwilsoncc) via [#319](https://github.com/10up/safe-redirect-manager/pull/319)).
+- Ensure the `message` array key exists before we use it (props [@dkotter](https://github.com/dkotter), [@ocean90](https://github.com/ocean90), [@vena](https://github.com/vena), [@peterwilsoncc](https://github.com/peterwilsoncc) via [#319](https://github.com/10up/safe-redirect-manager/pull/319)).
 - Deprecation notices in PHP 8.1 and later (props [@peterwilsoncc](https://github.com/peterwilsoncc), [@dkotter](https://github.com/dkotter) via [#322](https://github.com/10up/safe-redirect-manager/pull/322)).
 
 ## [2.0.0] - 2023-05-31
