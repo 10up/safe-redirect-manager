@@ -689,13 +689,18 @@ class SRM_Post_Type {
 	 * @return void
 	 */
 	public function srm_validate_from_url() {
-		$_wpnonce = filter_input( INPUT_GET, '_wpnonce', FILTER_SANITIZE_STRING );
+		if ( ! isset( $_GET['_wpnonce'] ) || ! isset( $_GET['from'] ) ) {
+			echo 0;
+			die();
+		}
+
+		$_wpnonce = sanitize_text_field( wp_unslash( $_GET['_wpnonce'] ) );
 		if ( ! wp_verify_nonce( $_wpnonce, 'srm-save-redirect-meta' ) ) {
 			echo 0;
 			die();
 		}
 
-		$from = filter_input( INPUT_GET, 'from', FILTER_SANITIZE_STRING );
+		$from = srm_sanitize_redirect_from( wp_unslash( $_GET['from'] ) );
 
 		/**
 		 * SRM treats '/sample-page' and 'sample-page' equally.
