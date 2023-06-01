@@ -121,6 +121,21 @@ describe('Test redirect rules', () => {
 		cy.verifyEndpointDead('wildcard-403-test/1', 'Test message for a 403 wildcard');
 	});
 
+	it('Can not create a duplicate redirect rule', () => {
+		cy.createRedirectRule(
+			'/duplicate-rule-test/',
+			'/hello-world/',
+			'Rule for testing duplicate rule creation.'
+		);
+
+		cy.visit('/wp-admin/post-new.php?post_type=redirect_rule');
+
+		cy.get('#srm_redirect_rule_from').click().clear().type('/duplicate-rule-test/');
+		cy.get('#srm_redirect_rule_to').click();
+
+		cy.get('.notice-error').should('contain', 'There is an existing redirect with the same Redirect From URL.');
+	});
+
 	it('Can die with a 403 header', () => {
 		cy.createRedirectRule(
 			'/403-test',
