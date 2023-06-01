@@ -38,9 +38,9 @@ class SRM_Redirect {
 		$this->multisite_checks();
 
 		/**
-		 * Filter whether to only redirect on 404 pages
+		 * Filter whether to only redirect on 404 File Not Found pages.
 		 *
-		 * @return bool
+		 * @param bool $404_redirects_only Whether to redirect file not found requests only. Default false.
 		 */
 		if ( apply_filters( 'srm_redirect_only_on_404', false ) ) {
 			add_action( 'template_redirect', array( $this, 'maybe_redirect' ), 0 );
@@ -100,9 +100,12 @@ class SRM_Redirect {
 		}
 
 		/**
-		 * Filter registered redirects
+		 * Filter registered redirects.
 		 *
-		 * @return array
+		 * Allows plugin developers to modify the available redirects.
+		 *
+		 * @param array $redirects Redirects found for the redirect path.
+		 * @param string $requested_path Original path of the requested URL.
 		 */
 		$redirects = apply_filters( 'srm_registered_redirects', $redirects, $requested_path );
 
