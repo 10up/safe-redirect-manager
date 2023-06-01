@@ -230,9 +230,9 @@ class SRM_Post_Type {
 		if ( $this->is_plugin_page() ) {
 
 			/**
-			 * Filter whether possible redirect loop checking is enabled or not
+			 * Filter whether possible redirect loop checking is enabled or not.
 			 *
-			 * @return bool
+			 * @param bool $check_possible_loop Whether to check for redirect loops. Default false.
 			 */
 			$possible_loop = apply_filters( 'srm_check_for_possible_redirect_loops', false );
 
@@ -483,9 +483,9 @@ class SRM_Post_Type {
 		}
 
 		/**
-		 * Filter the capability to manage redirects
+		 * Filter the capability required to manage redirects.
 		 *
-		 * @return string
+		 * @param string $redirect_capability The required capability. Default `srm_manage_redirects`.
 		 */
 		return apply_filters( 'srm_restrict_to_capability', $redirect_capability );
 	}
@@ -576,9 +576,14 @@ class SRM_Post_Type {
 
 		if ( empty( $status_code ) ) {
 			/**
-			 * Filter the default status code to redirect with
+			 * Filter the default HTTP status code to redirect with.
 			 *
-			 * @return int
+			 * Which HTTP redirect code safe redirect manager should default to. This can
+			 * be overridden in the dashboard for each redirect.
+			 *
+			 * @see https://developer.mozilla.org/en-US/docs/Web/HTTP/Redirections
+			 *
+			 * @param int $default_status_code Default redirect statues. Default value `302`.
 			 */
 			$status_code = apply_filters( 'srm_default_direct_status', 302 );
 		}
