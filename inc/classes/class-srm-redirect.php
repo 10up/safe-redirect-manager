@@ -40,7 +40,7 @@ class SRM_Redirect {
 		/**
 		 * Filter whether to only redirect on 404 File Not Found pages.
 		 *
-		 * @param bool $404_redirects_only Whether to redirect file not found requests only. Default false.
+		 * @param bool $404_redirects_only Whether to redirect file not found requests only. Default `false`.
 		 */
 		if ( apply_filters( 'srm_redirect_only_on_404', false ) ) {
 			add_action( 'template_redirect', array( $this, 'maybe_redirect' ), 0 );
@@ -110,9 +110,9 @@ class SRM_Redirect {
 		$redirects = apply_filters( 'srm_registered_redirects', $redirects, $requested_path );
 
 		/**
-		 * Filter whether to allow case sensitive redirects
+		 * Allow or disallow case insensitive redirects.
 		 *
-		 * @return array
+		 * @param bool $case_insensitive Enable or disable case insensitive redirects. Default is `true` which means insensitive is enabled.
 		 */
 		$case_insensitive = apply_filters( 'srm_case_insensitive_redirects', true );
 
@@ -170,9 +170,9 @@ class SRM_Redirect {
 				}
 
 				/**
-				 * Filter whether to compare only query params if the $redirect_from value contains parameters
+				 * Filter whether to compare only query params.
 				 *
-				 * @return int
+				 * @param int $matched_position The matched position of specific string in the URL. Default is the position of `?`.
 				 */
 				$match_query_params = apply_filters( 'srm_match_query_params', strpos( $redirect_from, '?' ) );
 
@@ -221,7 +221,7 @@ class SRM_Redirect {
 				/**
 				 * Filter the url to redirect to
 				 *
-				 * @return string
+				 * @param string $redirect_url Final URL to redirect to.
 				 */
 				$filterd_redirect_to   = apply_filters( 'srm_redirect_to', $redirect_to );
 				$sanitized_redirect_to = esc_url_raw( $filterd_redirect_to );
@@ -247,18 +247,20 @@ class SRM_Redirect {
 	public function maybe_redirect() {
 
 		/**
-		 * Don't redirect unless not on admin or (404 filter enabled and require query is a 404).
+		 * Whether to redirect only on 404 error.
 		 *
-		 * @return bool
+		 * @param bool $redirect_only_on_404 Whether to redirect only on 404 error. Default is `false`.
 		 */
-		if ( is_admin() || ( apply_filters( 'srm_redirect_only_on_404', false ) && ! is_404() ) ) {
+		$only_404 = apply_filters( 'srm_redirect_only_on_404', false );
+
+		if ( is_admin() || ( $only_404 && ! is_404() ) ) {
 			return;
 		}
 
 		/**
-		 * Get requested path and add a forward slash before it
+		 * Filter requested path.
 		 *
-		 * @return string
+		 * @param string $request_path Request path. Default `$_SERVER['REQUEST_URI']`.
 		 */
 		$requested_path   = esc_url_raw( apply_filters( 'srm_requested_path', $_SERVER['REQUEST_URI'] ) );
 		$requested_path   = untrailingslashit( stripslashes( $requested_path ) );
@@ -288,7 +290,7 @@ class SRM_Redirect {
 			/**
 			 * Default status code to redirect with
 			 *
-			 * @return int
+			 * @param int The status code to redirect with. Default `302`.
 			 */
 			$matched_redirect['status_code'] = apply_filters( 'srm_default_direct_status', 302 );
 		}
