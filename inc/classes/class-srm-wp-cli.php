@@ -5,6 +5,8 @@
  * @package safe-redirect-manager
  */
 
+use \WP_CLI\Utils;
+
 /**
  * WP CLI command class
  */
@@ -291,5 +293,57 @@ class SRM_WP_CLI extends WP_CLI_Command {
 		}
 
 		WP_CLI::success( "All done! {$created} redirects were imported, {$skipped} were skipped" );
+	}
+
+	/**
+	 * Export redirects to CSV file.
+	 *
+	 * ## EXAMPLE
+	 *
+	 *     wp safe-redirect-manager export
+	 *     wp safe-redirect-manager export --filename=sample-redirects
+	 *
+	 * @since 1.11.2
+	 *
+	 * @access public
+	 * @param array $args       Arguments.
+	 * @param array $assoc_args Associated aeguments.
+	 */
+	public function export_csv( $args, $assoc_args ) {
+
+		$assoc_args = wp_parse_args(
+			$assoc_args,
+			[
+				'filename' => 'srm-redirects',
+			]
+		);
+
+		$redirects = srm_get_redirects( [ 'post_status' => 'any' ], true );
+
+		if ( empty( $redirects ) ) {
+			WP_CLI::error( 'There are no redirects available. Please add some first and then try again.' );
+		}
+
+		$fields = [
+			'ID',
+			'redirect_from',
+			'redirect_to',
+			'status_code',
+			'enable_regex',
+			'post_status',
+		];
+
+		$file_name = $assoc_args['filename'] . '.csv';
+
+		if ( file_exists( $file_name ) ) {
+			WP_CLI::warning( sprintf( 'File already exists. The following file will be rewritten %s', $file_name ) );
+			WP_CLI::confirm( 'Proceed with rewritting the existing file?' );
+		}
+
+		$file_resource = fopen( $file_name, 'w' ); //phpcs:ignore
+
+		Utils\write_csv( $file_resource, $redirects, $fields );
+
+		WP_CLI::success( sprintf( 'Redirects exported to csv file %s', $file_name ) );
 	}
 }
