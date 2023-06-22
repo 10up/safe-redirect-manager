@@ -49,6 +49,8 @@ class SRM_Post_Type {
 		add_filter( 'default_hidden_columns', array( $this, 'filter_hidden_columns' ), 10, 1 );
 		add_action( 'admin_enqueue_scripts', array( $this, 'load_resources' ), 10, 0 );
 		add_action( 'wp_ajax_srm_validate_from_url', array( $this, 'srm_validate_from_url' ), 10, 0 );
+		add_action( 'wp_ajax_nopriv_srm_autocomplete', array( $this, 'srm_autocomplete' ), 10, 0 );
+		add_action( 'wp_ajax_srm_autocomplete', array( $this, 'srm_autocomplete' ), 10, 0 );
 	}
 
 	/**
@@ -671,6 +673,7 @@ class SRM_Post_Type {
 	 */
 	public function load_resources() {
 		if ( 'redirect_rule' === get_post_type() ) {
+			wp_enqueue_style( 'redirectjs', plugin_dir_url( 'safe-redirect-manager/safe-redirect-manager.php' ) . 'assets/css/redirect.css', array(), SRM_VERSION );
 			wp_enqueue_script( 'redirectjs', plugin_dir_url( 'safe-redirect-manager/safe-redirect-manager.php' ) . 'assets/js/redirect.js', array( 'jquery' ), SRM_VERSION );
 			wp_localize_script(
 				'redirectjs',
@@ -678,9 +681,55 @@ class SRM_Post_Type {
 				array(
 					'urlError' => __( 'There are some issues validating the URL. Please try again.', 'safe-redirect-manager' ),
 					'fail'     => __( 'There is an existing redirect with the same Redirect From URL. You may <a href="%s">Edit</a> the redirect or try other `from` URL.', 'safe-redirect-manager' ),
+					'ajax_url'   => admin_url( 'admin-ajax.php' ),
+					'ajax_nonce' => wp_create_nonce( 'srm_autocomplete_nonce' ),
 				)
 			);
 		}
+	}
+
+	/**
+	 * Fetches posts and pages based on the 'Redirect to:' field value.
+	 * This function handles an AJAX request, returning a JSON array of posts
+	 * and pages that match the search term.
+	 *
+	 * @return void
+	 */
+	public function srm_autocomplete() {
+		check_ajax_referer( 'srm_autocomplete_nonce', 'security' );
+
+		$search_term = isset( $_REQUEST['term'] ) ? sanitize_text_field( wp_unslash( $_REQUEST['term'] ) ) : false;
+		if ( ! $search_term ) {
+			echo wp_json_encode( array() );
+			wp_die();
+		}
+
+		// Remove the beginning / to prevent 0 results.
+		$search_term = ltrim( $search_term, '/' );
+
+		$query = get_posts(
+			array(
+				's'              => $search_term,
+				'posts_per_page' => 5,
+			)
+		);
+
+		if ( ! $query ) {
+			echo wp_json_encode( array() );
+			wp_die();
+		}
+
+		$suggestions = array();
+		foreach ( $query as $key => $post ) {
+			$suggestions[] = array(
+				'relative_url' => wp_make_link_relative( get_the_permalink( $post->ID ) ),
+				'post_title'   => $post->post_title,
+				'post_type'    => $post->post_type,
+			);
+		}
+
+		echo wp_json_encode( $suggestions );
+		wp_die();
 	}
 
 	/**
