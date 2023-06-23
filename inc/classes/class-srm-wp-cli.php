@@ -330,7 +330,6 @@ class SRM_WP_CLI extends WP_CLI_Command {
 			'redirect_to',
 			'status_code',
 			'enable_regex',
-			'post_status',
 		];
 
 		$file_name = $assoc_args['filename'] . '.csv';
