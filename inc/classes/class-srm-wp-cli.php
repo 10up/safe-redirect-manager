@@ -15,7 +15,7 @@ class SRM_WP_CLI extends WP_CLI_Command {
 
 	/**
 	 * List all of the currently configured redirects.
-	 * Available fields: 'ID', 'redirect_from', 'redirect_to', 'status_code', 'enable_regex', 'post_status'.
+	 * Available fields: 'ID', 'redirect_from', 'redirect_to', 'status_code', 'enable_regex'.
 	 *
 	 * [--field=<field>]
 	 * : Single field to dipslay, should be one of available fields.
@@ -53,7 +53,6 @@ class SRM_WP_CLI extends WP_CLI_Command {
 			'redirect_to',
 			'status_code',
 			'enable_regex',
-			'post_status',
 		);
 
 		$redirects = srm_get_redirects( array( 'post_status' => 'any' ), true );
