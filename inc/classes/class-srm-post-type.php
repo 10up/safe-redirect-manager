@@ -49,7 +49,6 @@ class SRM_Post_Type {
 		add_filter( 'default_hidden_columns', array( $this, 'filter_hidden_columns' ), 10, 1 );
 		add_action( 'admin_enqueue_scripts', array( $this, 'load_resources' ), 10, 0 );
 		add_action( 'wp_ajax_srm_validate_from_url', array( $this, 'srm_validate_from_url' ), 10, 0 );
-		add_action( 'wp_ajax_nopriv_srm_autocomplete', array( $this, 'srm_autocomplete' ), 10, 0 );
 		add_action( 'wp_ajax_srm_autocomplete', array( $this, 'srm_autocomplete' ), 10, 0 );
 	}
 
@@ -698,6 +697,11 @@ class SRM_Post_Type {
 	public function srm_autocomplete() {
 		check_ajax_referer( 'srm_autocomplete_nonce', 'security' );
 
+		if ( ! current_user_can( 'read' ) ) {
+			echo wp_json_encode( array() );
+			wp_die();
+		}
+
 		$search_term = isset( $_REQUEST['term'] ) ? sanitize_text_field( wp_unslash( $_REQUEST['term'] ) ) : false;
 		if ( ! $search_term ) {
 			echo wp_json_encode( array() );
@@ -709,6 +713,7 @@ class SRM_Post_Type {
 
 		$query = get_posts(
 			array(
+				'post_type'      => get_post_types(),
 				's'              => $search_term,
 				'posts_per_page' => 5,
 			)
