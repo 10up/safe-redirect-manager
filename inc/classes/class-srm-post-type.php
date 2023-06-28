@@ -697,7 +697,7 @@ class SRM_Post_Type {
 	public function srm_autocomplete() {
 		check_ajax_referer( 'srm_autocomplete_nonce', 'security' );
 
-		if ( ! current_user_can( 'read' ) ) {
+		if ( ! current_user_can( 'srm_manage_redirects' ) ) {
 			echo wp_json_encode( array() );
 			wp_die();
 		}
