@@ -730,9 +730,14 @@ class SRM_Post_Type {
 
 		$query = get_posts(
 			array(
-				'post_type'      => get_post_types(
+				// Get publicly viewable post types, except for redirect_rule.
+				'post_type'      => array_diff_key(
+					array_filter(
+						get_post_types(),
+						'is_post_type_viewable'
+					),
 					array(
-						'public' => true,
+						'redirect_rule' => '',
 					)
 				),
 				's'              => $search_term,
