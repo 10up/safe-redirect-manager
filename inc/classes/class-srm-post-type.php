@@ -301,24 +301,41 @@ class SRM_Post_Type {
 	public function filter_redirect_updated_messages( $messages ) {
 		global $post, $post_ID;
 
+		$message_tpl = function( $message ) {
+			return sprintf(
+				/* translators: %1%s: message status, %2%s: URL to the list of redirect rules */
+				__( 'Redirect rule %1$s. <a href="%2$s">&larr; Back to rules</a>', 'safe-redirect-manager' ),
+				$message,
+				esc_url( admin_url( 'edit.php?post_type=redirect_rule' ) )
+			);
+		};
+
 		$messages['redirect_rule'] = array(
 			0  => '', // Unused. Messages start at index 1.
-			1  => sprintf( esc_html__( 'Redirect rule updated.', 'safe-redirect-manager' ), esc_url( get_permalink( $post_ID ) ) ),
+			1  => $message_tpl( esc_html__( 'updated', 'safe-redirect-manager' ) ),
 			2  => esc_html__( 'Custom field updated.', 'safe-redirect-manager' ),
 			3  => esc_html__( 'Custom field deleted.', 'safe-redirect-manager' ),
-			4  => esc_html__( 'Redirect rule updated.', 'safe-redirect-manager' ),
-			/* translators: %s: date and time of the revision */
-			5  => isset( $_GET['revision'] ) ? sprintf( esc_html__( 'Redirect rule restored to revision from %s', 'safe-redirect-manager' ), wp_post_revision_title( (int) $_GET['revision'], false ) ) : false,
-			6  => sprintf( esc_html__( 'Redirect rule published.', 'safe-redirect-manager' ), esc_url( get_permalink( $post_ID ) ) ),
-			7  => esc_html__( 'Redirect rule saved.', 'safe-redirect-manager' ),
-			8  => sprintf( esc_html__( 'Redirect rule submitted.', 'safe-redirect-manager' ), esc_url( add_query_arg( 'preview', 'true', get_permalink( $post_ID ) ) ) ),
-			9  => sprintf(
-				esc_html__( 'Redirect rule scheduled for: %1$s.', 'safe-redirect-manager' ),
-				// translators: Publish box date format, see http://php.net/date
-				date_i18n( esc_html__( 'M j, Y @ G:i' ), strtotime( $post->post_date ) ),
-				esc_url( get_permalink( $post_ID ) )
+			4  => $message_tpl( __( 'updated', 'safe-redirect-manager' ) ),
+			5  => isset( $_GET['revision'] )
+				? $message_tpl(
+					sprintf(
+						/* translators: %s: the revision title */
+						esc_html__( 'restored to revision from %s', 'safe-redirect-manager' ),
+						wp_post_revision_title( (int) $_GET['revision'], false )
+					)
+				)
+				: false,
+			6  => $message_tpl( esc_html__( 'published', 'safe-redirect-manager' ) ),
+			7  => $message_tpl( esc_html__( 'saved', 'safe-redirect-manager' ) ),
+			8  => $message_tpl( esc_html__( 'submitted', 'safe-redirect-manager' ) ),
+			9  => $message_tpl(
+				sprintf(
+					/* translators: %s: publish box date format, see http://php.net/date */
+					esc_html__( 'scheduled for %s', 'safe-redirect-manager' ),
+					date_i18n( esc_html__( 'M j, Y @ G:i' ), strtotime( $post->post_date ) )
+				)
 			),
-			10 => sprintf( esc_html__( 'Redirect rule draft updated.', 'safe-redirect-manager' ), esc_url( add_query_arg( 'preview', 'true', get_permalink( $post_ID ) ) ) ),
+			10 => $message_tpl( esc_html__( 'draft updated', 'safe-redirect-manager' ) ),
 		);
 
 		return $messages;
