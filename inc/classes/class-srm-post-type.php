@@ -584,7 +584,7 @@ class SRM_Post_Type {
 
 		<p>
 			<label for="srm_redirect_rule_to"><strong><?php esc_html_e( '* Redirect To:', 'safe-redirect-manager' ); ?></strong></label><br />
-			<input class="widefat" type="text" name="srm_redirect_rule_to" id="srm_redirect_rule_to" value="<?php echo esc_attr( $redirect_to ); ?>" />
+			<input class="widefat" type="text" name="srm_redirect_rule_to" id="srm_redirect_rule_to" value="<?php echo esc_attr( urldecode( $redirect_to ) ); ?>" />
 		</p>
 		<p class="description" id="srm_to_disabled_message" style="display:none;"><em><?php esc_html_e( 'The "Redirect to" value doesn\'t apply for 4xx error codes.', 'safe-redirect-manager' ); ?></em></p>
 		<p class="description"><?php esc_html_e( 'This can be a URL or a path relative to the root of your website (not your WordPress installation). Ending with a (*) wildcard character will append the request match to the redirect.', 'safe-redirect-manager' ); ?></p>
