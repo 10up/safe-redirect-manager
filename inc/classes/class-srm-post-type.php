@@ -713,11 +713,7 @@ class SRM_Post_Type {
 
 		$query = get_posts(
 			array(
-				'post_type'      => get_post_types(
-					array(
-						'public' => true,
-					)
-				),
+				'post_type'      => array_filter( get_post_types(), 'is_post_type_viewable' ),
 				's'              => $search_term,
 				'posts_per_page' => 5,
 			)
