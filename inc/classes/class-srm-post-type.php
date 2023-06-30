@@ -713,7 +713,11 @@ class SRM_Post_Type {
 
 		$query = get_posts(
 			array(
-				'post_type'      => get_post_types(),
+				'post_type'      => get_post_types(
+					array(
+						'public' => true,
+					)
+				),
 				's'              => $search_term,
 				'posts_per_page' => 5,
 			)
