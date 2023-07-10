@@ -457,6 +457,12 @@ class SRM_Post_Type {
 				delete_post_meta( $post_id, '_redirect_rule_status_code' );
 			}
 
+			if ( ! empty( $_POST['srm_force_https'] ) ) {
+				update_post_meta( $post_id, '_force_https', true );
+			} else {
+				delete_post_meta( $post_id, '_force_https' );
+			}
+
 			if ( ! empty( $_POST['srm_redirect_rule_message'] ) ) {
 				update_post_meta( $post_id, '_redirect_rule_message', sanitize_text_field( $_POST['srm_redirect_rule_message'] ) );
 			} else {
@@ -582,13 +588,15 @@ class SRM_Post_Type {
 		$redirect_from    = get_post_meta( $post->ID, '_redirect_rule_from', true );
 		$redirect_to      = get_post_meta( $post->ID, '_redirect_rule_to', true );
 		$redirect_notes   = get_post_meta( $post->ID, '_redirect_rule_notes', true );
-		$redirect_message = get_post_meta( $post->ID, '_redirect_rule_message', true );
 		$status_code      = get_post_meta( $post->ID, '_redirect_rule_status_code', true );
 		$enable_regex     = get_post_meta( $post->ID, '_redirect_rule_from_regex', true );
+		$force_https      = get_post_meta( $post->ID, '_force_https', true );
+		$redirect_message = get_post_meta( $post->ID, '_redirect_rule_message', true );
 
 		if ( empty( $status_code ) ) {
 			$status_code = apply_filters( 'srm_default_direct_status', 302 );
 		}
+
 		?>
 		<div class="notice notice-error" id="message" style="display: none;"></div>
 		<p>
@@ -607,7 +615,7 @@ class SRM_Post_Type {
 		<p class="description"><?php esc_html_e( 'This can be a URL or a path relative to the root of your website (not your WordPress installation). Ending with a (*) wildcard character will append the request match to the redirect.', 'safe-redirect-manager' ); ?></p>
 
 		<p>
-			<label for="srm_redirect_rule_status_code"><strong><?php esc_html_e( '* HTTP Status Code:', 'safe-redirect-manager' ); ?></strong></label>
+			<label for="srm_redirect_rule_status_code"><strong><?php esc_html_e( '* HTTP Status Code:', 'safe-redirect-manager' ); ?></strong></label><br/>
 			<select name="srm_redirect_rule_status_code" id="srm_redirect_rule_status_code">
 				<?php foreach ( srm_get_valid_status_codes() as $code ) : ?>
 					<option value="<?php echo esc_attr( $code ); ?>" <?php selected( $status_code, $code ); ?>><?php echo esc_html( $code . ' ' . $this->status_code_labels[ $code ] ); ?></option>
@@ -620,6 +628,13 @@ class SRM_Post_Type {
 			<label for="srm_redirect_rule_message"><strong><?php esc_html_e( 'Message:', 'safe-redirect-manager' ); ?></strong></label>
 			<textarea name="srm_redirect_rule_message" id="srm_redirect_rule_message" class="widefat"><?php echo esc_textarea( $redirect_message ); ?></textarea>
 			<em><?php esc_html_e( 'Optionally display a message to users when they navigate to a 403 or 410 endpoint.', 'safe-redirect-manager' ); ?></em>
+		</p>
+
+		<p>
+			<label><strong><?php esc_html_e( 'Redirect Protocol:', 'safe-redirect-manager' ); ?></strong></label><br/>
+			<label>
+				<input type="checkbox" name="srm_force_https" value="1" <?php checked( $force_https, true ); ?>/> Force https
+			</label>
 		</p>
 
 		<p>

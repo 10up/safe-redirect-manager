@@ -17,6 +17,13 @@ class SRM_Redirect {
 	private $whitelist_host;
 
 	/**
+	 * Matched redirect
+	 *
+	 * @var array
+	 */
+	private $matched_redirect;
+
+	/**
 	 * Setup hook.
 	 *
 	 * @since 1.8
@@ -141,6 +148,7 @@ class SRM_Redirect {
 			$status_code  = $redirect['status_code'];
 			$enable_regex = ( isset( $redirect['enable_regex'] ) ) ? $redirect['enable_regex'] : false;
 			$redirect_id  = $redirect['ID'];
+			$force_https  = ! empty( $redirect['force_https'] ) && true == $redirect['force_https'];
 			$message      = $redirect['message'] ?? '';
 
 			// check if the redirection destination is valid, otherwise just skip it (unless this is a 4xx request)
@@ -209,6 +217,7 @@ class SRM_Redirect {
 					'status_code'  => $status_code,
 					'enable_regex' => $enable_regex,
 					'redirect_id'  => $redirect_id,
+					'force_https'  => $force_https,
 					'message'      => $message,
 				];
 			}
@@ -242,7 +251,8 @@ class SRM_Redirect {
 			'srm_do_redirect',
 			$requested_path,
 			$matched_redirect['redirect_to'],
-			$matched_redirect['status_code']
+			$matched_redirect['status_code'],
+			$matched_redirect['force_https']
 		);
 
 		if ( defined( 'PHPUNIT_SRM_TESTSUITE' ) && PHPUNIT_SRM_TESTSUITE ) {
@@ -257,6 +267,10 @@ class SRM_Redirect {
 		if ( ! in_array( $matched_redirect['status_code'], srm_get_valid_status_codes(), true ) ) {
 			$matched_redirect['status_code'] = apply_filters( 'srm_default_direct_status', 302 );
 		}
+
+		// Force http/https
+		$this->matched_redirect = $matched_redirect;
+		add_filter( 'wp_redirect', array( $this, 'modify_redirect_protocol' ) );
 
 		// wp_safe_redirect only supports 'true' 3xx redirects; handle predefined 4xx here.
 		if ( 403 === $matched_redirect['status_code'] || 410 === $matched_redirect['status_code'] ) {
@@ -283,6 +297,33 @@ class SRM_Redirect {
 
 		wp_safe_redirect( $matched_redirect['redirect_to'], $matched_redirect['status_code'], 'Safe Redirect Manager' );
 		exit;
+	}
+
+	/**
+	 * Apply redirect protocol using route setting
+	 *
+	 * @param string $url URL to redirect to
+	 *
+	 * @return string Modified URL to redirect to
+	 */
+	public function modify_redirect_protocol( $url ) {
+		if ( empty( $this->matched_redirect ) || ! $this->matched_redirect['force_https'] ) {
+			return $url;
+		}
+
+		// Convert relative path to absolute URL before applying protocol
+		if ( ! ( strpos( $url, 'http' ) === 0 ) ) {
+			$url = home_url( $url );
+		}
+
+		$http     = 'http://';
+		$position = strpos( $url, $http );
+
+		if ( 0 === $position ) {
+			$url = substr_replace( $url, 'https://', $position, strlen( $http ) );
+		}
+
+		return $url;
 	}
 
 	/**

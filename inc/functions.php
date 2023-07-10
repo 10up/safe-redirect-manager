@@ -65,6 +65,7 @@ function srm_get_redirects( $args = array(), $hard = false ) {
 					'status_code'   => (int) get_post_meta( $redirect_id, '_redirect_rule_status_code', true ),
 					'message'       => get_post_meta( $redirect_id, '_redirect_rule_message', true ),
 					'enable_regex'  => (bool) get_post_meta( $redirect_id, '_redirect_rule_from_regex', true ),
+					'force_https'   => get_post_meta( $redirect_id, '_force_https', true ),
 				);
 			}
 
@@ -129,7 +130,7 @@ function srm_get_valid_status_codes_data() {
 		return $status_codes;
 	}
 
-	$status_code_array  = $status_codes + $additional_status_codes;
+	$status_code_array = $status_codes + $additional_status_codes;
 
 	ksort( $status_code_array, SORT_NUMERIC );
 
