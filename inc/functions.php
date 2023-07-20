@@ -65,6 +65,7 @@ function srm_get_redirects( $args = array(), $hard = false ) {
 					'status_code'   => (int) get_post_meta( $redirect_id, '_redirect_rule_status_code', true ),
 					'message'       => get_post_meta( $redirect_id, '_redirect_rule_message', true ),
 					'enable_regex'  => (bool) get_post_meta( $redirect_id, '_redirect_rule_from_regex', true ),
+					'force_https'   => get_post_meta( $redirect_id, '_force_https', true ),
 				);
 			}
 
@@ -129,7 +130,7 @@ function srm_get_valid_status_codes_data() {
 		return $status_codes;
 	}
 
-	$status_code_array  = $status_codes + $additional_status_codes;
+	$status_code_array = $status_codes + $additional_status_codes;
 
 	ksort( $status_code_array, SORT_NUMERIC );
 
@@ -232,33 +233,69 @@ function srm_create_redirect( $redirect_from, $redirect_to, $status_code = 302, 
 		return new WP_Error( 'invalid-argument', esc_html__( 'Invalid status code.', 'safe-redirect-manager' ) );
 	}
 
-	// Check to ensure this redirect doesn't already exist
-	if ( $wpdb->get_var( $wpdb->prepare( "SELECT post_id FROM $wpdb->postmeta WHERE meta_key=%s AND meta_value=%s", '_redirect_rule_from', $sanitized_redirect_from ) ) ) {
-		return new WP_Error( 'duplicate-redirect', sprintf( esc_html__( 'Redirect already exists for %s', 'safe-redirect-manager' ), $sanitized_redirect_from ) );
-	}
+	// Check if the redirect already exists.
+	$existing_redirect = $wpdb->get_row(
+		$wpdb->prepare(
+			"SELECT
+				fromMeta.post_id AS post_id,
+				fromMeta.meta_value AS _redirect_rule_from,
+				toMeta.meta_value AS _redirect_rule_to,
+				statusCodeMeta.meta_value AS _redirect_rule_status_code,
+				fromRegexMeta.meta_value AS _redirect_rule_from_regex,
+				notesMeta.meta_value AS _redirect_rule_notes
+			FROM
+				$wpdb->postmeta AS fromMeta
+			LEFT JOIN
+    			wp_postmeta AS toMeta ON fromMeta.post_id = toMeta.post_id AND toMeta.meta_key = %s
+			LEFT JOIN
+    			wp_postmeta AS statusCodeMeta ON fromMeta.post_id = statusCodeMeta.post_id AND statusCodeMeta.meta_key = %s
+			LEFT JOIN
+    			wp_postmeta AS fromRegexMeta ON fromMeta.post_id = fromRegexMeta.post_id AND fromRegexMeta.meta_key = %s
+			LEFT JOIN
+   				wp_postmeta AS notesMeta ON fromMeta.post_id = notesMeta.post_id AND notesMeta.meta_key = %s
+			WHERE
+    			fromMeta.meta_key = %s AND fromMeta.meta_value = %s",
+			'_redirect_rule_to',
+			'_redirect_rule_status_code',
+			'_redirect_rule_from_regex',
+			'_redirect_rule_notes',
+			'_redirect_rule_from',
+			$sanitized_redirect_from
+		)
+	);
 
-	// create the post
+	// Create the post arguments.
 	$post_args = array(
 		'post_type'   => 'redirect_rule',
 		'post_status' => $sanitized_post_status,
 		'post_author' => 1,
 		'menu_order'  => $sanitized_menu_order,
+
 	);
 
-	$post_id = wp_insert_post( $post_args );
+	if ( $existing_redirect ) {
+		// Redirect exists, so update it.
+		$post_args['ID'] = $existing_redirect->post_id;
+		$post_id         = wp_update_post( $post_args );
 
-	if ( 0 >= $post_id ) {
-		return new WP_Error( 'error-creating', esc_html__( 'An error occurred creating the redirect.', 'safe-redirect-manager' ) );
+		if ( 0 >= $post_id ) {
+			return new WP_Error( 'error-updating', esc_html__( 'An error occurred updating the redirect.', 'safe-redirect-manager' ) );
+		}
+	} else {
+		$post_id = wp_insert_post( $post_args );
+		if ( 0 >= $post_id ) {
+			return new WP_Error( 'error-creating', esc_html__( 'An error occurred creating the redirect.', 'safe-redirect-manager' ) );
+		}
 	}
 
-	// update the posts meta info
+	// Update the posts meta info.
 	update_post_meta( $post_id, '_redirect_rule_from', wp_slash( $sanitized_redirect_from ) );
 	update_post_meta( $post_id, '_redirect_rule_to', $sanitized_redirect_to );
 	update_post_meta( $post_id, '_redirect_rule_status_code', $sanitized_status_code );
 	update_post_meta( $post_id, '_redirect_rule_from_regex', $sanitized_enable_regex );
 	update_post_meta( $post_id, '_redirect_rule_notes', $sanitized_notes );
 
-	// We need to update the cache after creating this redirect
+	// We need to update the cache after creating this redirect.
 	srm_flush_cache();
 
 	return $post_id;
