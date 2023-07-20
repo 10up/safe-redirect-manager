@@ -381,6 +381,11 @@ function srm_import_file( $file, $args ) {
 	// filter arguments
 	$args = apply_filters( 'srm_import_file_args', $args );
 
+	// enable line endings auto detection
+	if ( version_compare( PHP_VERSION, '8.1', '<' ) ) {
+		@ini_set( 'auto_detect_line_endings', true );
+	}
+
 	// open file pointer if $file is not a resource
 	if ( ! is_resource( $file ) ) {
 		$handle = fopen( $file, 'rb' );
