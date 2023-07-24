@@ -52,14 +52,16 @@ function srm_get_redirects( $args = array(), $hard = false ) {
 				break;
 			}
 
+			// Check whether include post_status in result
+			$include_post_status_in_result = is_array( $query_args['post_status'] ) || 'any' === $query_args['post_status'];
+
 			foreach ( $redirect_query->posts as $redirect_id ) {
 				if ( count( $redirects ) >= $default_max_redirects ) {
 					break 2;
 				}
 
-				$redirects[] = array(
+				$redirect_data = array(
 					'ID'            => $redirect_id,
-					'post_status'   => get_post_status( $redirect_id ),
 					'redirect_from' => get_post_meta( $redirect_id, '_redirect_rule_from', true ),
 					'redirect_to'   => get_post_meta( $redirect_id, '_redirect_rule_to', true ),
 					'status_code'   => (int) get_post_meta( $redirect_id, '_redirect_rule_status_code', true ),
@@ -67,6 +69,12 @@ function srm_get_redirects( $args = array(), $hard = false ) {
 					'enable_regex'  => (bool) get_post_meta( $redirect_id, '_redirect_rule_from_regex', true ),
 					'force_https'   => get_post_meta( $redirect_id, '_force_https', true ),
 				);
+
+				if ( $include_post_status_in_result ) {
+					$redirect_data['post_status'] = get_post_status( $redirect_id );
+				}
+
+				$redirects[] = $redirect_data;
 			}
 
 			$i++;
