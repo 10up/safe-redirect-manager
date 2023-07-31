@@ -390,7 +390,9 @@ function srm_import_file( $file, $args ) {
 	$args = apply_filters( 'srm_import_file_args', $args );
 
 	// enable line endings auto detection
-	@ini_set( 'auto_detect_line_endings', true );
+	if ( version_compare( PHP_VERSION, '8.1', '<' ) ) {
+		@ini_set( 'auto_detect_line_endings', true );
+	}
 
 	// open file pointer if $file is not a resource
 	if ( ! is_resource( $file ) ) {
@@ -410,8 +412,8 @@ function srm_import_file( $file, $args ) {
 
 	while ( ( $row = fgetcsv( $handle ) ) ) {
 		// validate
-		$rule = array_combine( $headers, $row );
-		if ( empty( $rule[ $args['source'] ] ) || empty( $rule[ $args['target'] ] ) ) {
+		$rule = is_array( $row ) ? array_combine( $headers, $row ) : array();
+		if ( empty( $rule ) || empty( $rule[ $args['source'] ] ) || empty( $rule[ $args['target'] ] ) ) {
 			$doing_wp_cli && WP_CLI::warning( 'Skipping - redirection rule is formatted improperly.' );
 			$skipped++;
 			continue;
