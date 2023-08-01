@@ -152,6 +152,7 @@ function srm_get_valid_status_codes_data() {
  */
 function srm_flush_cache() {
 	delete_transient( '_srm_redirects_' . srm_get_max_redirects() );
+	delete_transient( '_srm_redirects_graph' );
 }
 
 /**

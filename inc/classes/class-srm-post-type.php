@@ -235,7 +235,7 @@ class SRM_Post_Type {
 			 * will be running slow. Let's disable it by default.
 			 */
 			if ( apply_filters( 'srm_check_for_possible_redirect_loops', false ) ) {
-				if ( srm_check_for_possible_redirect_loops() ) {
+				if ( SRM_Loop_Detection::detect_redirect_loops() ) {
 					?>
 					<div class="updated">
 						<p><?php esc_html_e( 'Safe Redirect Manager Warning: Possible redirect loops and/or chains have been created.', 'safe-redirect-manager' ); ?></p>
