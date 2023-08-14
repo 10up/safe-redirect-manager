@@ -5,6 +5,8 @@
  * @package safe-redirect-manager
  */
 
+use \WP_CLI\Utils;
+
 /**
  * WP CLI command class
  */
@@ -224,12 +226,12 @@ class SRM_WP_CLI extends WP_CLI_Command {
 	 * redirection from and to URLs, regex flag and HTTP redirection code. Here
 	 * is example table:
 	 *
-	 * | source                     | target             | regex | code | order |
-	 * |----------------------------|--------------------|-------|------|-------|
-	 * | /legacy-url                | /new-url           | 0     | 301  | 0     |
-	 * | /category-1                | /new-category-slug | 0     | 302  | 1     |
-	 * | /tes?t/[0-9]+/path/[^/]+/? | /go/here           | 1     | 302  | 3     |
-	 * | ...                        | ...                | ...   | ...  | ...   |
+	 * | source                     | target             | regex | code | order | notes |
+	 * |----------------------------|--------------------|-------|------|-------|-------|
+	 * | /legacy-url                | /new-url           | 0     | 301  | 0     |       |
+	 * | /category-1                | /new-category-slug | 0     | 302  | 1     |       |
+	 * | /tes?t/[0-9]+/path/[^/]+/? | /go/here           | 1     | 302  | 3     |       |
+	 * | ...                        | ...                | ...   | ...  | ...   | ...   |
 	 *
 	 * You can also use exported redirects from "Redirection" plugin, which you
 	 * can download here: /wp-admin/tools.php?page=redirection.php&sub=modules
@@ -249,12 +251,14 @@ class SRM_WP_CLI extends WP_CLI_Command {
 	 * <order-column>
 	 * : Header title for order column mapping.
 	 *
+	 * <notes-column>
+	 * : Header title for notes column mapping.
 	 *
 	 * ## EXAMPLE
 	 *
 	 *     wp safe-redirect-manager import redirections.csv
 	 *
-	 * @synopsis <file> [--source=<source-column>] [--target=<target-column>] [--regex=<regex-column>] [--code=<code-column>]  [--order=<order-column>]
+	 * @synopsis <file> [--source=<source-column>] [--target=<target-column>] [--regex=<regex-column>] [--code=<code-column>]  [--order=<order-column>] [--notes=<notes-column>]
 	 *
 	 * @since 1.7.6
 	 *
@@ -271,6 +275,7 @@ class SRM_WP_CLI extends WP_CLI_Command {
 				'regex'  => 'regex',
 				'code'   => 'code',
 				'order'  => 'order',
+				'notes'  => 'notes',
 			)
 		);
 
@@ -288,5 +293,57 @@ class SRM_WP_CLI extends WP_CLI_Command {
 		}
 
 		WP_CLI::success( "All done! {$created} redirects were imported, {$skipped} were skipped" );
+	}
+
+	/**
+	 * Export redirects to CSV file.
+	 *
+	 * ## EXAMPLE
+	 *
+	 *     wp safe-redirect-manager export
+	 *     wp safe-redirect-manager export --filename=sample-redirects
+	 *
+	 * @since 1.11.2
+	 *
+	 * @access public
+	 * @param array $args       Arguments.
+	 * @param array $assoc_args Associated aeguments.
+	 */
+	public function export_csv( $args, $assoc_args ) {
+
+		$assoc_args = wp_parse_args(
+			$assoc_args,
+			[
+				'filename' => 'srm-redirects',
+			]
+		);
+
+		$redirects = srm_get_redirects( [ 'post_status' => 'any' ], true );
+
+		if ( empty( $redirects ) ) {
+			WP_CLI::error( 'There are no redirects available. Please add some first and then try again.' );
+		}
+
+		$fields = [
+			'ID',
+			'redirect_from',
+			'redirect_to',
+			'status_code',
+			'enable_regex',
+			'post_status',
+		];
+
+		$file_name = $assoc_args['filename'] . '.csv';
+
+		if ( file_exists( $file_name ) ) {
+			WP_CLI::warning( sprintf( 'File already exists. The following file will be rewritten %s', $file_name ) );
+			WP_CLI::confirm( 'Proceed with rewritting the existing file?' );
+		}
+
+		$file_resource = fopen( $file_name, 'w' ); //phpcs:ignore
+
+		Utils\write_csv( $file_resource, $redirects, $fields );
+
+		WP_CLI::success( sprintf( 'Redirects exported to csv file %s', $file_name ) );
 	}
 }

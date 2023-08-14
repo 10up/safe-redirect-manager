@@ -2,9 +2,9 @@
 Contributors:      10up, tlovett1, tollmanz, taylorde, jakemgold, danielbachhuber, VentureBeat, jeffpaul
 Tags:              http redirects, redirect manager, url redirection, safe http redirection, multisite redirects, redirects
 Requires at least: 5.7
-Tested up to:      6.1
+Tested up to:      6.2
 Requires PHP:      7.4
-Stable tag:        1.11.1
+Stable tag:        2.0.1
 License:           GPLv2 or later
 License URI:       http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -27,6 +27,7 @@ There are no overarching settings for this plugin. To manage redirects, navigate
 Each redirect contains a few fields that you can utilize:
 
 === "Redirect From" ===
+
 This should be a path relative to the root of your WordPress installation. When someone visits your site with a path that matches this one, a redirect will occur. If your site is located at `http://example.com/wp/` and you wanted to redirect `http://example.com/wp/about` to `http://example.com`, your "Redirect From" would be `/about`.
 
 Clicking the "Enable Regex" checkbox allows you to use regular expressions in your path. There are many [great tutorials](http://www.regular-expressions.info) on regular expressions.
@@ -34,9 +35,11 @@ Clicking the "Enable Regex" checkbox allows you to use regular expressions in yo
 You can also use wildcards in your "Redirect From" paths. By adding an `*` at the end of a URL, your redirect will match any request that starts with your "Redirect From". Wildcards support replacements. This means if you have a wildcard in your from path that matches a string, you can have that string replace a wildcard character in your "Redirect To" path. For example, if your "Redirect From" is `/test/*`, your "Redirect To" is `http://google.com/*`, and the requested path is `/test/string`, the user would be redirect to `http://google.com/string`.
 
 === "Redirect To" ===
+
 This should be a path (i.e. `/test`) or a URL (i.e. `http://example.com/wp/test`). If a requested path matches "Redirect From", they will be redirected here. "Redirect To" supports wildcard and regular expression replacements.
 
 === "HTTP Status Code" ===
+
 [HTTP status codes](http://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html) are numbers that contain information about a request (i.e. whether it was successful, unauthorized, not found, etc). You should almost always use either 302 (temporarily moved) or 301 (permanently moved).
 
 *Note:*
@@ -45,8 +48,39 @@ This should be a path (i.e. `/test`) or a URL (i.e. `http://example.com/wp/test`
 * By default the plugin only allows at most 1000 redirects to prevent performance issues. There is a filter `srm_max_redirects` that you can utilize to up this number.
 * "Redirect From" and requested paths are case insensitive by default.
 * Developers can use `srm_additional_status_codes` filter to add status codes if needed.
+* Rules set with 403 and 410 status codes are handled by applying the HTTP status code and render the default WordPress `wp_die` screen with an optional message.
+* Rules set with a 404 status code will apply the status code and render the 404 template.
 
 == Changelog ==
+
+= 2.0.1 - 2023-06-01 =
+* **Fixed:** Ensure our E2E tests run (props [@Sidsector9](https://github.com/Sidsector9), [@iamdharmesh](https://github.com/iamdharmesh) via [#318](https://github.com/10up/safe-redirect-manager/pull/318)).
+* **Fixed:** Ensure the `message` array key exists before we use it (props [@dkotter](https://github.com/dkotter), [@ocean90](https://github.com/ocean90), [@peterwilsoncc](https://github.com/peterwilsoncc) via [#319](https://github.com/10up/safe-redirect-manager/pull/319)).
+* **Fixed:** Resolve deprecation notices in PHP 8.1 and later (props [@peterwilsoncc](https://github.com/peterwilsoncc), [@dkotter](https://github.com/dkotter) via [#322](https://github.com/10up/safe-redirect-manager/pull/322)).
+
+= 2.0.0 - 2023-05-31 =
+**Note that this version bumps the PHP minimum from 5.6 to 7.4 and the WordPress minimum from 4.6 to 5.7.**
+
+* **Added:** Handling of 403, 404, and 410 status codes (props [@nateconley](https://github.com/nateconley), [@cadic](https://github.com/cadic), [@dkotter](https://github.com/dkotter), [@Sidsector9](https://github.com/Sidsector9), [@helen](https://github.com/helen), [@dinhtungdu](https://github.com/dinhtungdu), [@dustinrue](https://github.com/dustinrue), [@ciprianimike](https://github.com/ciprianimike), [@jeffpaul](https://github.com/jeffpaul), [@aosmichenko](https://github.com/aosmichenko), [@okadots](https://github.com/okadots) via [#300](https://github.com/10up/safe-redirect-manager/pull/300)).
+* **Added:** Support for adding notes when importing redirects (props [@barryceelen](https://github.com/barryceelen), [@cadic](https://github.com/cadic), [@jayedul](https://github.com/jayedul) via [#277](https://github.com/10up/safe-redirect-manager/pull/277)).
+* **Added:** "Build release zip" GitHub Action (props [@iamdharmesh](https://github.com/iamdharmesh), [@cadic](https://github.com/cadic), [@faisal-alvi](https://github.com/faisal-alvi) via [#293](https://github.com/10up/safe-redirect-manager/pull/293)).
+* **Added:** GitHub Action summary added Cypress test report (props [@jayedul](https://github.com/jayedul), [@peterwilsoncc](https://github.com/peterwilsoncc), [@iamdharmesh](https://github.com/iamdharmesh) via [#314](https://github.com/10up/safe-redirect-manager/pull/314)).
+* **Added:** - Dependency review Github action (props [@jeffpaul](https://github.com/jeffpaul), [@Sidsector9](https://github.com/Sidsector9) via [#317](https://github.com/10up/safe-redirect-manager/pull/317)).
+* **Changed:** Bumped PHP minimum supported version from 5.6 to 7.4 (props [@csloisel](https://github.com/csloisel), [@dkotter](https://github.com/dkotter), [@vikrampm1](https://github.com/vikrampm1) via [#289](https://github.com/10up/safe-redirect-manager/pull/289)).
+* **Changed:** Bumped WordPress minimum supported version from 4.6 to 5.7 (props [@csloisel](https://github.com/csloisel), [@dkotter](https://github.com/dkotter), [@vikrampm1](https://github.com/vikrampm1) via [#289](https://github.com/10up/safe-redirect-manager/pull/289)).
+* **Changed:** Bumped PHPCS compat script to use 7.4 as test version (props [@csloisel](https://github.com/csloisel), [@dkotter](https://github.com/dkotter), [@vikrampm1](https://github.com/vikrampm1) via [#289](https://github.com/10up/safe-redirect-manager/pull/289)).
+* **Changed:** Bumped WordPress "test up to" version 6.2 (props [@csloisel](https://github.com/csloisel), [@jayedul](https://github.com/jayedul) via [#290](https://github.com/10up/safe-redirect-manager/pull/290), [#310](https://github.com/10up/safe-redirect-manager/pull/310)).
+* **Changed:** Cypress integration migrated from 9.5.2 to 11.2.0 (props [@jayedul](https://github.com/jayedul), [@cadic](https://github.com/cadic), [@Sidsector9](https://github.com/Sidsector9), [@iamdharmesh](https://github.com/iamdharmesh) via [#295](https://github.com/10up/safe-redirect-manager/pull/295)).
+* **Changed:** Run E2E tests on the ZIP generated by "Build release zip" GitHub Action (props [@jayedul](https://github.com/jayedul), [@cadic](https://github.com/cadic), [@iamdharmesh](https://github.com/iamdharmesh), [@dkotter](https://github.com/dkotter) via [#306](https://github.com/10up/safe-redirect-manager/pull/306), [#311](https://github.com/10up/safe-redirect-manager/pull/311)).
+* **Changed:** Status code dropdown is now sorted numerically (props [@norcross](https://github.com/norcross), [@Sidsector9](https://github.com/Sidsector9) via [#307](https://github.com/10up/safe-redirect-manager/pull/307)).
+* **Removed:** PHP versions < 7.4 from phpunit tests (props [@csloisel](https://github.com/csloisel), [@dkotter](https://github.com/dkotter), [@vikrampm1](https://github.com/vikrampm1) via [#289](https://github.com/10up/safe-redirect-manager/pull/289)).
+* **Fixed:** Check non-active multisite directory against the main site redirects (props [@phpbits](https://github.com/phpbits), [@dinhtungdu](https://github.com/dinhtungdu), [@ciprianimike](https://github.com/ciprianimike), [@gsarig](https://github.com/gsarig), [@Sidsector9](https://github.com/Sidsector9), [@davidegreenwald](https://github.com/davidegreenwald), [@turtlepod](https://github.com/turtlepod) via [#248](https://github.com/10up/safe-redirect-manager/pull/248)).
+* **Fixed:** Regex redirects without leading `/` are buggy (props [@dhanendran](https://github.com/dhanendran), [@peterwilsoncc](https://github.com/peterwilsoncc) via [#279](https://github.com/10up/safe-redirect-manager/pull/279)).
+* **Fixed:** Issue with `srm_additional_status_codes` filter hook (props [@Sidsector9](https://github.com/Sidsector9), [@faisal-alvi](https://github.com/faisal-alvi) via [#312](https://github.com/10up/safe-redirect-manager/pull/312)).
+* **Security:** Bump `got` from 10.7.0 to 11.8.5 (props [@dependabot](https://github.com/apps/dependabot), [@peterwilsoncc](https://github.com/peterwilsoncc) via [#286](https://github.com/10up/safe-redirect-manager/pull/286)).
+* **Security:** Bump `@wordpress/env` from 4.9.0 to 5.3.0 (props [@dependabot](https://github.com/apps/dependabot), [@peterwilsoncc](https://github.com/peterwilsoncc) via [#286](https://github.com/10up/safe-redirect-manager/pull/286)).
+* **Security:** Bump `simple-git` from 3.9.0 to 3.16.0 (props [@dependabot](https://github.com/apps/dependabot), [@Sidsector9](https://github.com/Sidsector9), [@peterwilsoncc](https://github.com/peterwilsoncc) via [#294](https://github.com/10up/safe-redirect-manager/pull/294), [#302](https://github.com/10up/safe-redirect-manager/pull/302)).
+* **Security:** Bump `http-cache-semantics` from 4.1.0 to 4.1.1 (props [@dependabot](https://github.com/apps/dependabot), [@peterwilsoncc](https://github.com/peterwilsoncc) via [#305](https://github.com/10up/safe-redirect-manager/pull/305)).
 
 = 1.11.1 - 2022-09-28 =
 * **Added:** Indicate plugin as the source of redirects (props [@peterwilsoncc](https://github.com/peterwilsoncc), [@Sidsector9](https://github.com/Sidsector9) via [#281](https://github.com/10up/safe-redirect-manager/pull/281)).
@@ -187,3 +221,8 @@ This should be a path (i.e. `/test`) or a URL (i.e. `http://example.com/wp/test`
 
 = 1.0 - 2012-08-27 =
 *   Plugin released
+
+== Upgrade Notice ==
+
+= 2.0.0 =
+Note that this version bumps the PHP minimum from 5.6 to 7.4 and the WordPress minimum from 4.6 to 5.7.

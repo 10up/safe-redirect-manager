@@ -2,6 +2,7 @@
 	$( function() {
 		const publishBtn = $('#publish');
 		const fromRule = $('#srm_redirect_rule_from');
+		const toRule = $('#srm_redirect_rule_to');
 
 		fromRule.change(function(el) {
 			publishBtn.prop('disabled', true);
@@ -23,5 +24,77 @@
 				}
 			});
 		});
+
+		// Show autocomplete for the 'Redirect To:' field.
+		toRule.autocomplete({
+			minLength: 2,
+			classes: {
+				"ui-autocomplete": "srm-autocomplete"
+			},
+			source: function(request, response) {
+				$.ajax({
+					dataType: 'json',
+					url: redirectValidation.ajax_url,
+					data: {
+						term: request.term,
+						action: 'srm_autocomplete',
+						security: redirectValidation.ajax_nonce
+					},
+					success: function(data) {
+						response(data);
+					}
+				});
+			},
+			select: function( event, ui ) {
+				toRule.val( ui.item.relative_url );
+				return false;
+			}
+		})
+		.autocomplete("instance")._renderItem = function (ul, item) {
+			return $(`<li class="srm-autocomplete__item">`)
+				.append(`
+					<div class="srm-autocomplete__item-title">${item.post_title}</div>
+					<div class="srm-autocomplete__item-url">${item.relative_url}</div>
+					<div class="srm-autocomplete__item-type">${item.post_type}</div>
+				`)
+				.appendTo(ul);
+		};
+
+		// Disable the 'Redirect To:' field if a 4xx status code is set.
+		const statusSelect = $('#srm_redirect_rule_status_code');
+		const disabledMessage = $('#srm_to_disabled_message');
+
+		statusSelect.change(maybeDisableToRule);
+		maybeDisableToRule();
+
+		function maybeDisableToRule() {
+			const status = Number.parseInt(statusSelect.val());
+			if ([403, 404, 410].includes(status)) {
+				toRule.prop('disabled', 'disabled');
+				disabledMessage.show();
+			} else {
+				toRule.prop('disabled', '');
+				disabledMessage.hide();
+			}
+		}
+
+		// Disable and hide the 'Message' field unless 403 or 410 is selected.
+		const messageContainer = $('#srm_redirect_rule_message_container');
+		const message = $('#srm_redirect_rule_message');
+
+		statusSelect.change(maybeHideMessage);
+		maybeHideMessage();
+
+		function maybeHideMessage() {
+			const status = Number.parseInt(statusSelect.val());
+			if ([403, 410].includes(status)) {
+				message.prop('disabled', '');
+				messageContainer.show();
+			} else {
+				message.prop('disabled', 'disabled');
+				messageContainer.hide();
+			}
+		}
+
 	} );
 }( jQuery ) );

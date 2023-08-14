@@ -1,6 +1,6 @@
 {
   "name": "safe-redirect-manager",
-  "version": "1.11.1",
+  "version": "2.0.1",
   "description": "Easily and safely manage HTTP redirects.",
   "homepage": "https://github.com/10up/safe-redirect-manager",
   "bugs": {
@@ -18,11 +18,12 @@
     "url": "https://github.com/10up/safe-redirect-manager"
   },
   "dependencies": {
+    "cypress-mochawesome-reporter": "^3.4.0",
     "node-wp-i18n": "^1.2.5"
   },
   "scripts": {
-    "cypress:open": "cypress open --config-file tests/cypress/config.json",
-    "cypress:run": "cypress run --config-file tests/cypress/config.json",
+    "cypress:open": "cypress open --config-file tests/cypress/config.config.js",
+    "cypress:run": "cypress run --config-file tests/cypress/config.config.js",
     "env": "wp-env",
     "env:start": "wp-env start",
     "env:stop": "wp-env stop",
@@ -31,6 +32,6 @@
   "devDependencies": {
     "@10up/cypress-wp-utils": "github:10up/cypress-wp-utils#build",
     "@wordpress/env": "^5.3.0",
-    "cypress": "^9.5.2"
+    "cypress": "^11.2.0"
   }
 }
