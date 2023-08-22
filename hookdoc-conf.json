@@ -1,0 +1,11 @@
+{
+    "opts": {
+        "template": "node_modules/wp-hookdoc/template"
+    },
+    "source": {
+        "includePattern": ".+\\.(php|inc)?$"
+    },
+    "plugins": [
+        "node_modules/wp-hookdoc/plugin"
+    ]
+}
