@@ -357,6 +357,7 @@ function srm_import_file( $file, $args ) {
 	/**
 	 * Import file arguments
 	 *
+	 * @hook srm_import_file_args
 	 * @param {array} $file_arguments File arguments.
 	 * @returns {array} Filtered file arguments.
 	 */
@@ -449,6 +450,7 @@ function srm_get_max_redirects() {
 	/**
 	 * Filter maximum supported redirects.
 	 *
+	 * @hook srm_max_redirects
 	 * @param {int} $max_redirect Maximum supported redirects. Default is `1000`.
 	 * @returns {int} Maximum supported redirects.
 	 */

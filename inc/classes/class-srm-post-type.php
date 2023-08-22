@@ -232,7 +232,9 @@ class SRM_Post_Type {
 			/**
 			 * Filter whether possible redirect loop checking is enabled or not.
 			 *
-			 * @param bool $check_possible_loop Whether to check for redirect loops. Default false.
+			 * @hook srm_check_for_possible_redirect_loops
+			 * @param {bool} $check_possible_loop Whether to check for redirect loops. Default false.
+			 * @returns {bool} Bool to check for redirect loops.
 			 */
 			$possible_loop = apply_filters( 'srm_check_for_possible_redirect_loops', false );
 
@@ -491,7 +493,9 @@ class SRM_Post_Type {
 		/**
 		 * Filter the capability required to manage redirects.
 		 *
-		 * @param string $redirect_capability The required capability. Default `srm_manage_redirects`.
+		 * @hook srm_restrict_to_capability
+		 * @param {string} $redirect_capability The required capability. Default `srm_manage_redirects`.
+		 * @returns {string} The required capability.
 		 */
 		return apply_filters( 'srm_restrict_to_capability', $redirect_capability );
 	}
@@ -590,7 +594,9 @@ class SRM_Post_Type {
 			 *
 			 * @see https://developer.mozilla.org/en-US/docs/Web/HTTP/Redirections
 			 *
-			 * @param int $default_status_code Default redirect statues. Default value `302`.
+			 * @hook srm_default_direct_status
+			 * @param {int} $default_status_code Default redirect status. Default value `302`.
+			 * @returns {int} Redirect status.
 			 */
 			$status_code = apply_filters( 'srm_default_direct_status', 302 );
 		}
