@@ -739,8 +739,8 @@ class SRM_Post_Type {
 				'redirectjs',
 				'redirectValidation',
 				array(
-					'urlError' => __( 'There are some issues validating the URL. Please try again.', 'safe-redirect-manager' ),
-					'fail'     => __( 'There is an existing redirect with the same Redirect From URL. You may <a href="%s">Edit</a> the redirect or try other `from` URL.', 'safe-redirect-manager' ),
+					'urlError'   => __( 'There are some issues validating the URL. Please try again.', 'safe-redirect-manager' ),
+					'fail'       => __( 'There is an existing redirect with the same Redirect From URL. You may <a href="%s">Edit</a> the redirect or try other `from` URL.', 'safe-redirect-manager' ),
 					'ajax_url'   => admin_url( 'admin-ajax.php' ),
 					'ajax_nonce' => wp_create_nonce( 'srm_autocomplete_nonce' ),
 				)

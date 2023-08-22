@@ -111,6 +111,7 @@ function srm_max_redirects_reached() {
 function srm_get_valid_status_codes() {
 	/**
 	 * Valid status codes to redirect with.
+	 *
 	 * @hook srm_valid_status_codes
 	 * @param {array} $status_codes Valid status codes to redirect with. Default array( 301, 302, 303, 307, 403, 404, 410 ) and other codes returned by `srm_additional_status_codes` filter hook.
 	 * @returns {array} Filtered valid status codes.
