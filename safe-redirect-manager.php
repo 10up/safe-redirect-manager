@@ -19,6 +19,7 @@
 require_once dirname( __FILE__ ) . '/inc/functions.php';
 require_once dirname( __FILE__ ) . '/inc/classes/class-srm-post-type.php';
 require_once dirname( __FILE__ ) . '/inc/classes/class-srm-redirect.php';
+require_once dirname( __FILE__ ) . '/inc/classes/class-srm-loop-detection.php';
 
 define( 'SRM_VERSION', '2.0.1' );
 
