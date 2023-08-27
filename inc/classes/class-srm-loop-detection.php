@@ -78,27 +78,25 @@ class SRM_Loop_Detection {
 	 * @param string $vertex       Node in the graph that holds URL of source or destination.
 	 * @param array  $visited      Array of nodes visited during traversal.
 	 * @param array  $current_path Array of paths traversed.
+	 * @param array  $cycle_source Array of starting point of detected cycles.
 	 *
-	 * @return boolean
+	 * @return void
 	 */
-	private static function has_cycle_recursive( $graph, $vertex, &$visited, &$current_path ) {
+	private static function has_cycle_recursive( $graph, $vertex, &$visited, &$current_path, &$cycle_source ) {
 		$visited[ $vertex ]      = true;
 		$current_path[ $vertex ] = true;
 
 		if ( isset( $graph[ $vertex ] ) ) {
 			foreach ( $graph[ $vertex ] as $neighbor ) {
 				if ( ! isset( $visited[ $neighbor ] ) ) {
-					if ( self::has_cycle_recursive( $graph, $neighbor, $visited, $current_path ) ) {
-						return true;
-					}
+					self::has_cycle_recursive( $graph, $neighbor, $visited, $current_path, $cycle_source );
 				} elseif ( isset( $current_path[ $neighbor ] ) ) {
-					return true;
+					$cycle_source[] = $neighbor;
 				}
 			}
 		}
 
 		unset( $current_path[ $vertex ] );
-		return false;
 	}
 
 	/**
@@ -110,15 +108,32 @@ class SRM_Loop_Detection {
 		$graph        = self::get_directed_graph();
 		$visited      = array();
 		$current_path = array();
+		$cycle_source = array();
 
 		foreach ( $graph as $vertex => $destinations ) {
 			if ( ! isset( $visited[ $vertex ] ) ) {
-				if ( self::has_cycle_recursive( $graph, $vertex, $visited, $current_path ) ) {
-					return true;
+				if ( self::has_cycle_recursive( $graph, $vertex, $visited, $current_path, $cycle_source ) ) {
+					return $cycle_source;
 				}
 			}
 		}
 
-		return false;
+		return $cycle_source;
+	}
+
+	/**
+	 * Returns an array of "Redirect From" values that are the starting vertices of redirect loops.
+	 *
+	 * @param array $cycle_source Array of redirect loops.
+	 *
+	 * @return array
+	 */
+	public static function get_cycle_source( $cycle_source = array() ) {
+		return array_map(
+			function( $source ) {
+				return wp_parse_url( esc_url( $source ), PHP_URL_PATH );
+			},
+			$cycle_source
+		);
 	}
 }

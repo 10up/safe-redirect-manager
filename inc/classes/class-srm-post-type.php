@@ -231,14 +231,23 @@ class SRM_Post_Type {
 		if ( $this->is_plugin_page() ) {
 
 			/**
-			 * check_for_possible_redirect_loops() runs in best case Theta(n^2) so if you have 100 redirects, this method
-			 * will be running slow. Let's disable it by default.
+			 * Hook to toggle check for redirect loop.
+			 *
+			 * @param boolean $enable_loop_detection Detects redirect loop if true.
 			 */
-			if ( apply_filters( 'srm_check_for_possible_redirect_loops', false ) ) {
-				if ( SRM_Loop_Detection::detect_redirect_loops() ) {
+			if ( apply_filters( 'srm_check_for_possible_redirect_loops', true ) ) {
+				$cycle_source = SRM_Loop_Detection::detect_redirect_loops();
+				$paths        = SRM_Loop_Detection::get_cycle_source( $cycle_source );
+
+				if ( ! empty( $cycle_source ) ) {
 					?>
 					<div class="notice notice-warning">
-						<p><?php esc_html_e( 'Safe Redirect Manager Warning: Possible redirect loops and/or chains have been created.', 'safe-redirect-manager' ); ?></p>
+						<p><?php esc_html_e( 'Safe Redirect Manager Warning: The following redirects with the "Redirect From" value have been detected as a starting point of redirect chain/loops.', 'safe-redirect-manager' ); ?></p>
+						<ul style="list-style: inside;">
+							<?php foreach ( $paths as $path ) : ?>
+								<li><?php echo esc_html( $path ); ?></li>
+							<?php endforeach; ?>
+						</ul style>
 					</div>
 					<?php
 				}
