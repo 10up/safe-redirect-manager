@@ -242,10 +242,18 @@ class SRM_Post_Type {
 				if ( ! empty( $cycle_source ) ) {
 					?>
 					<div class="notice notice-warning">
-						<p><?php esc_html_e( 'Safe Redirect Manager Warning: The following redirects with the "Redirect From" value have been detected as a starting point of redirect chain/loops.', 'safe-redirect-manager' ); ?></p>
+						<p><?php esc_html_e( 'Safe Redirect Manager Warning: The following redirects with the "Redirect To" value have created redirect chain/loops.', 'safe-redirect-manager' ); ?></p>
 						<ul style="list-style: inside;">
 							<?php foreach ( $paths as $path ) : ?>
-								<li><?php echo esc_html( $path ); ?></li>
+								<li>
+								<?php
+									printf(
+										'<a href="%s">%s</a>',
+										esc_url( get_edit_post_link( esc_html( $path['id'] ) ) ),
+										esc_html( $path['path'] )
+									);
+								?>
+								</li>
 							<?php endforeach; ?>
 						</ul style>
 					</div>
@@ -719,8 +727,8 @@ class SRM_Post_Type {
 				'redirectjs',
 				'redirectValidation',
 				array(
-					'urlError' => __( 'There are some issues validating the URL. Please try again.', 'safe-redirect-manager' ),
-					'fail'     => __( 'There is an existing redirect with the same Redirect From URL. You may <a href="%s">Edit</a> the redirect or try other `from` URL.', 'safe-redirect-manager' ),
+					'urlError'   => __( 'There are some issues validating the URL. Please try again.', 'safe-redirect-manager' ),
+					'fail'       => __( 'There is an existing redirect with the same Redirect From URL. You may <a href="%s">Edit</a> the redirect or try other `from` URL.', 'safe-redirect-manager' ),
 					'ajax_url'   => admin_url( 'admin-ajax.php' ),
 					'ajax_nonce' => wp_create_nonce( 'srm_autocomplete_nonce' ),
 				)

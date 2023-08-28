@@ -62,7 +62,10 @@ class SRM_Loop_Detection {
 				}
 
 				// Add an edge from the source URL to the destination URL.
-				$graph[ $source_url ][] = $destination_url;
+				$graph[ $source_url ][] = array(
+					'id'          => $redirect['ID'],
+					'destination' => $destination_url,
+				);
 			}
 		}
 
@@ -88,9 +91,9 @@ class SRM_Loop_Detection {
 
 		if ( isset( $graph[ $vertex ] ) ) {
 			foreach ( $graph[ $vertex ] as $neighbor ) {
-				if ( ! isset( $visited[ $neighbor ] ) ) {
-					self::has_cycle_recursive( $graph, $neighbor, $visited, $current_path, $cycle_source );
-				} elseif ( isset( $current_path[ $neighbor ] ) ) {
+				if ( ! isset( $visited[ $neighbor['destination'] ] ) ) {
+					self::has_cycle_recursive( $graph, $neighbor['destination'], $visited, $current_path, $cycle_source );
+				} elseif ( isset( $current_path[ $neighbor['destination'] ] ) ) {
 					$cycle_source[] = $neighbor;
 				}
 			}
@@ -131,7 +134,10 @@ class SRM_Loop_Detection {
 	public static function get_cycle_source( $cycle_source = array() ) {
 		return array_map(
 			function( $source ) {
-				return wp_parse_url( esc_url( $source ), PHP_URL_PATH );
+				return array(
+					'path' => wp_parse_url( esc_url( $source['destination'] ), PHP_URL_PATH ),
+					'id'   => $source['id'],
+				);
 			},
 			$cycle_source
 		);
