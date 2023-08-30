@@ -1,4 +1,4 @@
-# Welcome to the Safe Redirect Manager Plugin Hook Documentation
+# Safe Redirect Manager Developer Documentation
 
 This resource is generated documentation on actions and filters found in the Safe Redirect Manager plugin. Use the sidebar to browse and navigate.
 
