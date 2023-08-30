@@ -229,7 +229,6 @@ class SRM_Post_Type {
 	public function action_redirect_chain_alert() {
 		global $hook_suffix;
 		if ( $this->is_plugin_page() ) {
-
 			/**
 			 * Filter whether possible redirect loop checking is enabled or not.
 			 *
@@ -237,17 +236,29 @@ class SRM_Post_Type {
 			 * @param {bool} $check_possible_loop Whether to check for redirect loops. Default false.
 			 * @returns {bool} Bool to check for redirect loops.
 			 */
-			$possible_loop = apply_filters( 'srm_check_for_possible_redirect_loops', false );
+			$possible_loop = apply_filters( 'srm_check_for_possible_redirect_loops', true );
 
-			/**
-			 * check_for_possible_redirect_loops() runs in best case Theta(n^2) so if you have 100 redirects, this method
-			 * will be running slow. Let's disable it by default.
-			 */
 			if ( $possible_loop ) {
-				if ( SRM_Loop_Detection::detect_redirect_loops() ) {
+				$cycle_source = SRM_Loop_Detection::detect_redirect_loops();
+				$paths        = SRM_Loop_Detection::get_cycle_source( $cycle_source );
+
+				if ( ! empty( $cycle_source ) ) {
 					?>
 					<div class="notice notice-warning">
-						<p><?php esc_html_e( 'Safe Redirect Manager Warning: Possible redirect loops and/or chains have been created.', 'safe-redirect-manager' ); ?></p>
+						<p><?php esc_html_e( 'Safe Redirect Manager Warning: The following redirects with the "Redirect To" value have created redirect chain/loops.', 'safe-redirect-manager' ); ?></p>
+						<ul style="list-style: inside;">
+							<?php foreach ( $paths as $path ) : ?>
+								<li>
+								<?php
+									printf(
+										'<a href="%s">%s</a>',
+										esc_url( get_edit_post_link( esc_html( $path['id'] ) ) ),
+										esc_html( $path['path'] )
+									);
+								?>
+								</li>
+							<?php endforeach; ?>
+						</ul style>
 					</div>
 					<?php
 				}
