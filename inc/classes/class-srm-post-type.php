@@ -233,7 +233,7 @@ class SRM_Post_Type {
 			 * Filter whether possible redirect loop checking is enabled or not.
 			 *
 			 * @hook srm_check_for_possible_redirect_loops
-			 * @param {bool} $check_possible_loop Whether to check for redirect loops. Default false.
+			 * @param {bool} $check_possible_loop Whether to check for redirect loops. Default true.
 			 * @returns {bool} Bool to check for redirect loops.
 			 */
 			$possible_loop = apply_filters( 'srm_check_for_possible_redirect_loops', true );
