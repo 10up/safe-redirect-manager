@@ -1,0 +1,25 @@
+name: Build Docs
+on:
+  push:
+    branches:
+    - trunk
+jobs:
+  release:
+    name: Publish Docs
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v3
+    - name: Set Node.js 16.x
+      uses: actions/setup-node@v3
+      with:
+        node-version: 16.x
+    - name: Install dependencies
+      run: npm install
+    - name: Build docs
+      run: npm run build:docs
+    - name: Deploy docs update
+      uses: peaceiris/actions-gh-pages@v3
+      with:
+        github_token: ${{ secrets.GITHUB_TOKEN }}
+        publish_dir: './docs-built'

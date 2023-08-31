@@ -17,3 +17,4 @@
 /phpcs.xml export-ignore
 /phpunit.xml.dist export-ignore
 /README.md export-ignore
+/hookdoc-conf.json export-ignore

@@ -229,13 +229,16 @@ class SRM_Post_Type {
 	public function action_redirect_chain_alert() {
 		global $hook_suffix;
 		if ( $this->is_plugin_page() ) {
-
 			/**
-			 * Hook to toggle check for redirect loop.
+			 * Filter whether possible redirect loop checking is enabled or not.
 			 *
-			 * @param boolean $enable_loop_detection Detects redirect loop if true.
+			 * @hook srm_check_for_possible_redirect_loops
+			 * @param {bool} $check_possible_loop Whether to check for redirect loops. Default true.
+			 * @returns {bool} Bool to check for redirect loops.
 			 */
-			if ( apply_filters( 'srm_check_for_possible_redirect_loops', true ) ) {
+			$possible_loop = apply_filters( 'srm_check_for_possible_redirect_loops', true );
+
+			if ( $possible_loop ) {
 				$cycle_source = SRM_Loop_Detection::detect_redirect_loops();
 				$paths        = SRM_Loop_Detection::get_cycle_source( $cycle_source );
 
@@ -260,6 +263,7 @@ class SRM_Post_Type {
 					<?php
 				}
 			}
+
 			if ( srm_max_redirects_reached() ) {
 
 				if ( 'post-new.php' === $hook_suffix ) {
@@ -521,6 +525,13 @@ class SRM_Post_Type {
 			$role->add_cap( $redirect_capability );
 		}
 
+		/**
+		 * Filter the capability required to manage redirects.
+		 *
+		 * @hook srm_restrict_to_capability
+		 * @param {string} $redirect_capability The required capability. Default `srm_manage_redirects`.
+		 * @returns {string} The required capability.
+		 */
 		return apply_filters( 'srm_restrict_to_capability', $redirect_capability );
 	}
 
@@ -611,6 +622,18 @@ class SRM_Post_Type {
 		$redirect_message = get_post_meta( $post->ID, '_redirect_rule_message', true );
 
 		if ( empty( $status_code ) ) {
+			/**
+			 * Filter the default HTTP status code to redirect with.
+			 *
+			 * Which HTTP redirect code safe redirect manager should default to. This can
+			 * be overridden in the dashboard for each redirect.
+			 *
+			 * @see https://developer.mozilla.org/en-US/docs/Web/HTTP/Redirections
+			 *
+			 * @hook srm_default_direct_status
+			 * @param {int} $default_status_code Default redirect status. Default value `302`.
+			 * @returns {int} Redirect status.
+			 */
 			$status_code = apply_filters( 'srm_default_direct_status', 302 );
 		}
 

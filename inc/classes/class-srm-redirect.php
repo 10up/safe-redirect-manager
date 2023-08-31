@@ -45,8 +45,11 @@ class SRM_Redirect {
 		$this->multisite_checks();
 
 		/**
-		 * To only redirect on 404 pages, use:
-		 *   add_filter( 'srm_redirect_only_on_404', '__return_true' );
+		 * Filter whether to only redirect on 404 File Not Found pages.
+		 *
+		 * @hook srm_redirect_only_on_404
+		 * @param {bool} $404_redirects_only Whether to redirect file not found requests only. Default `false`.
+		 * @param {bool} Bool to redirect file not found requests.
 		 */
 		if ( apply_filters( 'srm_redirect_only_on_404', false ) ) {
 			add_action( 'template_redirect', array( $this, 'maybe_redirect' ), 0 );
@@ -105,10 +108,25 @@ class SRM_Redirect {
 			$requested_path = '/';
 		}
 
-		// Allow redirects to be filtered
+		/**
+		 * Filter registered redirects.
+		 *
+		 * Allows plugin developers to modify the available redirects.
+		 *
+		 * @hook srm_registered_redirects
+		 * @param {array} $redirects Redirects found for the redirect path.
+		 * @param {string} $requested_path Original path of the requested URL.
+		 * @returns {array} Redirects for the redirect path.
+		 */
 		$redirects = apply_filters( 'srm_registered_redirects', $redirects, $requested_path );
 
-		// Allow for case insensitive redirects
+		/**
+		 * Allow or disallow case insensitive redirects.
+		 *
+		 * @hook srm_case_insensitive_redirects
+		 * @param {bool} $case_insensitive Enable or disable case insensitive redirects. Default is `true` which means insensitive is enabled.
+		 * @returns {bool} Bool to enable or disable case insensitive redirects.
+		 */
 		$case_insensitive = apply_filters( 'srm_case_insensitive_redirects', true );
 
 		if ( $case_insensitive ) {
@@ -165,7 +183,13 @@ class SRM_Redirect {
 					$redirect_from = strtolower( $redirect_from );
 				}
 
-				// only compare query params if the $redirect_from value contains parameters
+				/**
+				 * Filter whether to compare only query params.
+				 *
+				 * @hook srm_match_query_params
+				 * @param {int} $matched_position The matched position of specific string in the URL. Default is the position of `?`.
+				 * @returns {int} The matched position of specific string in the URL.
+				 */
 				$match_query_params = apply_filters( 'srm_match_query_params', strpos( $redirect_from, '?' ) );
 
 				$to_match     = ( ! $match_query_params && ! empty( $normalized_requested_path_no_query ) ) ? $normalized_requested_path_no_query : $normalized_requested_path;
@@ -210,7 +234,15 @@ class SRM_Redirect {
 					$redirect_to .= '?' . $requested_query_params;
 				}
 
-				$sanitized_redirect_to = esc_url_raw( apply_filters( 'srm_redirect_to', $redirect_to ) );
+				/**
+				 * Filter the url to redirect to
+				 *
+				 * @hook srm_redirect_to
+				 * @param {string} $redirect_url Final URL to redirect to.
+				 * @returns {string} Final URL to redirect to.
+				 */
+				$filterd_redirect_to   = apply_filters( 'srm_redirect_to', $redirect_to );
+				$sanitized_redirect_to = esc_url_raw( $filterd_redirect_to );
 
 				return [
 					'redirect_to'  => $sanitized_redirect_to,
@@ -233,12 +265,26 @@ class SRM_Redirect {
 	 */
 	public function maybe_redirect() {
 
-		// Don't redirect unless not on admin. If 404 filter enabled, require query is a 404.
-		if ( is_admin() || ( apply_filters( 'srm_redirect_only_on_404', false ) && ! is_404() ) ) {
+		/**
+		 * Whether to redirect only on 404 error.
+		 *
+		 * @hook srm_redirect_only_on_404
+		 * @param {bool} $redirect_only_on_404 Whether to redirect only on 404 error. Default is `false`.
+		 * @returns {bool} Bool to redirect only on 404 error.
+		 */
+		$only_404 = apply_filters( 'srm_redirect_only_on_404', false );
+
+		if ( is_admin() || ( $only_404 && ! is_404() ) ) {
 			return;
 		}
 
-		// get requested path and add a / before it
+		/**
+		 * Filter requested path.
+		 *
+		 * @hook srm_requested_path
+		 * @param {string} $request_path Request path. Default `$_SERVER['REQUEST_URI']`.
+		 * @returns {string} Request path.
+		 */
 		$requested_path   = esc_url_raw( apply_filters( 'srm_requested_path', $_SERVER['REQUEST_URI'] ) );
 		$requested_path   = untrailingslashit( stripslashes( $requested_path ) );
 		$matched_redirect = $this->match_redirect( $requested_path );
@@ -265,6 +311,13 @@ class SRM_Redirect {
 
 		// Use default status code if an invalid value is set.
 		if ( ! in_array( $matched_redirect['status_code'], srm_get_valid_status_codes(), true ) ) {
+			/**
+			 * Default status code to redirect with
+			 *
+			 * @hook srm_default_direct_status
+			 * @param {int} The status code to redirect with. Default `302`.
+			 * @returns {int} The status code to redirect with.
+			 */
 			$matched_redirect['status_code'] = apply_filters( 'srm_default_direct_status', 302 );
 		}
 
