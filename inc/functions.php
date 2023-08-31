@@ -109,6 +109,13 @@ function srm_max_redirects_reached() {
  * @return array
  */
 function srm_get_valid_status_codes() {
+	/**
+	 * Valid status codes to redirect with.
+	 *
+	 * @hook srm_valid_status_codes
+	 * @param {array} $status_codes Valid status codes to redirect with. Default array( 301, 302, 303, 307, 403, 404, 410 ) and other codes returned by `srm_additional_status_codes` filter hook.
+	 * @returns {array} Filtered valid status codes.
+	 */
 	return apply_filters( 'srm_valid_status_codes', array_keys( srm_get_valid_status_codes_data() ) );
 }
 
@@ -129,6 +136,13 @@ function srm_get_valid_status_codes_data() {
 		410 => esc_html__( 'Gone', 'safe-redirect-manager' ),
 	);
 
+	/**
+	 * Include additional status codes as valid to redirect with.
+	 *
+	 * @hook srm_additional_status_codes
+	 * @param {array} $status_codes Status codes to add in valid array. Default is empty array.
+	 * @returns {array} Status codes.
+	 */
 	$additional_status_codes = apply_filters(
 		'srm_additional_status_codes',
 		array()
@@ -387,7 +401,13 @@ function srm_import_file( $file, $args ) {
 	$close_handle = false;
 	$doing_wp_cli = defined( 'WP_CLI' ) && WP_CLI;
 
-	// filter arguments
+	/**
+	 * Import file arguments
+	 *
+	 * @hook srm_import_file_args
+	 * @param {array} $file_arguments File arguments.
+	 * @returns {array} Filtered file arguments.
+	 */
 	$args = apply_filters( 'srm_import_file_args', $args );
 
 	// enable line endings auto detection
@@ -476,5 +496,12 @@ function srm_match_redirect( $path ) {
  * @return int
  */
 function srm_get_max_redirects() {
+	/**
+	 * Filter maximum supported redirects.
+	 *
+	 * @hook srm_max_redirects
+	 * @param {int} $max_redirect Maximum supported redirects. Default is `1000`.
+	 * @returns {int} Maximum supported redirects.
+	 */
 	return apply_filters( 'srm_max_redirects', 1000 );
 }

@@ -229,20 +229,41 @@ class SRM_Post_Type {
 	public function action_redirect_chain_alert() {
 		global $hook_suffix;
 		if ( $this->is_plugin_page() ) {
-
 			/**
-			 * check_for_possible_redirect_loops() runs in best case Theta(n^2) so if you have 100 redirects, this method
-			 * will be running slow. Let's disable it by default.
+			 * Filter whether possible redirect loop checking is enabled or not.
+			 *
+			 * @hook srm_check_for_possible_redirect_loops
+			 * @param {bool} $check_possible_loop Whether to check for redirect loops. Default true.
+			 * @returns {bool} Bool to check for redirect loops.
 			 */
-			if ( apply_filters( 'srm_check_for_possible_redirect_loops', false ) ) {
-				if ( SRM_Loop_Detection::detect_redirect_loops() ) {
+			$possible_loop = apply_filters( 'srm_check_for_possible_redirect_loops', true );
+
+			if ( $possible_loop ) {
+				$cycle_source = SRM_Loop_Detection::detect_redirect_loops();
+				$paths        = SRM_Loop_Detection::get_cycle_source( $cycle_source );
+
+				if ( ! empty( $cycle_source ) ) {
 					?>
 					<div class="notice notice-warning">
-						<p><?php esc_html_e( 'Safe Redirect Manager Warning: Possible redirect loops and/or chains have been created.', 'safe-redirect-manager' ); ?></p>
+						<p><?php esc_html_e( 'Safe Redirect Manager Warning: The following redirects with the "Redirect To" value have created redirect chain/loops.', 'safe-redirect-manager' ); ?></p>
+						<ul style="list-style: inside;">
+							<?php foreach ( $paths as $path ) : ?>
+								<li>
+								<?php
+									printf(
+										'<a href="%s">%s</a>',
+										esc_url( get_edit_post_link( esc_html( $path['id'] ) ) ),
+										esc_html( $path['path'] )
+									);
+								?>
+								</li>
+							<?php endforeach; ?>
+						</ul style>
 					</div>
 					<?php
 				}
 			}
+
 			if ( srm_max_redirects_reached() ) {
 
 				if ( 'post-new.php' === $hook_suffix ) {
@@ -504,6 +525,13 @@ class SRM_Post_Type {
 			$role->add_cap( $redirect_capability );
 		}
 
+		/**
+		 * Filter the capability required to manage redirects.
+		 *
+		 * @hook srm_restrict_to_capability
+		 * @param {string} $redirect_capability The required capability. Default `srm_manage_redirects`.
+		 * @returns {string} The required capability.
+		 */
 		return apply_filters( 'srm_restrict_to_capability', $redirect_capability );
 	}
 
@@ -594,6 +622,18 @@ class SRM_Post_Type {
 		$redirect_message = get_post_meta( $post->ID, '_redirect_rule_message', true );
 
 		if ( empty( $status_code ) ) {
+			/**
+			 * Filter the default HTTP status code to redirect with.
+			 *
+			 * Which HTTP redirect code safe redirect manager should default to. This can
+			 * be overridden in the dashboard for each redirect.
+			 *
+			 * @see https://developer.mozilla.org/en-US/docs/Web/HTTP/Redirections
+			 *
+			 * @hook srm_default_direct_status
+			 * @param {int} $default_status_code Default redirect status. Default value `302`.
+			 * @returns {int} Redirect status.
+			 */
 			$status_code = apply_filters( 'srm_default_direct_status', 302 );
 		}
 
@@ -710,8 +750,8 @@ class SRM_Post_Type {
 				'redirectjs',
 				'redirectValidation',
 				array(
-					'urlError' => __( 'There are some issues validating the URL. Please try again.', 'safe-redirect-manager' ),
-					'fail'     => __( 'There is an existing redirect with the same Redirect From URL. You may <a href="%s">Edit</a> the redirect or try other `from` URL.', 'safe-redirect-manager' ),
+					'urlError'   => __( 'There are some issues validating the URL. Please try again.', 'safe-redirect-manager' ),
+					'fail'       => __( 'There is an existing redirect with the same Redirect From URL. You may <a href="%s">Edit</a> the redirect or try other `from` URL.', 'safe-redirect-manager' ),
 					'ajax_url'   => admin_url( 'admin-ajax.php' ),
 					'ajax_nonce' => wp_create_nonce( 'srm_autocomplete_nonce' ),
 				)
