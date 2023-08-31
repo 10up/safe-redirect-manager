@@ -4,6 +4,33 @@ All notable changes to this project will be documented in this file, per [the Ke
 
 ## [Unreleased] - TBD
 
+## [2.1.0] - TBD
+
+### Added
+- WP-CLI command export to exporting redirects into a CSV file. (props [@zamanq](https://github.com/zamanq), [@jeffpaul](https://github.com/jeffpaul), [@Sidsector9](https://github.com/Sidsector9) via [#299](https://github.com/10up/safe-redirect-manager/pull/299)).
+- Admin settings to set custom redirect protocol per route (props [@tlovett1](https://github.com/tlovett1), [@danielbachhuber](https://github.com/danielbachhuber), [@benoitchantre](https://github.com/benoitchantre), [@jayedul](https://github.com/jayedul), [@Sidsector9](https://github.com/Sidsector9) via [#301](https://github.com/10up/safe-redirect-manager/pull/301)).
+- Autocomplete to the "Redirect To" field via (props [@tlovett1](https://github.com/tlovett1), [@bmarshall511](https://github.com/bmarshall511), [@ravinderk](https://github.com/ravinderk)).
+- Allow existing import records to be updated vs. skipped (props [@retlehs](https://github.com/retlehs), [@bmarshall511](https://github.com/bmarshall511), [@dkotter](https://github.com/dkotter) via [#329](https://github.com/10up/safe-redirect-manager/pull/329)).
+
+### Changed
+- [Support Level](https://github.com/10up/safe-redirect-manager#support-level) from Active to Stable (props [@jeffpaul](https://github.com/jeffpaul), [@Sidsector9](https://github.com/Sidsector9), [@peterwilsoncc](https://github.com/peterwilsoncc) via [#303](https://github.com/10up/safe-redirect-manager/pull/303)).
+- Missing Docblocks for filter hooks (props [@peterwilsoncc](https://github.com/peterwilsoncc), [@jayedul](https://github.com/jayedul), [@dkotter](https://github.com/dkotter), [@faisal-alvi](https://github.com/faisal-alvi), [@iamdharmesh](https://github.com/iamdharmesh) via [#313](https://github.com/10up/safe-redirect-manager/pull/313)).
+- Removed `post_status` property from redirects data to reduce the number of queries in half (props [@tlovett1](https://github.com/tlovett1), [@pdclark](https://github.com/pdclark), [@mehul0810](https://github.com/mehul0810), [@Sidsector9](https://github.com/Sidsector9), [@dkotter](https://github.com/dkotter), [@nateconley](https://github.com/nateconley), [@sksaju](https://github.com/sksaju), [@ravinderk](https://github.com/ravinderk) via [#326](https://github.com/10up/safe-redirect-manager/pull/326)).
+- Added a back link to the admin notices when a post is saved/updated (props [@szepeviktor](https://github.com/szepeviktor), [@tlovett1](https://github.com/tlovett1), [@bmarshall511](https://github.com/bmarshall511), [@iamdharmesh](https://github.com/iamdharmesh) via [#328](https://github.com/10up/safe-redirect-manager/pull/328)).
+- Rule editor always shows raw redirect target (props [@tbenyon](https://github.com/tbenyon), [@jeffpaul](https://github.com/jeffpaul), [@trainoasis](https://github.com/trainoasis), [@jayedul](https://github.com/jayedul), [@dkotter](https://github.com/dkotter) via [#330](https://github.com/10up/safe-redirect-manager/pull/330), [#333](https://github.com/10up/safe-redirect-manager/pull/333)).
+- Bump WordPress tested up to from 6.2 to 6.3 (props [@github-actions](https://github.com/apps/github-actions), [@kmgalanakis](https://github.com/kmgalanakis), [@iamdharmesh](https://github.com/iamdharmesh) via [#339](https://github.com/10up/safe-redirect-manager/pull/339)).
+- Include links to redirects that cause redirect loops/chains in the warning (props [@joshbetz](https://github.com/joshbetz), [@tlovett1](https://github.com/tlovett1), [@Sidsector9](https://github.com/Sidsector9), [@ravinderk](https://github.com/ravinderk) via [#341](https://github.com/10up/safe-redirect-manager/pull/341)).
+
+### Fixed
+- `auto_detect_line_endings` deprecation warning in PHP 8.1 and above (props [@dhewer](https://github.com/dhewer), [@jayedul](https://github.com/jayedul), [@Sidsector9](https://github.com/Sidsector9), [@ravinderk](https://github.com/ravinderk) via [#327](https://github.com/10up/safe-redirect-manager/pull/327)).
+- To show only public post types in the autocomplete "Redirect To" field (props [@ravinderk](https://github.com/ravinderk), [@bmarshall511](https://github.com/bmarshall511), [@dkotter](https://github.com/dkotter) via [#332](https://github.com/10up/safe-redirect-manager/pull/332)).
+- Slow performance during redirect chain/loop detection (props [@tlovett1](https://github.com/tlovett1), [@danielbachhuber](https://github.com/danielbachhuber), [@Sidsector9](https://github.com/Sidsector9), [@ravinderk](https://github.com/ravinderk), [@iamdharmesh](https://github.com/iamdharmesh), [#336](https://github.com/10up/safe-redirect-manager/pull/336)).
+
+### Security
+- Bump semver from `7.3.8` to `7.5.3` (props [@dependabot](https://github.com/apps/dependabot), [@dkotter](https://github.com/dkotter) via [#334](https://github.com/10up/safe-redirect-manager/pull/334)).
+- Bump `tough-cookie` and `@cypress/request` (props [@dependabot](https://github.com/apps/dependabot), [@faisal-alvi](https://github.com/faisal-alvi)).
+- Bump semver from `7.3.8` to `7.5.4` (props [@dependabot](https://github.com/apps/dependabot), [@Sidsector9](https://github.com/Sidsector9) via [#342](https://github.com/10up/safe-redirect-manager/pull/342)).
+
 ## [2.0.1] - 2023-06-01
 ### Fixed
 - Ensure our E2E tests run (props [@Sidsector9](https://github.com/Sidsector9), [@iamdharmesh](https://github.com/iamdharmesh) via [#318](https://github.com/10up/safe-redirect-manager/pull/318)).
@@ -278,6 +305,7 @@ All notable changes to this project will be documented in this file, per [the Ke
 - Plugin released
 
 [Unreleased]: https://github.com/10up/safe-redirect-manager/compare/trunk...develop
+[2.1.0]: https://github.com/10up/safe-redirect-manager/compare/2.0.1...2.1.0
 [2.0.1]: https://github.com/10up/safe-redirect-manager/compare/2.0.0...2.0.1
 [2.0.0]: https://github.com/10up/safe-redirect-manager/compare/1.11.1...2.0.0
 [1.11.1]: https://github.com/10up/safe-redirect-manager/compare/1.11.0...1.11.1
