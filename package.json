@@ -28,7 +28,7 @@
     "env:start": "wp-env start",
     "env:stop": "wp-env stop",
     "postenv:start": "./tests/bin/initialize.sh",
-    "build:docs": "rm -rf out && jsdoc -c hookdoc-conf.json safe-redirect-manager.php inc"
+    "build:docs": "rm -rf docs-built && jsdoc -c hookdoc-conf.json safe-redirect-manager.php inc"
   },
   "devDependencies": {
     "@10up/cypress-wp-utils": "github:10up/cypress-wp-utils#build",
