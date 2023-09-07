@@ -53,7 +53,7 @@ This should be a path (i.e. `/test`) or a URL (i.e. `http://example.com/wp/test`
 
 == Changelog ==
 
-= 2.1.0 - TBD =
+= 2.1.0 - 2023-09-07 =
 * **Added:** WP-CLI command `export` to export redirects into a CSV file. (props [@zamanq](https://github.com/zamanq), [@jeffpaul](https://github.com/jeffpaul), [@Sidsector9](https://github.com/Sidsector9) via [#299](https://github.com/10up/safe-redirect-manager/pull/299)).
 * **Added:** Admin settings to set custom redirect protocol per route (props [@tlovett1](https://github.com/tlovett1), [@danielbachhuber](https://github.com/danielbachhuber), [@benoitchantre](https://github.com/benoitchantre), [@jayedul](https://github.com/jayedul), [@Sidsector9](https://github.com/Sidsector9) via [#301](https://github.com/10up/safe-redirect-manager/pull/301)).
 * **Added:** Autocomplete to the "Redirect To" field (props [@tlovett1](https://github.com/tlovett1), [@bmarshall511](https://github.com/bmarshall511), [@ravinderk](https://github.com/ravinderk) via [#325](https://github.com/10up/safe-redirect-manager/pull/325)).
