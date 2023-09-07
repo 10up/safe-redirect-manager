@@ -7,3 +7,4 @@ tests/cypress/videos
 tests/cypress/reports
 .wp-env.override.json
 .phpunit.result.cache
+docs-built

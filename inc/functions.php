@@ -52,20 +52,29 @@ function srm_get_redirects( $args = array(), $hard = false ) {
 				break;
 			}
 
+			// Check whether include post_status in result
+			$include_post_status_in_result = is_array( $query_args['post_status'] ) || 'any' === $query_args['post_status'];
+
 			foreach ( $redirect_query->posts as $redirect_id ) {
 				if ( count( $redirects ) >= $default_max_redirects ) {
 					break 2;
 				}
 
-				$redirects[] = array(
+				$redirect_data = array(
 					'ID'            => $redirect_id,
-					'post_status'   => get_post_status( $redirect_id ),
 					'redirect_from' => get_post_meta( $redirect_id, '_redirect_rule_from', true ),
 					'redirect_to'   => get_post_meta( $redirect_id, '_redirect_rule_to', true ),
 					'status_code'   => (int) get_post_meta( $redirect_id, '_redirect_rule_status_code', true ),
 					'message'       => get_post_meta( $redirect_id, '_redirect_rule_message', true ),
 					'enable_regex'  => (bool) get_post_meta( $redirect_id, '_redirect_rule_from_regex', true ),
+					'force_https'   => get_post_meta( $redirect_id, '_force_https', true ),
 				);
+
+				if ( $include_post_status_in_result ) {
+					$redirect_data['post_status'] = get_post_status( $redirect_id );
+				}
+
+				$redirects[] = $redirect_data;
 			}
 
 			$i++;
@@ -100,6 +109,13 @@ function srm_max_redirects_reached() {
  * @return array
  */
 function srm_get_valid_status_codes() {
+	/**
+	 * Valid status codes to redirect with.
+	 *
+	 * @hook srm_valid_status_codes
+	 * @param {array} $status_codes Valid status codes to redirect with. Default array( 301, 302, 303, 307, 403, 404, 410 ) and other codes returned by `srm_additional_status_codes` filter hook.
+	 * @returns {array} Filtered valid status codes.
+	 */
 	return apply_filters( 'srm_valid_status_codes', array_keys( srm_get_valid_status_codes_data() ) );
 }
 
@@ -120,6 +136,13 @@ function srm_get_valid_status_codes_data() {
 		410 => esc_html__( 'Gone', 'safe-redirect-manager' ),
 	);
 
+	/**
+	 * Include additional status codes as valid to redirect with.
+	 *
+	 * @hook srm_additional_status_codes
+	 * @param {array} $status_codes Status codes to add in valid array. Default is empty array.
+	 * @returns {array} Status codes.
+	 */
 	$additional_status_codes = apply_filters(
 		'srm_additional_status_codes',
 		array()
@@ -129,7 +152,7 @@ function srm_get_valid_status_codes_data() {
 		return $status_codes;
 	}
 
-	$status_code_array  = $status_codes + $additional_status_codes;
+	$status_code_array = $status_codes + $additional_status_codes;
 
 	ksort( $status_code_array, SORT_NUMERIC );
 
@@ -143,6 +166,7 @@ function srm_get_valid_status_codes_data() {
  */
 function srm_flush_cache() {
 	delete_transient( '_srm_redirects_' . srm_get_max_redirects() );
+	delete_transient( '_srm_redirects_graph' );
 }
 
 /**
@@ -232,33 +256,69 @@ function srm_create_redirect( $redirect_from, $redirect_to, $status_code = 302, 
 		return new WP_Error( 'invalid-argument', esc_html__( 'Invalid status code.', 'safe-redirect-manager' ) );
 	}
 
-	// Check to ensure this redirect doesn't already exist
-	if ( $wpdb->get_var( $wpdb->prepare( "SELECT post_id FROM $wpdb->postmeta WHERE meta_key=%s AND meta_value=%s", '_redirect_rule_from', $sanitized_redirect_from ) ) ) {
-		return new WP_Error( 'duplicate-redirect', sprintf( esc_html__( 'Redirect already exists for %s', 'safe-redirect-manager' ), $sanitized_redirect_from ) );
-	}
+	// Check if the redirect already exists.
+	$existing_redirect = $wpdb->get_row(
+		$wpdb->prepare(
+			"SELECT
+				fromMeta.post_id AS post_id,
+				fromMeta.meta_value AS _redirect_rule_from,
+				toMeta.meta_value AS _redirect_rule_to,
+				statusCodeMeta.meta_value AS _redirect_rule_status_code,
+				fromRegexMeta.meta_value AS _redirect_rule_from_regex,
+				notesMeta.meta_value AS _redirect_rule_notes
+			FROM
+				$wpdb->postmeta AS fromMeta
+			LEFT JOIN
+    			wp_postmeta AS toMeta ON fromMeta.post_id = toMeta.post_id AND toMeta.meta_key = %s
+			LEFT JOIN
+    			wp_postmeta AS statusCodeMeta ON fromMeta.post_id = statusCodeMeta.post_id AND statusCodeMeta.meta_key = %s
+			LEFT JOIN
+    			wp_postmeta AS fromRegexMeta ON fromMeta.post_id = fromRegexMeta.post_id AND fromRegexMeta.meta_key = %s
+			LEFT JOIN
+   				wp_postmeta AS notesMeta ON fromMeta.post_id = notesMeta.post_id AND notesMeta.meta_key = %s
+			WHERE
+    			fromMeta.meta_key = %s AND fromMeta.meta_value = %s",
+			'_redirect_rule_to',
+			'_redirect_rule_status_code',
+			'_redirect_rule_from_regex',
+			'_redirect_rule_notes',
+			'_redirect_rule_from',
+			$sanitized_redirect_from
+		)
+	);
 
-	// create the post
+	// Create the post arguments.
 	$post_args = array(
 		'post_type'   => 'redirect_rule',
 		'post_status' => $sanitized_post_status,
 		'post_author' => 1,
 		'menu_order'  => $sanitized_menu_order,
+
 	);
 
-	$post_id = wp_insert_post( $post_args );
+	if ( $existing_redirect ) {
+		// Redirect exists, so update it.
+		$post_args['ID'] = $existing_redirect->post_id;
+		$post_id         = wp_update_post( $post_args );
 
-	if ( 0 >= $post_id ) {
-		return new WP_Error( 'error-creating', esc_html__( 'An error occurred creating the redirect.', 'safe-redirect-manager' ) );
+		if ( 0 >= $post_id ) {
+			return new WP_Error( 'error-updating', esc_html__( 'An error occurred updating the redirect.', 'safe-redirect-manager' ) );
+		}
+	} else {
+		$post_id = wp_insert_post( $post_args );
+		if ( 0 >= $post_id ) {
+			return new WP_Error( 'error-creating', esc_html__( 'An error occurred creating the redirect.', 'safe-redirect-manager' ) );
+		}
 	}
 
-	// update the posts meta info
+	// Update the posts meta info.
 	update_post_meta( $post_id, '_redirect_rule_from', wp_slash( $sanitized_redirect_from ) );
 	update_post_meta( $post_id, '_redirect_rule_to', $sanitized_redirect_to );
 	update_post_meta( $post_id, '_redirect_rule_status_code', $sanitized_status_code );
 	update_post_meta( $post_id, '_redirect_rule_from_regex', $sanitized_enable_regex );
 	update_post_meta( $post_id, '_redirect_rule_notes', $sanitized_notes );
 
-	// We need to update the cache after creating this redirect
+	// We need to update the cache after creating this redirect.
 	srm_flush_cache();
 
 	return $post_id;
@@ -341,11 +401,19 @@ function srm_import_file( $file, $args ) {
 	$close_handle = false;
 	$doing_wp_cli = defined( 'WP_CLI' ) && WP_CLI;
 
-	// filter arguments
+	/**
+	 * Import file arguments
+	 *
+	 * @hook srm_import_file_args
+	 * @param {array} $file_arguments File arguments.
+	 * @returns {array} Filtered file arguments.
+	 */
 	$args = apply_filters( 'srm_import_file_args', $args );
 
 	// enable line endings auto detection
-	@ini_set( 'auto_detect_line_endings', true );
+	if ( version_compare( PHP_VERSION, '8.1', '<' ) ) {
+		@ini_set( 'auto_detect_line_endings', true );
+	}
 
 	// open file pointer if $file is not a resource
 	if ( ! is_resource( $file ) ) {
@@ -365,8 +433,8 @@ function srm_import_file( $file, $args ) {
 
 	while ( ( $row = fgetcsv( $handle ) ) ) {
 		// validate
-		$rule = array_combine( $headers, $row );
-		if ( empty( $rule[ $args['source'] ] ) || empty( $rule[ $args['target'] ] ) ) {
+		$rule = is_array( $row ) ? array_combine( $headers, $row ) : array();
+		if ( empty( $rule ) || empty( $rule[ $args['source'] ] ) || empty( $rule[ $args['target'] ] ) ) {
 			$doing_wp_cli && WP_CLI::warning( 'Skipping - redirection rule is formatted improperly.' );
 			$skipped++;
 			continue;
@@ -428,5 +496,12 @@ function srm_match_redirect( $path ) {
  * @return int
  */
 function srm_get_max_redirects() {
+	/**
+	 * Filter maximum supported redirects.
+	 *
+	 * @hook srm_max_redirects
+	 * @param {int} $max_redirect Maximum supported redirects. Default is `1000`.
+	 * @returns {int} Maximum supported redirects.
+	 */
 	return apply_filters( 'srm_max_redirects', 1000 );
 }
