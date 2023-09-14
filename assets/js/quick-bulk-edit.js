@@ -1,13 +1,13 @@
 ( function ($) {
 	$( function () {
-		var wpInlineEditor = inlineEditPost.edit;
+		const wpInlineEditor = inlineEditPost.edit;
 
 		inlineEditPost.edit = function (id) {
 
 			wpInlineEditor.apply(this, arguments);
 
 			var postId = 0;
-			if (typeof (id) == 'object') {
+			if (typeof (id) === 'object') {
 				postId = parseInt(this.getId(id));
 			}
 

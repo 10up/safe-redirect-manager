@@ -444,9 +444,9 @@ class SRM_Post_Type {
 				<div class="inline-edit-col">
 					<div class="inline-edit-group wp-clearfix">
 						<label class="inline-edit-status alignleft">
-							<span class="title">HTTP Status Code</span>
+							<span class="title"><?php esc_html_e( 'HTTP Status Code', 'safe-redirect-manager' ); ?></span>
 							<select name="srm_redirect_rule_status_code">
-								<option value="-1">— No Change —</option>
+								<option value="-1"><?php esc_html_e( '— No Change —', 'safe-redirect-manager' ); ?></option>
 								<?php foreach ( srm_get_valid_status_codes() as $code ) : ?>
 									<option value="<?php echo esc_attr( $code ); ?>"><?php echo esc_html( $code . ' ' . $this->status_code_labels[ $code ] ); ?></option>
 								<?php endforeach; ?>
@@ -464,7 +464,7 @@ class SRM_Post_Type {
 				<div class="inline-edit-col">
 					<div class="inline-edit-group wp-clearfix">
 						<label class="inline-edit-status alignleft">
-							<span class="title">Force https</span>
+							<span class="title"><?php esc_html_e( 'Force https', 'safe-redirect-manager' ); ?></span>
 							<input type="checkbox" name="srm_redirect_rule_force_https" value="1"/>
 						</label>
 					</div>
