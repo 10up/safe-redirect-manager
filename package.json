@@ -32,6 +32,7 @@
     "cypress": "^13.1.0",
     "cypress-mochawesome-reporter": "^3.5.1",
     "jsdoc": "^3.6.11",
+    "mochawesome-json-to-md": "^0.7.2",
     "node-wp-i18n": "^1.2.7",
     "wp-hookdoc": "^0.2.0"
   }
