@@ -4,7 +4,7 @@ Tags:              http redirects, redirect manager, url redirection, safe http 
 Requires at least: 5.7
 Tested up to:      6.4
 Requires PHP:      7.4
-Stable tag:        2.1.0
+Stable tag:        2.1.1
 License:           GPLv2 or later
 License URI:       http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -52,6 +52,14 @@ This should be a path (i.e. `/test`) or a URL (i.e. `http://example.com/wp/test`
 * Rules set with a 404 status code will apply the status code and render the 404 template.
 
 == Changelog ==
+
+= 2.1.1 - 2024-01-08 =
+* **Added:** Support for the WordPress.org plugin preview (props [@dkotter](https://github.com/dkotter), [@jeffpaul](https://github.com/jeffpaul) via [#357](https://github.com/10up/safe-redirect-manager/pull/357)).
+* **Added:** `phpcs:ignore` on the now safe `ini_set()` (props [@philipjohn](https://github.com/philipjohn), [@ravinderk](https://github.com/ravinderk) via [#355](https://github.com/10up/safe-redirect-manager/pull/355)).
+* **Changed:** Bump `Cypress` from 13.0.0 to 13.1.0, `@10up/cypress-wp-utils` from 0.1.0 to 0.2.0, `@wordpress/env` from 5.3.0 to 8.7.0, `cypress-mochawesome-reporter` from 3.4.0 to 3.5.1 and `node-wp-i18n` from 1.2.5 to 1.2.7 (props [@iamdharmesh](https://github.com/iamdharmesh), [@ravinderk](https://github.com/ravinderk) via [#349](https://github.com/10up/safe-redirect-manager/pull/349)).
+* **Changed:** Bump WordPress "tested up to" version 6.4 (props [@qasumitbagthariya](https://github.com/qasumitbagthariya), [@jeffpaul](https://github.com/jeffpaul) via [#353](https://github.com/10up/safe-redirect-manager/pull/353), [#354](https://github.com/10up/safe-redirect-manager/pull/354)).
+* **Changed:** Validate and sanitize a superglobal before using it (props [@jspellman814](https://github.com/jspellman814), [@ravinderk](https://github.com/ravinderk) via [#356](https://github.com/10up/safe-redirect-manager/pull/356)).
+* **Fixed:** Ensure text can be translated (props [@alexclassroom](https://github.com/alexclassroom), [@iamdharmesh](https://github.com/iamdharmesh) via [#351](https://github.com/10up/safe-redirect-manager/pull/351)).
 
 = 2.1.0 - 2023-09-07 =
 * **Added:** WP-CLI command `export` to export redirects into a CSV file. (props [@zamanq](https://github.com/zamanq), [@jeffpaul](https://github.com/jeffpaul), [@Sidsector9](https://github.com/Sidsector9) via [#299](https://github.com/10up/safe-redirect-manager/pull/299)).
