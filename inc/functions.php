@@ -412,7 +412,7 @@ function srm_import_file( $file, $args ) {
 
 	// enable line endings auto detection
 	if ( version_compare( PHP_VERSION, '8.1', '<' ) ) {
-		@ini_set( 'auto_detect_line_endings', true );
+		@ini_set( 'auto_detect_line_endings', true ); // phpcs:ignore PHPCompatibility.IniDirectives.RemovedIniDirectives.auto_detect_line_endingsDeprecated
 	}
 
 	// open file pointer if $file is not a resource
