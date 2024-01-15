@@ -285,7 +285,7 @@ class SRM_Redirect {
 		 * @param {string} $request_path Request path. Default `$_SERVER['REQUEST_URI']`.
 		 * @returns {string} Request path.
 		 */
-		$requested_path   = esc_url_raw( apply_filters( 'srm_requested_path', $_SERVER['REQUEST_URI'] ) );
+		$requested_path   = esc_url_raw( apply_filters( 'srm_requested_path', sanitize_text_field( wp_unslash( $_SERVER['REQUEST_URI'] ) ) ?? '' ) );
 		$requested_path   = untrailingslashit( stripslashes( $requested_path ) );
 		$matched_redirect = $this->match_redirect( $requested_path );
 

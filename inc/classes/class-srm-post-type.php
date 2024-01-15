@@ -673,7 +673,7 @@ class SRM_Post_Type {
 		<p>
 			<label><strong><?php esc_html_e( 'Redirect Protocol:', 'safe-redirect-manager' ); ?></strong></label><br/>
 			<label>
-				<input type="checkbox" name="srm_force_https" value="1" <?php checked( $force_https, true ); ?>/> Force https
+				<input type="checkbox" name="srm_force_https" value="1" <?php checked( $force_https, true ); ?>/> <?php esc_html_e( 'Force https', 'safe-redirect-manager' ); ?>
 			</label>
 		</p>
 

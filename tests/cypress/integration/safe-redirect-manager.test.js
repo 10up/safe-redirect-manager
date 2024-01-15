@@ -1,5 +1,5 @@
 describe('Test redirect rules', () => {
-	before(() => {
+	beforeEach(() => {
 		cy.login();
 	});
 
