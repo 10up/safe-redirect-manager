@@ -269,13 +269,13 @@ function srm_create_redirect( $redirect_from, $redirect_to, $status_code = 302, 
 			FROM
 				$wpdb->postmeta AS fromMeta
 			LEFT JOIN
-    			wp_postmeta AS toMeta ON fromMeta.post_id = toMeta.post_id AND toMeta.meta_key = %s
+    			$wpdb->postmeta AS toMeta ON fromMeta.post_id = toMeta.post_id AND toMeta.meta_key = %s
 			LEFT JOIN
-    			wp_postmeta AS statusCodeMeta ON fromMeta.post_id = statusCodeMeta.post_id AND statusCodeMeta.meta_key = %s
+    			$wpdb->postmeta AS statusCodeMeta ON fromMeta.post_id = statusCodeMeta.post_id AND statusCodeMeta.meta_key = %s
 			LEFT JOIN
-    			wp_postmeta AS fromRegexMeta ON fromMeta.post_id = fromRegexMeta.post_id AND fromRegexMeta.meta_key = %s
+    			$wpdb->postmeta AS fromRegexMeta ON fromMeta.post_id = fromRegexMeta.post_id AND fromRegexMeta.meta_key = %s
 			LEFT JOIN
-   				wp_postmeta AS notesMeta ON fromMeta.post_id = notesMeta.post_id AND notesMeta.meta_key = %s
+   				$wpdb->postmeta AS notesMeta ON fromMeta.post_id = notesMeta.post_id AND notesMeta.meta_key = %s
 			WHERE
     			fromMeta.meta_key = %s AND fromMeta.meta_value = %s",
 			'_redirect_rule_to',
