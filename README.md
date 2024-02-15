@@ -45,6 +45,22 @@ This should be a path (i.e. `/test`) or a URL (i.e. `http://example.com/wp/test`
 
 ## Filters
 
+### Default redirect status code
+
+The default redirect HTTP status code can be changed using the `srm_default_direct_status` filter.
+
+```php
+add_filter(
+	'srm_default_direct_status',
+	/**
+	 * Set the default redirect status to 301 (Moved Permanently).
+	 */
+	function() {
+		return 301;
+	}
+);
+```
+
 ### Redirect loops detection
 
 By default redirect loop detection is disabled. To prevent redirect loops you can filter `srm_check_for_possible_redirect_loops`.
