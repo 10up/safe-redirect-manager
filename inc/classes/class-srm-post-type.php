@@ -244,8 +244,8 @@ class SRM_Post_Type {
 
 				if ( ! empty( $cycle_source ) ) {
 					?>
-					<div class="notice notice-warning">
-						<p><?php esc_html_e( 'Safe Redirect Manager Warning: The following redirects with the "Redirect To" value have created redirect chain/loops.', 'safe-redirect-manager' ); ?></p>
+					<div class="notice notice-error">
+						<p><?php esc_html_e( 'Safe Redirect Manager Error: The following redirects with the "Redirect To" value have created redirect loops.', 'safe-redirect-manager' ); ?></p>
 						<ul style="list-style: inside;">
 							<?php foreach ( $paths as $path ) : ?>
 								<li>
