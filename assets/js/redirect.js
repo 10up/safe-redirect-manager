@@ -3,26 +3,15 @@
 		const publishBtn = $('#publish');
 		const fromRule = $('#srm_redirect_rule_from');
 		const toRule = $('#srm_redirect_rule_to');
+		let timer = 0;
+		let currentRequest = null;
 
-		fromRule.change(function(el) {
+		fromRule.keyup(function(el) {
 			publishBtn.prop('disabled', true);
-			$.get(
-				window.ajaxurl,
-				{
-					action: 'srm_validate_from_url',
-					from: fromRule.val(),
-					_wpnonce: $('#srm_redirect_nonce').val()
-				}
-			).done(function( data ) {
-				if ( '1' === data ) {
-					$('#message').html( '' ).hide();
-					publishBtn.prop('disabled', false);
-				} else if ( '0' === data ) {
-					$('#message').html( `<p>${redirectValidation.urlError}</p>` ).show();
-				} else {
-					$('#message').html( `<p>${redirectValidation.fail.replace( '%s', data )}</p>` ).show();
-				}
-			});
+			if (timer) {
+				clearTimeout(timer); // Clear the time after function execution.
+			}
+			timer = setTimeout( validateUrl, 850); // Wait for 0.85 seconds.
 		});
 
 		// Show autocomplete for the 'Redirect To:' field.
@@ -94,6 +83,36 @@
 				message.prop('disabled', 'disabled');
 				messageContainer.hide();
 			}
+		}
+
+		/**
+		 * Validate URL for 'Redirect From' field.
+		 */
+		function validateUrl() {
+			currentRequest = $.ajax({
+				url: window.ajaxurl,
+				method : 'GET',
+				data : {
+					action: 'srm_validate_from_url',
+					from: fromRule.val(),
+					_wpnonce: $('#srm_redirect_nonce').val()
+				},
+				beforeSend : function() {
+					if ( currentRequest != null ) {
+						currentRequest.abort();
+					}
+				},
+				success: function( data ) {
+					if ( '1' === data ) {
+						$('#message').html( '' ).hide();
+						publishBtn.prop('disabled', false);
+					} else if ( '0' === data ) {
+						$('#message').html( `<p>${redirectValidation.urlError}</p>` ).show();
+					} else {
+						$('#message').html( `<p>${redirectValidation.fail.replace( '%s', data )}</p>` ).show();
+					}
+				}
+			});
 		}
 
 	} );
