@@ -7,7 +7,8 @@
 		let currentRequest = null;
 
 		fromRule.keyup(function(el) {
-			publishBtn.prop('disabled', true);
+			publishBtn.prop('disabled', true); // Disable submit button.
+			fromRule.addClass('ui-autocomplete-loading'); // Add loader.
 			if (timer) {
 				clearTimeout(timer); // Clear the time after function execution.
 			}
@@ -103,6 +104,11 @@
 					}
 				},
 				success: function( data ) {
+
+					// Remove loader.
+					if ( fromRule.hasClass( 'ui-autocomplete-loading' ) ) {
+						fromRule.removeClass( 'ui-autocomplete-loading' );
+					}
 					if ( '1' === data ) {
 						$('#message').html( '' ).hide();
 						publishBtn.prop('disabled', false);
