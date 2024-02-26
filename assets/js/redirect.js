@@ -6,7 +6,7 @@
 		let timer = 0;
 		let currentRequest = null;
 
-		fromRule.keyup(function(el) {
+		fromRule.on('input',function(el) {
 			publishBtn.prop('disabled', true); // Disable submit button.
 			fromRule.addClass('ui-autocomplete-loading'); // Add loader.
 			if (timer) {
@@ -99,16 +99,15 @@
 					_wpnonce: $('#srm_redirect_nonce').val()
 				},
 				beforeSend : function() {
-					if ( currentRequest != null ) {
+					if ( currentRequest !== null ) {
 						currentRequest.abort();
 					}
 				},
 				success: function( data ) {
 
 					// Remove loader.
-					if ( fromRule.hasClass( 'ui-autocomplete-loading' ) ) {
-						fromRule.removeClass( 'ui-autocomplete-loading' );
-					}
+					fromRule.removeClass( 'ui-autocomplete-loading' );
+
 					if ( '1' === data ) {
 						$('#message').html( '' ).hide();
 						publishBtn.prop('disabled', false);
