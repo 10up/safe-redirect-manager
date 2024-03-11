@@ -25,7 +25,6 @@ jobs:
           fail-label: needs:feedback
           pass-label: needs:code-review
           conflict-label: needs:refresh
-          sync-pr-branch: true
           reviewers: |
             team:open-source-practice
         env:
