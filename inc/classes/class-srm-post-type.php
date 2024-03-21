@@ -37,11 +37,12 @@ class SRM_Post_Type {
 		add_filter( 'manage_redirect_rule_posts_columns', array( $this, 'filter_redirect_columns' ) );
 		add_filter( 'manage_edit-redirect_rule_sortable_columns', array( $this, 'filter_redirect_sortable_columns' ) );
 		add_action( 'manage_redirect_rule_posts_custom_column', array( $this, 'action_custom_redirect_columns' ), 10, 2 );
+		add_action( 'quick_edit_custom_box', array( $this, 'action_quick_edit_custom_redirect_columns' ), 10, 2 );
+		add_action( 'bulk_edit_custom_box', array( $this, 'action_quick_edit_custom_redirect_columns' ), 10, 2 );
 		add_action( 'transition_post_status', array( $this, 'action_transition_post_status' ), 10, 3 );
 		add_filter( 'post_updated_messages', array( $this, 'filter_redirect_updated_messages' ) );
 		add_action( 'admin_notices', array( $this, 'action_redirect_chain_alert' ) );
 		add_filter( 'the_title', array( $this, 'filter_admin_title' ), 100, 2 );
-		add_filter( 'bulk_actions-edit-redirect_rule', array( $this, 'filter_bulk_actions' ) );
 		add_action( 'admin_print_styles-edit.php', array( $this, 'action_print_logo_css' ), 10, 1 );
 		add_action( 'admin_print_styles-post.php', array( $this, 'action_print_logo_css' ), 10, 1 );
 		add_action( 'admin_print_styles-post-new.php', array( $this, 'action_print_logo_css' ), 10, 1 );
@@ -108,7 +109,6 @@ class SRM_Post_Type {
 	 */
 	public function filter_disable_quick_edit( $actions, $post ) {
 		if ( 'redirect_rule' === get_post_type( $post ) && isset( $actions['inline hide-if-no-js'] ) ) {
-			unset( $actions['inline hide-if-no-js'] );
 			unset( $actions['view'] );
 		}
 
@@ -191,21 +191,6 @@ class SRM_Post_Type {
 			</style>
 			<?php
 		}
-	}
-
-	/**
-	 * Limit the bulk actions available in the Manage Redirects view
-	 *
-	 * @param  array $actions Array of actions
-	 * @since 1.0
-	 * @return array
-	 */
-	public function filter_bulk_actions( $actions ) {
-
-		// No bulk editing at this time
-		unset( $actions['edit'] );
-
-		return $actions;
 	}
 
 	/**
@@ -396,6 +381,8 @@ class SRM_Post_Type {
 			echo esc_html( get_post_meta( $post_id, '_redirect_rule_to', true ) );
 		} elseif ( 'srm_redirect_rule_status_code' === $column ) {
 			echo absint( get_post_meta( $post_id, '_redirect_rule_status_code', true ) );
+		} elseif ( 'srm_redirect_rule_force_https' === $column ) {
+			echo absint( get_post_meta( $post_id, '_force_https', true ) ) ? '&#10003;' : 'x';
 		} elseif ( 'menu_order' === $column ) {
 			global $post;
 			echo esc_html( $post->menu_order );
@@ -412,6 +399,7 @@ class SRM_Post_Type {
 	public function filter_redirect_columns( $columns ) {
 		$columns['srm_redirect_rule_to']          = esc_html__( 'Redirect To', 'safe-redirect-manager' );
 		$columns['srm_redirect_rule_status_code'] = esc_html__( 'HTTP Status Code', 'safe-redirect-manager' );
+		$columns['srm_redirect_rule_force_https'] = esc_html__( 'Force https', 'safe-redirect-manager' );
 		$columns['menu_order']                    = esc_html__( 'Order', 'safe-redirect-manager' );
 
 		// Change the title column
@@ -434,6 +422,56 @@ class SRM_Post_Type {
 	public function filter_redirect_sortable_columns( $columns ) {
 		$columns['menu_order'] = 'menu_order';
 		return $columns;
+	}
+
+	/**
+	 * Add custom fileds to the qucik edit screen.
+	 *
+	 * @param string $column_name Name of the column to edit.
+	 * @param string $post_type   The post type slug, or current screen name if this is a taxonomy list table.
+	 *
+	 * @return void
+	 */
+	public function action_quick_edit_custom_redirect_columns( $column_name, $post_type ) {
+		if ( 'redirect_rule' !== $post_type ) {
+			return;
+		}
+
+		if ( 'srm_redirect_rule_status_code' === $column_name ) :
+			wp_nonce_field( 'srm-save-redirect-ajax-meta', 'srm_redirect_ajax_nonce' );
+			?>
+			<fieldset class="inline-edit-col-right">
+				<div class="inline-edit-col">
+					<div class="inline-edit-group wp-clearfix">
+						<label class="inline-edit-status alignleft">
+							<span class="title"><?php esc_html_e( 'HTTP Status Code', 'safe-redirect-manager' ); ?></span>
+							<select name="srm_redirect_rule_status_code">
+								<option value="-1"><?php esc_html_e( '— No Change —', 'safe-redirect-manager' ); ?></option>
+								<?php foreach ( srm_get_valid_status_codes() as $code ) : ?>
+									<option value="<?php echo esc_attr( $code ); ?>"><?php echo esc_html( $code . ' ' . $this->status_code_labels[ $code ] ); ?></option>
+								<?php endforeach; ?>
+							</select>
+						</label>
+					</div>
+				</div>
+			</fieldset>
+			<?php
+		endif;
+
+		if ( 'srm_redirect_rule_force_https' === $column_name ) :
+			?>
+			<fieldset class="inline-edit-col-right">
+				<div class="inline-edit-col">
+					<div class="inline-edit-group wp-clearfix">
+						<label class="inline-edit-status alignleft">
+							<span class="title"><?php esc_html_e( 'Force https', 'safe-redirect-manager' ); ?></span>
+							<input type="checkbox" name="srm_redirect_rule_force_https" value="1"/>
+						</label>
+					</div>
+				</div>
+			</fieldset>
+			<?php
+		endif;
 	}
 
 	/**
@@ -502,6 +540,23 @@ class SRM_Post_Type {
 			 * redirect info is saved, updating the cache before it is not sufficient.
 			 */
 			srm_flush_cache();
+		}
+
+		if ( ! empty( $_REQUEST['srm_redirect_ajax_nonce'] )
+			&& wp_verify_nonce( $_REQUEST['srm_redirect_ajax_nonce'], 'srm-save-redirect-ajax-meta' )
+			&& current_user_can( 'edit_post', $post_id )
+		) {
+			if ( ! empty( $_REQUEST['srm_redirect_rule_status_code'] ) && '-1' !== $_REQUEST['srm_redirect_rule_status_code'] ) {
+				update_post_meta( $post_id, '_redirect_rule_status_code', absint( $_REQUEST['srm_redirect_rule_status_code'] ) );
+			} elseif ( '-1' !== $_REQUEST['srm_redirect_rule_status_code'] ) {
+				delete_post_meta( $post_id, '_redirect_rule_status_code' );
+			}
+
+			if ( ! empty( $_REQUEST['srm_redirect_rule_force_https'] ) ) {
+				update_post_meta( $post_id, '_force_https', true );
+			} else {
+				delete_post_meta( $post_id, '_force_https' );
+			}
 		}
 	}
 
@@ -746,6 +801,7 @@ class SRM_Post_Type {
 		if ( 'redirect_rule' === get_post_type() ) {
 			wp_enqueue_style( 'redirectjs', plugin_dir_url( 'safe-redirect-manager/safe-redirect-manager.php' ) . 'assets/css/redirect.css', array(), SRM_VERSION );
 			wp_enqueue_script( 'redirectjs', plugin_dir_url( 'safe-redirect-manager/safe-redirect-manager.php' ) . 'assets/js/redirect.js', array( 'jquery' ), SRM_VERSION );
+			wp_enqueue_script( 'quick-bulk-editjs', plugin_dir_url( 'safe-redirect-manager/safe-redirect-manager.php' ) . 'assets/js/quick-bulk-edit.js', array( 'jquery', 'inline-edit-post' ), SRM_VERSION );
 			wp_localize_script(
 				'redirectjs',
 				'redirectValidation',
