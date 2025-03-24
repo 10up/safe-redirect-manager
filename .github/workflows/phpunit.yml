@@ -19,12 +19,12 @@ jobs:
 
     steps:
     - name: Checkout
-      uses: actions/checkout@v2
+      uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
 
-    - uses: getong/mariadb-action@v1.1
+    - uses: getong/mariadb-action@d6d2ec41fd5588f369be4c9398ce77ee725ca9ea # v1.11
 
     - name: Set PHP version
-      uses: shivammathur/setup-php@v2
+      uses: shivammathur/setup-php@9e72090525849c5e82e596468b86eb55e9cc5401 # v2.32.0
       with:
         php-version: ${{ matrix.php }}
         coverage: none
