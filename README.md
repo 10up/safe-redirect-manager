@@ -66,7 +66,7 @@ add_filter(
 
 ### Redirect loops detection
 
-By default redirect loop detection is disabled. To prevent redirect loops you can filter `srm_check_for_possible_redirect_loops`.
+By default redirect loop detection is enabled. To prevent redirect loops you can filter `srm_check_for_possible_redirect_loops`.
 
 ```php
 add_filter( 'srm_check_for_possible_redirect_loops', '__return_true' );
