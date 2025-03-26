@@ -69,7 +69,7 @@ add_filter(
 By default redirect loop detection is enabled. To prevent redirect loops you can filter `srm_check_for_possible_redirect_loops`.
 
 ```php
-add_filter( 'srm_check_for_possible_redirect_loops', '__return_true' );
+add_filter( 'srm_check_for_possible_redirect_loops', '__return_false' );
 ```
 
 ### Only redirect if 404 occurs
