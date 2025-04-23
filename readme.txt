@@ -1,7 +1,8 @@
 === Safe Redirect Manager ===
 Contributors:      10up, tlovett1, tollmanz, taylorde, jakemgold, danielbachhuber, jeffpaul
 Tags:              http redirects, redirect manager, url redirection, safe http redirection, multisite redirects
-Tested up to:      6.7
+Requires at least: 6.6
+Tested up to:      6.8
 Stable tag:        2.2.2
 License:           GPLv2 or later
 License URI:       http://www.gnu.org/licenses/gpl-2.0.html
