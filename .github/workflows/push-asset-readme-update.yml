@@ -1,5 +1,8 @@
 name: Plugin asset/readme update
 
+permissions:
+  contents: read
+
 on:
   push:
     branches:
