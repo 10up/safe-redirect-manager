@@ -5,6 +5,9 @@ on:
     branches:
     - trunk
 
+permissions:
+  contents: write
+
 jobs:
   release:
     name: Publish Docs
