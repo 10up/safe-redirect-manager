@@ -7,7 +7,7 @@ on:
 
 permissions:
   contents: write
-  packages: write
+  packages: read
 
 jobs:
   tag:
