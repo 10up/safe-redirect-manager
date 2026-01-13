@@ -54,6 +54,12 @@ This should be a path (i.e. `/test`) or a URL (i.e. `http://example.com/wp/test`
 
 Safe Redirect Manager includes a number of actions and filters developers can make use of. These are documented on the [Safe Redirect Manager developer documentation](http://10up.github.io/safe-redirect-manager/) micro-site.
 
+== Frequently Asked Questions ==
+
+= Where do I report security bugs found in this plugin? =
+
+Please report security bugs found in the source code of the Safe Redirect Manager plugin through the [Patchstack Vulnerability Disclosure  Program](https://patchstack.com/database/vdp/3fab514f-46ce-4b71-ab53-450228f73bde).  The Patchstack team will assist you with verification, CVE assignment, and notify the developers of this plugin.
+
 == Screenshots ==
 
 1. List of Redirect rules under Tools > Safe Redirect Manager
