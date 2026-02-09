@@ -812,7 +812,7 @@ class SRM_Post_Type {
 					'fail'            => __( 'There is an existing redirect with the same Redirect From URL. You may <a href="%s">Edit</a> the redirect or try other `from` URL.', 'safe-redirect-manager' ),
 					'ajax_url'        => admin_url( 'admin-ajax.php' ),
 					'ajax_nonce'      => wp_create_nonce( 'srm_autocomplete_nonce' ),
-					'current_post_id' => get_the_ID()
+					'current_post_id' => get_the_ID(),
 				)
 			);
 		}
