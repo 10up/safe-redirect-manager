@@ -808,10 +808,11 @@ class SRM_Post_Type {
 				'redirectjs',
 				'redirectValidation',
 				array(
-					'urlError'   => __( 'There are some issues validating the URL. Please try again.', 'safe-redirect-manager' ),
-					'fail'       => __( 'There is an existing redirect with the same Redirect From URL. You may <a href="%s">Edit</a> the redirect or try other `from` URL.', 'safe-redirect-manager' ),
-					'ajax_url'   => admin_url( 'admin-ajax.php' ),
-					'ajax_nonce' => wp_create_nonce( 'srm_autocomplete_nonce' ),
+					'urlError'        => __( 'There are some issues validating the URL. Please try again.', 'safe-redirect-manager' ),
+					'fail'            => __( 'There is an existing redirect with the same Redirect From URL. You may <a href="%s">Edit</a> the redirect or try other `from` URL.', 'safe-redirect-manager' ),
+					'ajax_url'        => admin_url( 'admin-ajax.php' ),
+					'ajax_nonce'      => wp_create_nonce( 'srm_autocomplete_nonce' ),
+					'current_post_id' => get_the_ID(),
 				)
 			);
 		}
@@ -902,12 +903,21 @@ class SRM_Post_Type {
 		 */
 		$from = '/' === substr( $from, 0, 1 ) ? $from : '/' . $from;
 
+		/*
+		 * Query for an existing post.
+		 *
+		 * Two posts are queried as the post currently being edited may be returned in the results
+		 * after publication. As the `post__not_in` parameter can lead to performance issues the
+		 * current post ID is excluded via PHP rather than in the SQL argument.
+		 *
+		 * See https://docs.wpvip.com/databases/optimize-queries/using-post__not_in/
+		 */
 		$existing_post_ids = new WP_Query(
 			[
 				'meta_key'               => '_redirect_rule_from',
 				'meta_value'             => $from,
 				'fields'                 => 'ids',
-				'posts_per_page'         => 1,
+				'posts_per_page'         => 2,
 				'no_found_rows'          => true,
 				'post_type'              => 'redirect_rule',
 				'post_status'            => 'publish',
@@ -918,14 +928,22 @@ class SRM_Post_Type {
 			]
 		);
 
+		// If $_GET['current_post_id'] is set, exclude it from the post results.
+		$post_ids = $existing_post_ids->posts;
+		// Ensure the post IDs are integers before comparing.
+		$post_ids = array_map( 'absint', $post_ids );
+		if ( isset( $_GET['current_post_id'] ) ) {
+			$current_post_id = absint( $_GET['current_post_id'] );
+			$post_ids        = array_diff( $post_ids, [ $current_post_id ] );
+		}
+
 		// If no posts found, then bail out.
-		if ( empty( $existing_post_ids->posts ) ) {
+		if ( empty( $post_ids ) ) {
 			echo 1;
 			die();
 		}
 
-		$existing_post_id = $existing_post_ids->posts[0];
-
+		$existing_post_id = array_values( $post_ids )[0];
 		echo esc_url( get_edit_post_link( $existing_post_id ) );
 		die();
 	}
