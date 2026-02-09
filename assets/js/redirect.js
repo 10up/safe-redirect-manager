@@ -96,7 +96,8 @@
 				data : {
 					action: 'srm_validate_from_url',
 					from: fromRule.val(),
-					_wpnonce: $('#srm_redirect_nonce').val()
+					_wpnonce: $('#srm_redirect_nonce').val(),
+					current_post_id: redirectValidation.current_post_id || null
 				},
 				beforeSend : function() {
 					if ( currentRequest !== null ) {
