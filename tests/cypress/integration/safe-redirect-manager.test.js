@@ -136,6 +136,24 @@ describe('Test redirect rules', () => {
 		cy.get('.notice-error').should('contain', 'There is an existing redirect with the same Redirect From URL.');
 	});
 
+	it('Posts are not flagged as their own duplicate', () => {
+		cy.createRedirectRule(
+			'/duplicates-not-flagged-own-duplicate-test/',
+			'/hello-world/',
+			'Rule for testing duplicate detection does not flag the current post.'
+		);
+
+		cy.visit('/wp-admin/edit.php?post_type=redirect_rule');
+		cy.get('#the-list td.title a').contains('/duplicates-not-flagged-own-duplicate-test/').click();
+
+		cy.intercept('GET', '/wp-admin/admin-ajax.php?action=srm_validate_from_url&**').as('validate')
+
+		cy.get('#srm_redirect_rule_from').click().clear().type('duplicates-not-flagged-own-duplicate-test/');
+		cy.get('#srm_redirect_rule_to').click();
+		cy.wait('@validate').its('response.statusCode').should('equal', 200);
+		cy.get('.notice-error').should('not.be.visible');
+	});
+
 	it('Can die with a 403 header', () => {
 		cy.createRedirectRule(
 			'/403-test',
