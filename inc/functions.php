@@ -428,9 +428,9 @@ function srm_import_file( $file, $args ) {
 	// process all rows of the file
 	$created = 0;
 	$skipped = 0;
-	$headers = fgetcsv( $handle );
+	$headers = fgetcsv( $handle, null, ',', '"', '\\' );
 
-	while ( ( $row = fgetcsv( $handle ) ) ) {
+	while ( ( $row = fgetcsv( $handle, null, ',', '"', '\\' ) ) ) {
 		// validate
 		$rule = is_array( $row ) ? array_combine( $headers, $row ) : array();
 		if ( empty( $rule ) || empty( $rule[ $args['source'] ] ) || empty( $rule[ $args['target'] ] ) ) {
