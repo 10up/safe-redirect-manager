@@ -61,7 +61,7 @@ jobs:
           timeout_minutes: 10
           max_attempts: 3
           command: |
-            npm run env start
+            npm run env:start
 
       - name: Log versions
         run: |
