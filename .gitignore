@@ -8,5 +8,5 @@ tests/cypress/reports
 tests/_output/*
 !/tests/_output/.gitkeep
 .wp-env.override.json
-.phpunit.result.cache
+tests/.phpunit.result.cache
 docs-built
