@@ -10,7 +10,8 @@
   ],
   "require-dev": {
     "10up/phpcs-composer": "dev-master",
-    "yoast/phpunit-polyfills": "^1.0.3"
+    "wp-phpunit/wp-phpunit": "^6.9",
+    "yoast/phpunit-polyfills": "^4.0"
   },
   "scripts": {
     "lint": [
