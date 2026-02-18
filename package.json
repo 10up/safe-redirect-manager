@@ -20,6 +20,7 @@
   "scripts": {
     "cypress:open": "cypress open --config-file tests/cypress/config.config.js",
     "cypress:run": "cypress run --config-file tests/cypress/config.config.js",
+    "test:php": "wp-env run tests-cli --env-cwd=wp-content/plugins/safe-redirect-manager vendor/bin/phpunit -c phpunit.xml.dist",
     "env": "wp-env",
     "env:start": "wp-env start",
     "env:stop": "wp-env stop",
