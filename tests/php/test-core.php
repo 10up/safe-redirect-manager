@@ -487,7 +487,7 @@ class SRMTestCore extends WP_UnitTestCase {
 		);
 
 		foreach ( $redirects as $row ) {
-			fputcsv( $tmp_file, $row );
+			fputcsv( $tmp_file, $row, ',', '"', '\\' );
 		}
 
 		// let's import it
