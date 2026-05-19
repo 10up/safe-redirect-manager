@@ -155,11 +155,10 @@ class SRM_WP_CLI extends WP_CLI_Command {
 	 * Import .htaccess file redirects
 	 *
 	 * @param array $args Array of arguments
-	 * @param array $assoc_args Array of associate arguments
 	 * @subcommand import-htaccess
 	 * @synopsis <file>
 	 */
-	public function import_htaccess( $args, $assoc_args ) {
+	public function import_htaccess( $args ) {
 		list( $file ) = $args;
 
 		// phpcs:ignore WordPressVIPMinimum.Performance.FetchingRemoteData.FileGetContentsUnknown
