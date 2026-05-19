@@ -123,9 +123,14 @@ class SRM_Post_Type {
 	 */
 	public function disable_core_search( $query ) {
 		if ( $query->is_search() && 'redirect_rule' === $query->get( 'post_type' ) ) {
-			// Store a reference to the search term for later use.
+			/*
+			 * Store a reference to the search term for later use, then
+			 * remove the core search term so SRM can provide the custom
+			 * search capability rather than having core build its search.
+			 */
+			// phpcs:ignore WordPressVIPMinimum.Hooks.PreGetPosts.PreGetPosts -- Modifying search intentionally.
 			$this->redirect_search_term = $query->get( 's' );
-			// Don't let core build it's search clauses since we override them.
+			// phpcs:ignore WordPressVIPMinimum.Hooks.PreGetPosts.PreGetPosts -- Modifying search intentionally.
 			$query->set( 's', '' );
 		}
 	}
