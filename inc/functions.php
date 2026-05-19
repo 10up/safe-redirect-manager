@@ -407,6 +407,7 @@ function srm_import_file( $file, $args ) {
 
 	// open file pointer if $file is not a resource
 	if ( ! is_resource( $file ) ) {
+		// phpcs:ignore WordPress.WP.AlternativeFunctions.file_system_operations_fopen
 		$handle = fopen( $file, 'rb' );
 		if ( ! $handle ) {
 			$doing_wp_cli && WP_CLI::error( sprintf( 'Error retrieving %s file', basename( $file ) ) );
@@ -452,6 +453,7 @@ function srm_import_file( $file, $args ) {
 
 	// close an open file pointer if we've opened it
 	if ( $close_handle ) {
+		// phpcs:ignore WordPress.WP.AlternativeFunctions.file_system_operations_fclose
 		fclose( $handle );
 	}
 

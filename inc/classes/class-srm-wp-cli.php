@@ -162,6 +162,7 @@ class SRM_WP_CLI extends WP_CLI_Command {
 	public function import_htaccess( $args, $assoc_args ) {
 		list( $file ) = $args;
 
+		// phpcs:ignore WordPressVIPMinimum.Performance.FetchingRemoteData.FileGetContentsUnknown
 		$contents = file_get_contents( $file );
 		if ( ! $contents ) {
 			WP_CLI::error( 'Error retrieving .htaccess file' );
@@ -340,7 +341,8 @@ class SRM_WP_CLI extends WP_CLI_Command {
 			WP_CLI::confirm( 'Proceed with rewriting the existing file?' );
 		}
 
-		$file_resource = fopen( $file_name, 'w' ); //phpcs:ignore
+		// phpcs:ignore WordPress.WP.AlternativeFunctions.file_system_operations_fopen
+		$file_resource = fopen( $file_name, 'w' );
 
 		Utils\write_csv( $file_resource, $redirects, $fields );
 
