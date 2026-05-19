@@ -364,7 +364,7 @@ class SRM_Post_Type {
 				sprintf(
 					/* translators: %s: publish box date format, see http://php.net/date */
 					esc_html__( 'scheduled for %s', 'safe-redirect-manager' ),
-					date_i18n( esc_html__( 'M j, Y @ G:i' ), strtotime( $post->post_date ) )
+					date_i18n( esc_html__( 'M j, Y @ G:i', 'safe-redirect-manager' ), strtotime( $post->post_date ) )
 				)
 			),
 			10 => $message_tpl( esc_html__( 'draft updated', 'safe-redirect-manager' ) ),
