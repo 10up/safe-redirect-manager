@@ -422,6 +422,7 @@ function srm_import_file( $file, $args ) {
 	$skipped = 0;
 	$headers = fgetcsv( $handle, null, ',', '"', '\\' );
 
+	// phpcs:ignore Generic.CodeAnalysis.AssignmentInCondition.FoundInWhileCondition -- Intended.
 	while ( ( $row = fgetcsv( $handle, null, ',', '"', '\\' ) ) ) {
 		// validate
 		$rule = is_array( $row ) ? array_combine( $headers, $row ) : array();
