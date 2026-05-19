@@ -5,6 +5,16 @@
 	<rule ref="WordPress.Security"/>
 	<rule ref="WordPressVIPMinimum"/>
 
+	<rule ref="WordPress.Security.ValidatedSanitizedInput">
+		<properties>
+			<property name="customSanitizingFunctions" type="array">
+				<element value="srm_sanitize_redirect_from"/>
+				<element value="srm_sanitize_redirect_to"/>
+			</property>
+		</properties>
+	</rule>
+
+
 	<arg name="extensions" value="php" />
 	<arg value="s"/>
 
