@@ -90,15 +90,11 @@ class SRM_Redirect {
 			return false;
 		}
 
-		/**
+		/*
 		 * If WordPress resides in a directory that is not the public root, we have to chop
 		 * the pre-WP path off the requested path.
 		 */
-		if ( function_exists( 'wp_parse_url' ) ) {
-			$parsed_home_url = wp_parse_url( home_url() );
-		} else {
-			$parsed_home_url = parse_url( home_url() ); // phpcs:ignore
-		}
+		$parsed_home_url = wp_parse_url( home_url() );
 
 		if ( isset( $parsed_home_url['path'] ) && '/' !== $parsed_home_url['path'] ) {
 			$requested_path = preg_replace( '@' . $parsed_home_url['path'] . '@i', '', $requested_path, 1 );
@@ -138,11 +134,7 @@ class SRM_Redirect {
 			$normalized_requested_path = $requested_path;
 		}
 
-		if ( function_exists( 'wp_parse_url' ) ) {
-			$parsed_requested_path = wp_parse_url( $normalized_requested_path );
-		} else {
-			$parsed_requested_path = parse_url( $normalized_requested_path ); // phpcs:ignore
-		}
+		$parsed_requested_path = wp_parse_url( $normalized_requested_path );
 		// Normalize the request path with and without query strings, for comparison later
 		$normalized_requested_path_no_query = '';
 		$requested_query_params             = '';
@@ -212,14 +204,10 @@ class SRM_Redirect {
 			// If the requested path matches a redirect rule...
 			// this variable is not used after this boolean.
 			if ( $matched_path ) {
-				/**
+				/*
 				 * Whitelist redirect host
 				 */
-				if ( function_exists( 'wp_parse_url' ) ) {
-					$parsed_redirect = wp_parse_url( $redirect_to );
-				} else {
-					$parsed_redirect = parse_url( $redirect_to ); // phpcs:ignore
-				}
+				$parsed_redirect = wp_parse_url( $redirect_to );
 
 				if ( is_array( $parsed_redirect ) && ! empty( $parsed_redirect['host'] ) ) {
 					$this->whitelist_host = $parsed_redirect['host'];

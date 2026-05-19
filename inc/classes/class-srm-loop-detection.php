@@ -30,13 +30,8 @@ class SRM_Loop_Detection {
 			$source_url      = '';
 			$destination_url = '';
 
-			if ( function_exists( 'wp_parse_url' ) ) {
-				$current_url  = wp_parse_url( home_url() );
-				$redirect_url = wp_parse_url( $destination );
-			} else {
-				$current_url  = parse_url( home_url() ); // phpcs:ignore WordPress.WP.AlternativeFunctions.parse_url_parse_url
-				$redirect_url = parse_url( $destination ); // phpcs:ignore WordPress.WP.AlternativeFunctions.parse_url_parse_url
-			}
+			$current_url  = wp_parse_url( home_url() );
+			$redirect_url = wp_parse_url( $destination );
 
 			$this_host     = ( is_array( $current_url ) && ! empty( $current_url['host'] ) ) ? $current_url['host'] : '';
 			$redirect_host = ( is_array( $redirect_url ) && ! empty( $redirect_url['host'] ) ) ? $redirect_url['host'] : '';

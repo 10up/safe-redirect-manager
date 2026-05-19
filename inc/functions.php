@@ -176,13 +176,8 @@ function srm_flush_cache() {
  * @return boolean
  */
 function srm_check_for_possible_redirect_loops() {
-	$redirects = srm_get_redirects();
-
-	if ( function_exists( 'wp_parse_url' ) ) {
-		$current_url = wp_parse_url( home_url() );
-	} else {
-		$current_url = parse_url( home_url() );
-	}
+	$redirects   = srm_get_redirects();
+	$current_url = wp_parse_url( home_url() );
 
 	$this_host = ( is_array( $current_url ) && ! empty( $current_url['host'] ) ) ? $current_url['host'] : '';
 
@@ -191,13 +186,8 @@ function srm_check_for_possible_redirect_loops() {
 
 		// check redirect from against all redirect to's
 		foreach ( $redirects as $compare_redirect ) {
-			$redirect_to = $compare_redirect['redirect_to'];
-
-			if ( function_exists( 'wp_parse_url' ) ) {
-				$redirect_url = wp_parse_url( $redirect_to );
-			} else {
-				$redirect_url = parse_url( $redirect_to );
-			}
+			$redirect_to  = $compare_redirect['redirect_to'];
+			$redirect_url = wp_parse_url( $redirect_to );
 
 			$redirect_host = ( is_array( $redirect_url ) && ! empty( $redirect_url['host'] ) ) ? $redirect_url['host'] : '';
 
