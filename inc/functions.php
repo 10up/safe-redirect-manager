@@ -401,7 +401,7 @@ function srm_import_file( $file, $args ) {
 
 	// enable line endings auto detection
 	if ( version_compare( PHP_VERSION, '8.1', '<' ) ) {
-		// phpcs:ignore Generic.PHP.NoSilencedErrors.Forbidden, PHPCompatibility.IniDirectives.RemovedIniDirectives.auto_detect_line_endingsDeprecated -- required for PHP 8.0 and earlier.
+		// phpcs:ignore WordPress.PHP.NoSilencedErrors.Discouraged, Generic.PHP.NoSilencedErrors.Forbidden, PHPCompatibility.IniDirectives.RemovedIniDirectives.auto_detect_line_endingsDeprecated -- required for PHP 8.0 and earlier.
 		@ini_set( 'auto_detect_line_endings', true );
 	}
 
