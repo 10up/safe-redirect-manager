@@ -5,6 +5,10 @@
  * @package safe-redirect-manager
  */
 
+if ( ! defined( 'ABSPATH' ) ) {
+	exit; // Run in WP context only.
+}
+
 /**
  * Get redirects from the database
  *
