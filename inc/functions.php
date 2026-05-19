@@ -249,6 +249,7 @@ function srm_create_redirect( $redirect_from, $redirect_to, $status_code = 302, 
 	}
 
 	// Check if the redirect already exists.
+	// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- Perf. Caching not required as it would be flushed below.
 	$existing_redirect = $wpdb->get_row(
 		$wpdb->prepare(
 			"SELECT
