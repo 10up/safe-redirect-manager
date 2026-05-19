@@ -329,7 +329,7 @@ class SRM_Post_Type {
 	 * @return array
 	 */
 	public function filter_redirect_updated_messages( $messages ) {
-		global $post, $post_ID;
+		global $post;
 
 		$message_tpl = function ( $message ) {
 			return sprintf(
