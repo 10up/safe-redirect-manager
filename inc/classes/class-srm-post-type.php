@@ -891,7 +891,7 @@ class SRM_Post_Type {
 		}
 
 		$suggestions = array();
-		foreach ( $query as $key => $post ) {
+		foreach ( $query as $post ) {
 			$suggestions[] = array(
 				'relative_url' => wp_make_link_relative( get_the_permalink( $post->ID ) ),
 				'post_title'   => $post->post_title,
