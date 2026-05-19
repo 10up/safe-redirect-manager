@@ -5,7 +5,7 @@
  * @package safe-redirect-manager
  */
 
-use \WP_CLI\Utils;
+use WP_CLI\Utils;
 
 /**
  * WP CLI command class
@@ -37,10 +37,10 @@ class SRM_WP_CLI extends WP_CLI_Command {
 	public function cli_list( $args, $assoc_args ) {
 		$assoc_args = wp_parse_args(
 			$assoc_args,
-			[
+			array(
 				'show_total' => true,
 				'format'     => 'table',
-			]
+			)
 		);
 
 		if ( 'false' === $assoc_args['show_total'] ) {
@@ -58,7 +58,7 @@ class SRM_WP_CLI extends WP_CLI_Command {
 
 		$redirects = srm_get_redirects( array( 'post_status' => 'any' ), true );
 		$redirects = array_map(
-			function( $item ) use ( $assoc_args ) {
+			function ( $item ) use ( $assoc_args ) {
 				if ( 'table' === $assoc_args['format'] ) {
 					$item['enable_regex'] = $item['enable_regex'] ? 'true' : 'false';
 				} else {
@@ -207,10 +207,10 @@ class SRM_WP_CLI extends WP_CLI_Command {
 			$id = srm_create_redirect( $sanitized_redirect_from, $sanitized_redirect_to, $http_status );
 			if ( is_wp_error( $id ) ) {
 				WP_CLI::warning( 'Error - ' . $id->get_error_message() );
-				$skipped++;
+				++$skipped;
 			} else {
 				WP_CLI::line( "Success - Created redirect from '{$sanitized_redirect_from}' to '{$sanitized_redirect_to}'" );
-				$created++;
+				++$created;
 			}
 		}
 		WP_CLI::success( "All done! {$created} redirects were created, {$skipped} were skipped" );
@@ -313,25 +313,25 @@ class SRM_WP_CLI extends WP_CLI_Command {
 
 		$assoc_args = wp_parse_args(
 			$assoc_args,
-			[
+			array(
 				'filename' => 'srm-redirects',
-			]
+			)
 		);
 
-		$redirects = srm_get_redirects( [ 'post_status' => 'any' ], true );
+		$redirects = srm_get_redirects( array( 'post_status' => 'any' ), true );
 
 		if ( empty( $redirects ) ) {
 			WP_CLI::error( 'There are no redirects available. Please add some first and then try again.' );
 		}
 
-		$fields = [
+		$fields = array(
 			'ID',
 			'redirect_from',
 			'redirect_to',
 			'status_code',
 			'enable_regex',
 			'post_status',
-		];
+		);
 
 		$file_name = $assoc_args['filename'] . '.csv';
 

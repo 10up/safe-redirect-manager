@@ -308,7 +308,7 @@ class SRM_Post_Type {
 	public function filter_redirect_updated_messages( $messages ) {
 		global $post, $post_ID;
 
-		$message_tpl = function( $message ) {
+		$message_tpl = function ( $message ) {
 			return sprintf(
 				/* translators: %1%s: message status, %2%s: URL to the list of redirect rules */
 				__( 'Redirect rule %1$s. <a href="%2$s">&larr; Back to rules</a>', 'safe-redirect-manager' ),
@@ -913,7 +913,7 @@ class SRM_Post_Type {
 		 * See https://docs.wpvip.com/databases/optimize-queries/using-post__not_in/
 		 */
 		$existing_post_ids = new WP_Query(
-			[
+			array(
 				'meta_key'               => '_redirect_rule_from',
 				'meta_value'             => $from,
 				'fields'                 => 'ids',
@@ -925,7 +925,7 @@ class SRM_Post_Type {
 				'order'                  => 'ASC',
 				'update_post_meta_cache' => false,
 				'update_post_term_cache' => false,
-			]
+			)
 		);
 
 		// If $_GET['current_post_id'] is set, exclude it from the post results.
@@ -934,7 +934,7 @@ class SRM_Post_Type {
 		$post_ids = array_map( 'absint', $post_ids );
 		if ( isset( $_GET['current_post_id'] ) ) {
 			$current_post_id = absint( $_GET['current_post_id'] );
-			$post_ids        = array_diff( $post_ids, [ $current_post_id ] );
+			$post_ids        = array_diff( $post_ids, array( $current_post_id ) );
 		}
 
 		// If no posts found, then bail out.

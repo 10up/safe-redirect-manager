@@ -133,7 +133,7 @@ class SRM_Loop_Detection {
 	 */
 	public static function get_cycle_source( $cycle_source = array() ) {
 		return array_map(
-			function( $source ) {
+			function ( $source ) {
 				return array(
 					'path' => wp_parse_url( esc_url( $source['destination'] ), PHP_URL_PATH ),
 					'id'   => $source['id'],

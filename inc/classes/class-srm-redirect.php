@@ -253,14 +253,14 @@ class SRM_Redirect {
 				$filtered_redirect_to  = apply_filters( 'srm_redirect_to', $redirect_to );
 				$sanitized_redirect_to = esc_url_raw( $filtered_redirect_to );
 
-				return [
+				return array(
 					'redirect_to'  => $sanitized_redirect_to,
 					'status_code'  => $status_code,
 					'enable_regex' => $enable_regex,
 					'redirect_id'  => $redirect_id,
 					'force_https'  => $force_https,
 					'message'      => $message,
-				];
+				);
 			}
 		}
 
@@ -437,4 +437,3 @@ class SRM_Redirect {
 		return $instance;
 	}
 }
-

@@ -77,7 +77,7 @@ function srm_get_redirects( $args = array(), $hard = false ) {
 				$redirects[] = $redirect_data;
 			}
 
-			$i++;
+			++$i;
 
 		}
 
@@ -435,7 +435,7 @@ function srm_import_file( $file, $args ) {
 		$rule = is_array( $row ) ? array_combine( $headers, $row ) : array();
 		if ( empty( $rule ) || empty( $rule[ $args['source'] ] ) || empty( $rule[ $args['target'] ] ) ) {
 			$doing_wp_cli && WP_CLI::warning( 'Skipping - redirection rule is formatted improperly.' );
-			$skipped++;
+			++$skipped;
 			continue;
 		}
 
@@ -452,10 +452,10 @@ function srm_import_file( $file, $args ) {
 
 		if ( is_wp_error( $id ) ) {
 			$doing_wp_cli && WP_CLI::warning( $id );
-			$skipped++;
+			++$skipped;
 		} else {
 			$doing_wp_cli && WP_CLI::line( "Success - Created redirect from '{$redirect_from}' to '{$redirect_to}'" );
-			$created++;
+			++$created;
 		}
 	}
 
