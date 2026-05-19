@@ -346,11 +346,13 @@ class SRM_Post_Type {
 			2  => esc_html__( 'Custom field updated.', 'safe-redirect-manager' ),
 			3  => esc_html__( 'Custom field deleted.', 'safe-redirect-manager' ),
 			4  => $message_tpl( __( 'updated', 'safe-redirect-manager' ) ),
+			// phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Not required for message handler.
 			5  => isset( $_GET['revision'] )
 				? $message_tpl(
 					sprintf(
 						/* translators: %s: the revision title */
 						esc_html__( 'restored to revision from %s', 'safe-redirect-manager' ),
+						// phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Not required for message handler.
 						wp_post_revision_title( (int) $_GET['revision'], false )
 					)
 				)
