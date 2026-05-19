@@ -1,7 +1,15 @@
 <?xml version="1.0"?>
 <ruleset name="Project Rules">
-	<rule ref="10up-Default">
-	</rule>
+	<rule ref="WordPress-Core" />
+	<rule ref="WordPress.DB"/>
+	<rule ref="WordPress.Security"/>
+	<rule ref="WordPressVIPMinimum"/>
+
+	<arg name="extensions" value="php" />
+	<arg value="s"/>
+
+	<file>.</file>
+	<exclude-pattern>docs-built</exclude-pattern>
 	<exclude-pattern>node_modules</exclude-pattern>
 	<exclude-pattern>vendor</exclude-pattern>
 </ruleset>
