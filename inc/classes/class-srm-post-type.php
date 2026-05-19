@@ -208,7 +208,24 @@ class SRM_Post_Type {
 	 * @return bool
 	 */
 	private function is_plugin_page() {
-		return (bool) ( get_post_type() === 'redirect_rule' || ( isset( $_GET['post_type'] ) && 'redirect_rule' === $_GET['post_type'] ) );
+		if ( ! function_exists( 'get_current_screen' ) || ! get_current_screen() ) {
+			// Not in the admin or screen not defined.
+			return false;
+		}
+
+		$current_screen = get_current_screen();
+
+		// New/Edit post screen.
+		if ( 'post' === $current_screen->base && 'redirect_rule' === $current_screen->post_type ) {
+			return true;
+		}
+
+		// List table screen.
+		if ( 'edit-redirect_rule' === $current_screen->id && 'redirect_rule' === $current_screen->post_type ) {
+			return true;
+		}
+
+		return false;
 	}
 
 	/**
