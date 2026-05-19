@@ -514,7 +514,7 @@ class SRM_Post_Type {
 		}
 
 		// Update post meta for redirect rules
-		if ( ! empty( $_POST['srm_redirect_nonce'] ) && wp_verify_nonce( $_POST['srm_redirect_nonce'], 'srm-save-redirect-meta' ) && current_user_can( 'edit_post', $post_id ) ) {
+		if ( ! empty( $_POST['srm_redirect_nonce'] ) && wp_verify_nonce( sanitize_key( wp_unslash( $_POST['srm_redirect_nonce'] ) ), 'srm-save-redirect-meta' ) && current_user_can( 'edit_post', $post_id ) ) {
 
 			if ( ! empty( $_POST['srm_redirect_rule_from_regex'] ) ) {
 				$allow_regex = (bool) $_POST['srm_redirect_rule_from_regex'];
