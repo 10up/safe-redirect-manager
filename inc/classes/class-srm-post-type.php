@@ -90,6 +90,7 @@ class SRM_Post_Type {
 	 * @return array
 	 */
 	public function filter_hidden_columns( $hidden ) {
+		// phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Post List Table.
 		if ( empty( $_GET['post_type'] ) || 'redirect_rule' !== $_GET['post_type'] ) {
 			return $hidden;
 		}
