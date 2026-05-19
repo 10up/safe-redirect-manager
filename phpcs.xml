@@ -6,6 +6,9 @@
 	<rule ref="WordPressVIPMinimum">
 		<!-- Caching warning is very out of date -->
 		<exclude name="WordPressVIPMinimum.Functions.RestrictedFunctions.get_posts_get_posts"/>
+
+		<!-- General purpose plugin, not used exclusively on VIP. -->
+		<exclude name="WordPressVIPMinimum.Classes.RestrictedExtendClasses.wp_cli"/>
 	</rule>
 
 	<rule ref="WordPress.Security.ValidatedSanitizedInput">
