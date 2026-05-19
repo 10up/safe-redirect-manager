@@ -13,7 +13,8 @@
     "wp-phpunit/wp-phpunit": "^6.9",
     "yoast/phpunit-polyfills": "^4.0",
     "wp-coding-standards/wpcs": "^3.0",
-    "automattic/vipwpcs": "^3.0"
+    "automattic/vipwpcs": "^3.0",
+    "phpcompatibility/phpcompatibility-wp": "^3.0@dev"
   },
   "scripts": {
     "lint": [
