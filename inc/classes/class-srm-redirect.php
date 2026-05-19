@@ -398,10 +398,12 @@ class SRM_Redirect {
 					$main_site_id = get_main_site_id();
 
 					if ( ! empty( $main_site_id ) ) {
+						// phpcs:ignore WordPressVIPMinimum.Functions.RestrictedFunctions.switch_to_blog_switch_to_blog -- Switch to allow DB checks.
 						switch_to_blog( $main_site_id );
 
 						$this->maybe_redirect();
 
+						// phpcs:ignore WordPressVIPMinimum.Functions.RestrictedFunctions.switch_to_blog_switch_to_blog -- Switch back to original site.
 						switch_to_blog( $blog_id );
 					}
 				}
