@@ -525,13 +525,13 @@ class SRM_Post_Type {
 			}
 
 			if ( ! empty( $_POST['srm_redirect_rule_from'] ) ) {
-				update_post_meta( $post_id, '_redirect_rule_from', srm_sanitize_redirect_from( $_POST['srm_redirect_rule_from'], $allow_regex ) );
+				update_post_meta( $post_id, '_redirect_rule_from', srm_sanitize_redirect_from( wp_unslash( $_POST['srm_redirect_rule_from'] ), $allow_regex ) );
 			} else {
 				delete_post_meta( $post_id, '_redirect_rule_from' );
 			}
 
 			if ( ! empty( $_POST['srm_redirect_rule_to'] ) ) {
-				update_post_meta( $post_id, '_redirect_rule_to', srm_sanitize_redirect_to( $_POST['srm_redirect_rule_to'] ) );
+				update_post_meta( $post_id, '_redirect_rule_to', srm_sanitize_redirect_to( wp_unslash( $_POST['srm_redirect_rule_to'] ) ) );
 			} else {
 				delete_post_meta( $post_id, '_redirect_rule_to' );
 			}
@@ -549,13 +549,13 @@ class SRM_Post_Type {
 			}
 
 			if ( ! empty( $_POST['srm_redirect_rule_message'] ) ) {
-				update_post_meta( $post_id, '_redirect_rule_message', sanitize_text_field( $_POST['srm_redirect_rule_message'] ) );
+				update_post_meta( $post_id, '_redirect_rule_message', sanitize_text_field( wp_unslash( $_POST['srm_redirect_rule_message'] ) ) );
 			} else {
 				delete_post_meta( $post_id, '_redirect_rule_message' );
 			}
 
 			if ( ! empty( $_POST['srm_redirect_rule_notes'] ) ) {
-				update_post_meta( $post_id, '_redirect_rule_notes', sanitize_text_field( $_POST['srm_redirect_rule_notes'] ) );
+				update_post_meta( $post_id, '_redirect_rule_notes', sanitize_text_field( wp_unslash( $_POST['srm_redirect_rule_notes'] ) ) );
 			} else {
 				delete_post_meta( $post_id, '_redirect_rule_notes' );
 			}
@@ -569,7 +569,7 @@ class SRM_Post_Type {
 		}
 
 		if ( ! empty( $_REQUEST['srm_redirect_ajax_nonce'] )
-			&& wp_verify_nonce( $_REQUEST['srm_redirect_ajax_nonce'], 'srm-save-redirect-ajax-meta' )
+			&& wp_verify_nonce( sanitize_key( wp_unslash( $_REQUEST['srm_redirect_ajax_nonce'] ) ), 'srm-save-redirect-ajax-meta' )
 			&& current_user_can( 'edit_post', $post_id )
 		) {
 			if ( ! empty( $_REQUEST['srm_redirect_rule_status_code'] ) && '-1' !== $_REQUEST['srm_redirect_rule_status_code'] ) {
