@@ -25,8 +25,8 @@
 	<arg value="s"/>
 
 	<file>.</file>
-	<exclude-pattern>docs-built</exclude-pattern>
-	<exclude-pattern>node_modules</exclude-pattern>
-	<exclude-pattern>/tests</exclude-pattern>
-	<exclude-pattern>vendor</exclude-pattern>
+	<exclude-pattern>*/docs-built/*</exclude-pattern>
+	<exclude-pattern>*/node_modules/*</exclude-pattern>
+	<exclude-pattern>*/tests/*</exclude-pattern>
+	<exclude-pattern>*/vendor/*</exclude-pattern>
 </ruleset>
