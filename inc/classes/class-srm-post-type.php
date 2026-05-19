@@ -940,8 +940,8 @@ class SRM_Post_Type {
 		 */
 		$existing_post_ids = new WP_Query(
 			array(
-				'meta_key'               => '_redirect_rule_from',
-				'meta_value'             => $from,
+				'meta_key'               => '_redirect_rule_from', // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_key -- Indexed meta key.
+				'meta_value'             => $from, // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_value -- Required for lookup.
 				'fields'                 => 'ids',
 				'posts_per_page'         => 2,
 				'no_found_rows'          => true,
