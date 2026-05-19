@@ -327,7 +327,7 @@ class SRM_Redirect {
 			wp_die(
 				esc_html( $matched_redirect['message'] ),
 				'',
-				$matched_redirect['status_code'] // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+				(int) $matched_redirect['status_code']
 			);
 			return;
 		}
