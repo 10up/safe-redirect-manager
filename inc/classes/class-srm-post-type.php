@@ -331,43 +331,81 @@ class SRM_Post_Type {
 	public function filter_redirect_updated_messages( $messages ) {
 		global $post;
 
-		$message_tpl = function ( $message ) {
-			return sprintf(
-				/* translators: %1%s: message status, %2%s: URL to the list of redirect rules */
-				__( 'Redirect rule %1$s. <a href="%2$s">&larr; Back to rules</a>', 'safe-redirect-manager' ),
-				$message,
-				esc_url( admin_url( 'edit.php?post_type=redirect_rule' ) )
-			);
-		};
+		$scheduled_date = sprintf(
+			/* translators: Publish box date string. 1: Date, 2: Time. */
+			__( '%1$s at %2$s', 'safe-redirect-manager' ),
+			/* translators: Publish box date format, see https://www.php.net/manual/datetime.format.php */
+			date_i18n( _x( 'M j, Y', 'publish box date format', 'safe-redirect-manager' ), strtotime( $post->post_date ) ),
+			/* translators: Publish box time format, see https://www.php.net/manual/datetime.format.php */
+			date_i18n( _x( 'H:i', 'publish box time format', 'safe-redirect-manager' ), strtotime( $post->post_date ) )
+		);
 
 		$messages['redirect_rule'] = array(
 			0  => '', // Unused. Messages start at index 1.
-			1  => $message_tpl( esc_html__( 'updated', 'safe-redirect-manager' ) ),
-			2  => esc_html__( 'Custom field updated.', 'safe-redirect-manager' ),
-			3  => esc_html__( 'Custom field deleted.', 'safe-redirect-manager' ),
-			4  => $message_tpl( __( 'updated', 'safe-redirect-manager' ) ),
+			1  => wp_kses_post(
+				sprintf(
+					// translators: %1$s URL to the list of redirect rules.
+					__( 'Redirect rule updated. <a href="%1$s">&larr; Back to rules</a>', 'safe-redirect-manager' ),
+					esc_url( admin_url( 'edit.php?post_type=redirect_rule' ) )
+				)
+			),
+			2  => __( 'Custom field updated.', 'safe-redirect-manager' ),
+			3  => __( 'Custom field deleted.', 'safe-redirect-manager' ),
+			4  => wp_kses_post(
+				sprintf(
+					// translators: %1$s URL to the list of redirect rules.
+					__( 'Redirect rule updated. <a href="%1$s">&larr; Back to rules</a>', 'safe-redirect-manager' ),
+					esc_url( admin_url( 'edit.php?post_type=redirect_rule' ) )
+				)
+			),
 			// phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Not required for message handler.
 			5  => isset( $_GET['revision'] )
-				? $message_tpl(
+				? wp_kses_post(
 					sprintf(
-						/* translators: %s: the revision title */
-						esc_html__( 'restored to revision from %s', 'safe-redirect-manager' ),
+						// translators: %1$s: the revision title, %2$s: URL to the list of redirect rules.
+						__( 'Redirect rule restored to revision from %1$s. <a href="%2$s">&larr; Back to rules</a>', 'safe-redirect-manager' ),
 						// phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Not required for message handler.
-						wp_post_revision_title( (int) $_GET['revision'], false )
+						wp_post_revision_title( (int) $_GET['revision'], false ),
+						esc_url( admin_url( 'edit.php?post_type=redirect_rule' ) )
 					)
 				)
 				: false,
-			6  => $message_tpl( esc_html__( 'published', 'safe-redirect-manager' ) ),
-			7  => $message_tpl( esc_html__( 'saved', 'safe-redirect-manager' ) ),
-			8  => $message_tpl( esc_html__( 'submitted', 'safe-redirect-manager' ) ),
-			9  => $message_tpl(
+			6  => wp_kses_post(
 				sprintf(
-					/* translators: %s: publish box date format, see http://php.net/date */
-					esc_html__( 'scheduled for %s', 'safe-redirect-manager' ),
-					date_i18n( esc_html__( 'M j, Y @ G:i', 'safe-redirect-manager' ), strtotime( $post->post_date ) )
+					// translators: %1$s URL to the list of redirect rules.
+					__( 'Redirect rule published. <a href="%1$s">&larr; Back to rules</a>', 'safe-redirect-manager' ),
+					esc_url( admin_url( 'edit.php?post_type=redirect_rule' ) )
 				)
 			),
-			10 => $message_tpl( esc_html__( 'draft updated', 'safe-redirect-manager' ) ),
+			7  => wp_kses_post(
+				sprintf(
+					// translators: %1$s URL to the list of redirect rules.
+					__( 'Redirect rule saved. <a href="%1$s">&larr; Back to rules</a>', 'safe-redirect-manager' ),
+					esc_url( admin_url( 'edit.php?post_type=redirect_rule' ) )
+				)
+			),
+			8  => wp_kses_post(
+				sprintf(
+					// translators: %1$s URL to the list of redirect rules.
+					__( 'Redirect rule submitted. <a href="%1$s">&larr; Back to rules</a>', 'safe-redirect-manager' ),
+					esc_url( admin_url( 'edit.php?post_type=redirect_rule' ) )
+				)
+			),
+			9  => wp_kses_post(
+				sprintf(
+					// translators: %1$s: the scheduled date, %2$s: URL to the list of redirect rules.
+					__( 'Redirect rule scheduled for: %1$s. <a href="%2$s">&larr; Back to rules</a>', 'safe-redirect-manager' ),
+					'<strong>' . $scheduled_date . '</strong>',
+					esc_url( admin_url( 'edit.php?post_type=redirect_rule' ) )
+				)
+			),
+			10 => wp_kses_post(
+				sprintf(
+					// translators: %1$s URL to the list of redirect rules.
+					__( 'Redirect rule draft updated. <a href="%1$s">&larr; Back to rules</a>', 'safe-redirect-manager' ),
+					esc_url( admin_url( 'edit.php?post_type=redirect_rule' ) )
+				)
+			),
 		);
 
 		return $messages;
