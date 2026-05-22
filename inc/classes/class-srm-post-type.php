@@ -90,6 +90,7 @@ class SRM_Post_Type {
 	 * @return array
 	 */
 	public function filter_hidden_columns( $hidden ) {
+		// phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Post List Table.
 		if ( empty( $_GET['post_type'] ) || 'redirect_rule' !== $_GET['post_type'] ) {
 			return $hidden;
 		}
@@ -122,9 +123,14 @@ class SRM_Post_Type {
 	 */
 	public function disable_core_search( $query ) {
 		if ( $query->is_search() && 'redirect_rule' === $query->get( 'post_type' ) ) {
-			// Store a reference to the search term for later use.
+			/*
+			 * Store a reference to the search term for later use, then
+			 * remove the core search term so SRM can provide the custom
+			 * search capability rather than having core build its search.
+			 */
+			// phpcs:ignore WordPressVIPMinimum.Hooks.PreGetPosts.PreGetPosts -- Modifying search intentionally.
 			$this->redirect_search_term = $query->get( 's' );
-			// Don't let core build it's search clauses since we override them.
+			// phpcs:ignore WordPressVIPMinimum.Hooks.PreGetPosts.PreGetPosts -- Modifying search intentionally.
 			$query->set( 's', '' );
 		}
 	}
@@ -202,7 +208,24 @@ class SRM_Post_Type {
 	 * @return bool
 	 */
 	private function is_plugin_page() {
-		return (bool) ( get_post_type() === 'redirect_rule' || ( isset( $_GET['post_type'] ) && 'redirect_rule' === $_GET['post_type'] ) );
+		if ( ! function_exists( 'get_current_screen' ) || ! get_current_screen() ) {
+			// Not in the admin or screen not defined.
+			return false;
+		}
+
+		$current_screen = get_current_screen();
+
+		// New/Edit post screen.
+		if ( 'post' === $current_screen->base && 'redirect_rule' === $current_screen->post_type ) {
+			return true;
+		}
+
+		// List table screen.
+		if ( 'edit-redirect_rule' === $current_screen->id && 'redirect_rule' === $current_screen->post_type ) {
+			return true;
+		}
+
+		return false;
 	}
 
 	/**
@@ -306,43 +329,83 @@ class SRM_Post_Type {
 	 * @return array
 	 */
 	public function filter_redirect_updated_messages( $messages ) {
-		global $post, $post_ID;
+		global $post;
 
-		$message_tpl = function( $message ) {
-			return sprintf(
-				/* translators: %1%s: message status, %2%s: URL to the list of redirect rules */
-				__( 'Redirect rule %1$s. <a href="%2$s">&larr; Back to rules</a>', 'safe-redirect-manager' ),
-				$message,
-				esc_url( admin_url( 'edit.php?post_type=redirect_rule' ) )
-			);
-		};
+		$scheduled_date = sprintf(
+			/* translators: Publish box date string. 1: Date, 2: Time. */
+			__( '%1$s at %2$s', 'safe-redirect-manager' ),
+			/* translators: Publish box date format, see https://www.php.net/manual/datetime.format.php */
+			date_i18n( _x( 'M j, Y', 'publish box date format', 'safe-redirect-manager' ), strtotime( $post->post_date ) ),
+			/* translators: Publish box time format, see https://www.php.net/manual/datetime.format.php */
+			date_i18n( _x( 'H:i', 'publish box time format', 'safe-redirect-manager' ), strtotime( $post->post_date ) )
+		);
 
 		$messages['redirect_rule'] = array(
 			0  => '', // Unused. Messages start at index 1.
-			1  => $message_tpl( esc_html__( 'updated', 'safe-redirect-manager' ) ),
-			2  => esc_html__( 'Custom field updated.', 'safe-redirect-manager' ),
-			3  => esc_html__( 'Custom field deleted.', 'safe-redirect-manager' ),
-			4  => $message_tpl( __( 'updated', 'safe-redirect-manager' ) ),
+			1  => wp_kses_post(
+				sprintf(
+					// translators: %1$s URL to the list of redirect rules.
+					__( 'Redirect rule updated. <a href="%1$s">&larr; Back to rules</a>', 'safe-redirect-manager' ),
+					esc_url( admin_url( 'edit.php?post_type=redirect_rule' ) )
+				)
+			),
+			2  => __( 'Custom field updated.', 'safe-redirect-manager' ),
+			3  => __( 'Custom field deleted.', 'safe-redirect-manager' ),
+			4  => wp_kses_post(
+				sprintf(
+					// translators: %1$s URL to the list of redirect rules.
+					__( 'Redirect rule updated. <a href="%1$s">&larr; Back to rules</a>', 'safe-redirect-manager' ),
+					esc_url( admin_url( 'edit.php?post_type=redirect_rule' ) )
+				)
+			),
+			// phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Not required for message handler.
 			5  => isset( $_GET['revision'] )
-				? $message_tpl(
+				? wp_kses_post(
 					sprintf(
-						/* translators: %s: the revision title */
-						esc_html__( 'restored to revision from %s', 'safe-redirect-manager' ),
-						wp_post_revision_title( (int) $_GET['revision'], false )
+						// translators: %1$s: the revision title, %2$s: URL to the list of redirect rules.
+						__( 'Redirect rule restored to revision from %1$s. <a href="%2$s">&larr; Back to rules</a>', 'safe-redirect-manager' ),
+						// phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Not required for message handler.
+						wp_post_revision_title( (int) $_GET['revision'], false ),
+						esc_url( admin_url( 'edit.php?post_type=redirect_rule' ) )
 					)
 				)
 				: false,
-			6  => $message_tpl( esc_html__( 'published', 'safe-redirect-manager' ) ),
-			7  => $message_tpl( esc_html__( 'saved', 'safe-redirect-manager' ) ),
-			8  => $message_tpl( esc_html__( 'submitted', 'safe-redirect-manager' ) ),
-			9  => $message_tpl(
+			6  => wp_kses_post(
 				sprintf(
-					/* translators: %s: publish box date format, see http://php.net/date */
-					esc_html__( 'scheduled for %s', 'safe-redirect-manager' ),
-					date_i18n( esc_html__( 'M j, Y @ G:i' ), strtotime( $post->post_date ) )
+					// translators: %1$s URL to the list of redirect rules.
+					__( 'Redirect rule published. <a href="%1$s">&larr; Back to rules</a>', 'safe-redirect-manager' ),
+					esc_url( admin_url( 'edit.php?post_type=redirect_rule' ) )
 				)
 			),
-			10 => $message_tpl( esc_html__( 'draft updated', 'safe-redirect-manager' ) ),
+			7  => wp_kses_post(
+				sprintf(
+					// translators: %1$s URL to the list of redirect rules.
+					__( 'Redirect rule saved. <a href="%1$s">&larr; Back to rules</a>', 'safe-redirect-manager' ),
+					esc_url( admin_url( 'edit.php?post_type=redirect_rule' ) )
+				)
+			),
+			8  => wp_kses_post(
+				sprintf(
+					// translators: %1$s URL to the list of redirect rules.
+					__( 'Redirect rule submitted. <a href="%1$s">&larr; Back to rules</a>', 'safe-redirect-manager' ),
+					esc_url( admin_url( 'edit.php?post_type=redirect_rule' ) )
+				)
+			),
+			9  => wp_kses_post(
+				sprintf(
+					// translators: %1$s: the scheduled date, %2$s: URL to the list of redirect rules.
+					__( 'Redirect rule scheduled for: %1$s. <a href="%2$s">&larr; Back to rules</a>', 'safe-redirect-manager' ),
+					'<strong>' . $scheduled_date . '</strong>',
+					esc_url( admin_url( 'edit.php?post_type=redirect_rule' ) )
+				)
+			),
+			10 => wp_kses_post(
+				sprintf(
+					// translators: %1$s URL to the list of redirect rules.
+					__( 'Redirect rule draft updated. <a href="%1$s">&larr; Back to rules</a>', 'safe-redirect-manager' ),
+					esc_url( admin_url( 'edit.php?post_type=redirect_rule' ) )
+				)
+			),
 		);
 
 		return $messages;
@@ -489,7 +552,7 @@ class SRM_Post_Type {
 		}
 
 		// Update post meta for redirect rules
-		if ( ! empty( $_POST['srm_redirect_nonce'] ) && wp_verify_nonce( $_POST['srm_redirect_nonce'], 'srm-save-redirect-meta' ) && current_user_can( 'edit_post', $post_id ) ) {
+		if ( ! empty( $_POST['srm_redirect_nonce'] ) && wp_verify_nonce( sanitize_key( wp_unslash( $_POST['srm_redirect_nonce'] ) ), 'srm-save-redirect-meta' ) && current_user_can( 'edit_post', $post_id ) ) {
 
 			if ( ! empty( $_POST['srm_redirect_rule_from_regex'] ) ) {
 				$allow_regex = (bool) $_POST['srm_redirect_rule_from_regex'];
@@ -500,13 +563,13 @@ class SRM_Post_Type {
 			}
 
 			if ( ! empty( $_POST['srm_redirect_rule_from'] ) ) {
-				update_post_meta( $post_id, '_redirect_rule_from', srm_sanitize_redirect_from( $_POST['srm_redirect_rule_from'], $allow_regex ) );
+				update_post_meta( $post_id, '_redirect_rule_from', srm_sanitize_redirect_from( wp_unslash( $_POST['srm_redirect_rule_from'] ), $allow_regex ) );
 			} else {
 				delete_post_meta( $post_id, '_redirect_rule_from' );
 			}
 
 			if ( ! empty( $_POST['srm_redirect_rule_to'] ) ) {
-				update_post_meta( $post_id, '_redirect_rule_to', srm_sanitize_redirect_to( $_POST['srm_redirect_rule_to'] ) );
+				update_post_meta( $post_id, '_redirect_rule_to', srm_sanitize_redirect_to( wp_unslash( $_POST['srm_redirect_rule_to'] ) ) );
 			} else {
 				delete_post_meta( $post_id, '_redirect_rule_to' );
 			}
@@ -524,13 +587,13 @@ class SRM_Post_Type {
 			}
 
 			if ( ! empty( $_POST['srm_redirect_rule_message'] ) ) {
-				update_post_meta( $post_id, '_redirect_rule_message', sanitize_text_field( $_POST['srm_redirect_rule_message'] ) );
+				update_post_meta( $post_id, '_redirect_rule_message', sanitize_text_field( wp_unslash( $_POST['srm_redirect_rule_message'] ) ) );
 			} else {
 				delete_post_meta( $post_id, '_redirect_rule_message' );
 			}
 
 			if ( ! empty( $_POST['srm_redirect_rule_notes'] ) ) {
-				update_post_meta( $post_id, '_redirect_rule_notes', sanitize_text_field( $_POST['srm_redirect_rule_notes'] ) );
+				update_post_meta( $post_id, '_redirect_rule_notes', sanitize_text_field( wp_unslash( $_POST['srm_redirect_rule_notes'] ) ) );
 			} else {
 				delete_post_meta( $post_id, '_redirect_rule_notes' );
 			}
@@ -544,7 +607,7 @@ class SRM_Post_Type {
 		}
 
 		if ( ! empty( $_REQUEST['srm_redirect_ajax_nonce'] )
-			&& wp_verify_nonce( $_REQUEST['srm_redirect_ajax_nonce'], 'srm-save-redirect-ajax-meta' )
+			&& wp_verify_nonce( sanitize_key( wp_unslash( $_REQUEST['srm_redirect_ajax_nonce'] ) ), 'srm-save-redirect-ajax-meta' )
 			&& current_user_can( 'edit_post', $post_id )
 		) {
 			if ( ! empty( $_REQUEST['srm_redirect_rule_status_code'] ) && '-1' !== $_REQUEST['srm_redirect_rule_status_code'] ) {
@@ -802,13 +865,14 @@ class SRM_Post_Type {
 		if ( 'redirect_rule' === get_post_type() ) {
 			wp_enqueue_style( 'redirectjs', SRM_PLUGIN_URL . 'assets/css/redirect.css', array(), SRM_VERSION );
 			wp_enqueue_script( 'bulk-select', SRM_PLUGIN_URL . 'assets/js/bulk-select.js', array( 'jquery' ), SRM_VERSION, true );
-			wp_enqueue_script( 'redirectjs', SRM_PLUGIN_URL . 'assets/js/redirect.js', array( 'jquery' ), SRM_VERSION );
-			wp_enqueue_script( 'quick-bulk-editjs', SRM_PLUGIN_URL . 'assets/js/quick-bulk-edit.js', array( 'jquery', 'inline-edit-post' ), SRM_VERSION );
+			wp_enqueue_script( 'redirectjs', SRM_PLUGIN_URL . 'assets/js/redirect.js', array( 'jquery' ), SRM_VERSION, true );
+			wp_enqueue_script( 'quick-bulk-editjs', SRM_PLUGIN_URL . 'assets/js/quick-bulk-edit.js', array( 'jquery', 'inline-edit-post' ), SRM_VERSION, true );
 			wp_localize_script(
 				'redirectjs',
 				'redirectValidation',
 				array(
 					'urlError'        => __( 'There are some issues validating the URL. Please try again.', 'safe-redirect-manager' ),
+					// translators: %s is the URL to the edit screen of the existing redirect rule with the same "Redirect From" value.
 					'fail'            => __( 'There is an existing redirect with the same Redirect From URL. You may <a href="%s">Edit</a> the redirect or try other `from` URL.', 'safe-redirect-manager' ),
 					'ajax_url'        => admin_url( 'admin-ajax.php' ),
 					'ajax_nonce'      => wp_create_nonce( 'srm_autocomplete_nonce' ),
@@ -865,7 +929,11 @@ class SRM_Post_Type {
 		}
 
 		$suggestions = array();
-		foreach ( $query as $key => $post ) {
+		foreach ( $query as $post ) {
+			if ( ! is_post_publicly_viewable( $post->ID ) ) {
+				return;
+			}
+
 			$suggestions[] = array(
 				'relative_url' => wp_make_link_relative( get_the_permalink( $post->ID ) ),
 				'post_title'   => $post->post_title,
@@ -913,9 +981,9 @@ class SRM_Post_Type {
 		 * See https://docs.wpvip.com/databases/optimize-queries/using-post__not_in/
 		 */
 		$existing_post_ids = new WP_Query(
-			[
-				'meta_key'               => '_redirect_rule_from',
-				'meta_value'             => $from,
+			array(
+				'meta_key'               => '_redirect_rule_from', // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_key -- Indexed meta key.
+				'meta_value'             => $from, // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_value -- Required for lookup.
 				'fields'                 => 'ids',
 				'posts_per_page'         => 2,
 				'no_found_rows'          => true,
@@ -925,7 +993,7 @@ class SRM_Post_Type {
 				'order'                  => 'ASC',
 				'update_post_meta_cache' => false,
 				'update_post_term_cache' => false,
-			]
+			)
 		);
 
 		// If $_GET['current_post_id'] is set, exclude it from the post results.
@@ -934,7 +1002,7 @@ class SRM_Post_Type {
 		$post_ids = array_map( 'absint', $post_ids );
 		if ( isset( $_GET['current_post_id'] ) ) {
 			$current_post_id = absint( $_GET['current_post_id'] );
-			$post_ids        = array_diff( $post_ids, [ $current_post_id ] );
+			$post_ids        = array_diff( $post_ids, array( $current_post_id ) );
 		}
 
 		// If no posts found, then bail out.

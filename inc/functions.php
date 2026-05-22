@@ -77,7 +77,7 @@ function srm_get_redirects( $args = array(), $hard = false ) {
 				$redirects[] = $redirect_data;
 			}
 
-			$i++;
+			++$i;
 
 		}
 
@@ -176,13 +176,8 @@ function srm_flush_cache() {
  * @return boolean
  */
 function srm_check_for_possible_redirect_loops() {
-	$redirects = srm_get_redirects();
-
-	if ( function_exists( 'wp_parse_url' ) ) {
-		$current_url = wp_parse_url( home_url() );
-	} else {
-		$current_url = parse_url( home_url() );
-	}
+	$redirects   = srm_get_redirects();
+	$current_url = wp_parse_url( home_url() );
 
 	$this_host = ( is_array( $current_url ) && ! empty( $current_url['host'] ) ) ? $current_url['host'] : '';
 
@@ -191,13 +186,8 @@ function srm_check_for_possible_redirect_loops() {
 
 		// check redirect from against all redirect to's
 		foreach ( $redirects as $compare_redirect ) {
-			$redirect_to = $compare_redirect['redirect_to'];
-
-			if ( function_exists( 'wp_parse_url' ) ) {
-				$redirect_url = wp_parse_url( $redirect_to );
-			} else {
-				$redirect_url = parse_url( $redirect_to );
-			}
+			$redirect_to  = $compare_redirect['redirect_to'];
+			$redirect_url = wp_parse_url( $redirect_to );
 
 			$redirect_host = ( is_array( $redirect_url ) && ! empty( $redirect_url['host'] ) ) ? $redirect_url['host'] : '';
 
@@ -259,6 +249,7 @@ function srm_create_redirect( $redirect_from, $redirect_to, $status_code = 302, 
 	}
 
 	// Check if the redirect already exists.
+	// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- Perf. Caching not required as it would be flushed below.
 	$existing_redirect = $wpdb->get_row(
 		$wpdb->prepare(
 			"SELECT
@@ -411,11 +402,13 @@ function srm_import_file( $file, $args ) {
 
 	// enable line endings auto detection
 	if ( version_compare( PHP_VERSION, '8.1', '<' ) ) {
-		@ini_set( 'auto_detect_line_endings', true ); // phpcs:ignore PHPCompatibility.IniDirectives.RemovedIniDirectives.auto_detect_line_endingsDeprecated
+		// phpcs:ignore WordPress.PHP.NoSilencedErrors.Discouraged, Generic.PHP.NoSilencedErrors.Forbidden, PHPCompatibility.IniDirectives.RemovedIniDirectives.auto_detect_line_endingsDeprecated -- required for PHP 8.0 and earlier.
+		@ini_set( 'auto_detect_line_endings', true );
 	}
 
 	// open file pointer if $file is not a resource
 	if ( ! is_resource( $file ) ) {
+		// phpcs:ignore WordPress.WP.AlternativeFunctions.file_system_operations_fopen
 		$handle = fopen( $file, 'rb' );
 		if ( ! $handle ) {
 			$doing_wp_cli && WP_CLI::error( sprintf( 'Error retrieving %s file', basename( $file ) ) );
@@ -430,12 +423,13 @@ function srm_import_file( $file, $args ) {
 	$skipped = 0;
 	$headers = fgetcsv( $handle, null, ',', '"', '\\' );
 
+	// phpcs:ignore Generic.CodeAnalysis.AssignmentInCondition.FoundInWhileCondition -- Intended.
 	while ( ( $row = fgetcsv( $handle, null, ',', '"', '\\' ) ) ) {
 		// validate
 		$rule = is_array( $row ) ? array_combine( $headers, $row ) : array();
 		if ( empty( $rule ) || empty( $rule[ $args['source'] ] ) || empty( $rule[ $args['target'] ] ) ) {
 			$doing_wp_cli && WP_CLI::warning( 'Skipping - redirection rule is formatted improperly.' );
-			$skipped++;
+			++$skipped;
 			continue;
 		}
 
@@ -452,15 +446,16 @@ function srm_import_file( $file, $args ) {
 
 		if ( is_wp_error( $id ) ) {
 			$doing_wp_cli && WP_CLI::warning( $id );
-			$skipped++;
+			++$skipped;
 		} else {
 			$doing_wp_cli && WP_CLI::line( "Success - Created redirect from '{$redirect_from}' to '{$redirect_to}'" );
-			$created++;
+			++$created;
 		}
 	}
 
 	// close an open file pointer if we've opened it
 	if ( $close_handle ) {
+		// phpcs:ignore WordPress.WP.AlternativeFunctions.file_system_operations_fclose
 		fclose( $handle );
 	}
 

@@ -43,7 +43,7 @@ function site_meets_php_requirements(): bool {
 if ( ! site_meets_php_requirements() ) {
 	add_action(
 		'admin_notices',
-		function() {
+		function () {
 			?>
 			<div class="notice notice-error">
 				<p>
@@ -65,17 +65,17 @@ if ( ! site_meets_php_requirements() ) {
 }
 
 // Load helper functions and classes
-require_once dirname( __FILE__ ) . '/inc/functions.php';
-require_once dirname( __FILE__ ) . '/inc/classes/class-srm-post-type.php';
-require_once dirname( __FILE__ ) . '/inc/classes/class-srm-redirect.php';
-require_once dirname( __FILE__ ) . '/inc/classes/class-srm-loop-detection.php';
+require_once __DIR__ . '/inc/functions.php';
+require_once __DIR__ . '/inc/classes/class-srm-post-type.php';
+require_once __DIR__ . '/inc/classes/class-srm-redirect.php';
+require_once __DIR__ . '/inc/classes/class-srm-loop-detection.php';
 
 define( 'SRM_VERSION', '2.2.2' );
 define( 'SRM_PLUGIN_FULL_FILE', __FILE__ );
 define( 'SRM_PLUGIN_URL', plugin_dir_url( SRM_PLUGIN_FULL_FILE ) );
 
 if ( defined( 'WP_CLI' ) && WP_CLI ) {
-	require_once dirname( __FILE__ ) . '/inc/classes/class-srm-wp-cli.php';
+	require_once __DIR__ . '/inc/classes/class-srm-wp-cli.php';
 	\WP_CLI::add_command( 'safe-redirect-manager', 'SRM_WP_CLI' );
 }
 

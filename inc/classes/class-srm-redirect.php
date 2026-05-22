@@ -90,15 +90,11 @@ class SRM_Redirect {
 			return false;
 		}
 
-		/**
+		/*
 		 * If WordPress resides in a directory that is not the public root, we have to chop
 		 * the pre-WP path off the requested path.
 		 */
-		if ( function_exists( 'wp_parse_url' ) ) {
-			$parsed_home_url = wp_parse_url( home_url() );
-		} else {
-			$parsed_home_url = parse_url( home_url() ); // phpcs:ignore
-		}
+		$parsed_home_url = wp_parse_url( home_url() );
 
 		if ( isset( $parsed_home_url['path'] ) && '/' !== $parsed_home_url['path'] ) {
 			$requested_path = preg_replace( '@' . $parsed_home_url['path'] . '@i', '', $requested_path, 1 );
@@ -138,11 +134,7 @@ class SRM_Redirect {
 			$normalized_requested_path = $requested_path;
 		}
 
-		if ( function_exists( 'wp_parse_url' ) ) {
-			$parsed_requested_path = wp_parse_url( $normalized_requested_path );
-		} else {
-			$parsed_requested_path = parse_url( $normalized_requested_path ); // phpcs:ignore
-		}
+		$parsed_requested_path = wp_parse_url( $normalized_requested_path );
 		// Normalize the request path with and without query strings, for comparison later
 		$normalized_requested_path_no_query = '';
 		$requested_query_params             = '';
@@ -166,8 +158,9 @@ class SRM_Redirect {
 			$status_code  = $redirect['status_code'];
 			$enable_regex = ( isset( $redirect['enable_regex'] ) ) ? $redirect['enable_regex'] : false;
 			$redirect_id  = $redirect['ID'];
-			$force_https  = ! empty( $redirect['force_https'] ) && true == $redirect['force_https'];
-			$message      = $redirect['message'] ?? '';
+			// phpcs:ignore Universal.Operators.StrictComparisons.LooseEqual -- truethy check.
+			$force_https = ! empty( $redirect['force_https'] ) && true == $redirect['force_https'];
+			$message     = $redirect['message'] ?? '';
 
 			// check if the redirection destination is valid, otherwise just skip it (unless this is a 4xx request)
 			if ( empty( $redirect_to ) && ! in_array( $status_code, array( 403, 404, 410 ), true ) ) {
@@ -212,14 +205,10 @@ class SRM_Redirect {
 			// If the requested path matches a redirect rule...
 			// this variable is not used after this boolean.
 			if ( $matched_path ) {
-				/**
+				/*
 				 * Whitelist redirect host
 				 */
-				if ( function_exists( 'wp_parse_url' ) ) {
-					$parsed_redirect = wp_parse_url( $redirect_to );
-				} else {
-					$parsed_redirect = parse_url( $redirect_to ); // phpcs:ignore
-				}
+				$parsed_redirect = wp_parse_url( $redirect_to );
 
 				if ( is_array( $parsed_redirect ) && ! empty( $parsed_redirect['host'] ) ) {
 					$this->whitelist_host = $parsed_redirect['host'];
@@ -253,14 +242,14 @@ class SRM_Redirect {
 				$filtered_redirect_to  = apply_filters( 'srm_redirect_to', $redirect_to );
 				$sanitized_redirect_to = esc_url_raw( $filtered_redirect_to );
 
-				return [
+				return array(
 					'redirect_to'  => $sanitized_redirect_to,
 					'status_code'  => $status_code,
 					'enable_regex' => $enable_regex,
 					'redirect_id'  => $redirect_id,
 					'force_https'  => $force_https,
 					'message'      => $message,
-				];
+				);
 			}
 		}
 
@@ -294,7 +283,7 @@ class SRM_Redirect {
 		 * @param {string} $request_path Request path. Default `$_SERVER['REQUEST_URI']`.
 		 * @returns {string} Request path.
 		 */
-		$requested_path   = esc_url_raw( apply_filters( 'srm_requested_path', sanitize_text_field( wp_unslash( $_SERVER['REQUEST_URI'] ) ) ?? '' ) );
+		$requested_path   = esc_url_raw( apply_filters( 'srm_requested_path', sanitize_text_field( wp_unslash( $_SERVER['REQUEST_URI'] ?? '' ) ) ) );
 		$requested_path   = untrailingslashit( stripslashes( $requested_path ) );
 		$matched_redirect = $this->match_redirect( $requested_path );
 
@@ -339,7 +328,7 @@ class SRM_Redirect {
 			wp_die(
 				esc_html( $matched_redirect['message'] ),
 				'',
-				$matched_redirect['status_code'] // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+				(int) $matched_redirect['status_code']
 			);
 			return;
 		}
@@ -409,10 +398,12 @@ class SRM_Redirect {
 					$main_site_id = get_main_site_id();
 
 					if ( ! empty( $main_site_id ) ) {
+						// phpcs:ignore WordPressVIPMinimum.Functions.RestrictedFunctions.switch_to_blog_switch_to_blog -- Switch to allow DB checks.
 						switch_to_blog( $main_site_id );
 
 						$this->maybe_redirect();
 
+						// phpcs:ignore WordPressVIPMinimum.Functions.RestrictedFunctions.switch_to_blog_switch_to_blog -- Switch back to original site.
 						switch_to_blog( $blog_id );
 					}
 				}
@@ -437,4 +428,3 @@ class SRM_Redirect {
 		return $instance;
 	}
 }
-
