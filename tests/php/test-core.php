@@ -199,6 +199,33 @@ class SRMTestCore extends WP_UnitTestCase {
 	}
 
 	/**
+	 * Test that wildcard replacement preserves the leading slash when redirect_from
+	 * has no trailing slash before the wildcard (e.g. /from* -> https://example.com*).
+	 *
+	 * Without this fix, /from* -> https://example.com* with request /from/abc
+	 * produced https://example.comabc (missing slash) instead of
+	 * https://example.com/abc.
+	 */
+	public function testReplaceWildcardNoTrailingSlash() {
+		$_SERVER['REQUEST_URI'] = '/from/abc';
+		$redirected_to_actual   = '';
+		srm_create_redirect( '/from*', 'https://example.com*' );
+
+		add_action(
+			'srm_do_redirect',
+			function ( $requested_path, $redirected_to, $status_code ) use ( &$redirected_to_actual ) {
+				$redirected_to_actual = $redirected_to;
+			},
+			10,
+			3
+		);
+
+		SRM_Redirect::factory()->maybe_redirect();
+
+		$this->assertSame( 'https://example.com/abc', $redirected_to_actual );
+	}
+
+	/**
 	 * Test lots of permutations of URL trailing slashes with and without regex
 	 *
 	 * @since 1.7.3
