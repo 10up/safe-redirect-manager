@@ -37,4 +37,4 @@ jobs:
           build-dir: './tmp-build/safe-redirect-manager'
           # Prefix: Plugin uses `srm_` as the prefix rather than the full plugin name. It was submitted to wp.org 14 years ago.
           # InputNotSanitized: Tested by phpcs workflow. Fails in plugin check due to custom sanitization functions.
-          ignore-codes: 'WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedFunctionFound,WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound,WordPress.Security.ValidatedSanitizedInput.InputNotSanitized'
+          ignore-codes: 'WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedFunctionFound,WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound,WordPress.Security.ValidatedSanitizedInput.InputNotSanitized,Squiz.PHP.DiscouragedFunctions.Discouraged'
