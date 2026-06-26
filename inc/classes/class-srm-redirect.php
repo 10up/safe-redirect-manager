@@ -201,7 +201,13 @@ class SRM_Redirect {
 					// Mark as path match if requested path matches the base of the redirect from.
 					$matched_path = ( substr( trailingslashit( $normalized_requested_path ), 0, strlen( $wildcard_base ) ) === $wildcard_base );
 					if ( ( strrpos( $redirect_to, '*' ) === strlen( $redirect_to ) - 1 ) ) {
-						$redirect_to = rtrim( $redirect_to, '*' ) . ltrim( substr( $requested_path, strlen( $wildcard_base ) ), '/' );
+						$suffix        = substr( $requested_path, strlen( $wildcard_base ) );
+						$redirect_base = rtrim( $redirect_to, '*' );
+						// Avoid double slash: only strip leading slash from suffix when
+						// redirect_base already ends with one (e.g. /from/* -> /to/*).
+						// Without this guard, /from* -> https://example.com* would produce
+						// https://example.comabc instead of https://example.com/abc.
+						$redirect_to = $redirect_base . ( '/' === substr( $redirect_base, -1 ) ? ltrim( $suffix, '/' ) : $suffix );
 					}
 				}
 			}
