@@ -71,6 +71,11 @@ class SRM_Export {
 			return;
 		}
 
+		// Hide the button when there are no redirects to export. wp_count_posts() is cached.
+		if ( ! array_sum( (array) wp_count_posts( 'redirect_rule' ) ) ) {
+			return;
+		}
+
 		$format_labels = array(
 			'csv'  => __( 'CSV', 'safe-redirect-manager' ),
 			'json' => __( 'JSON', 'safe-redirect-manager' ),
@@ -148,7 +153,16 @@ class SRM_Export {
 			$export_format = 'csv';
 		}
 
+		// Raise the redirect cap so the export includes every record. Filterable via srm_export_max_redirects.
+		$export_limit = apply_filters( 'srm_export_max_redirects', PHP_INT_MAX );
+		add_filter( 'srm_max_redirects', fn() => $export_limit );
 		$redirects = srm_get_redirects( array( 'post_status' => 'any' ), true );
+
+		delete_transient( '_srm_redirects_' . $export_limit );
+
+		if ( empty( $redirects ) ) {
+			wp_die( esc_html__( 'There are no redirects to export.', 'safe-redirect-manager' ) );
+		}
 
 		// Clear any existing output buffers to prevent content from corrupting the download.
 		while ( ob_get_level() ) {
@@ -187,9 +201,7 @@ class SRM_Export {
 			'redirect_to'   => $redirect['redirect_to'],
 			'status_code'   => (int) $redirect['status_code'],
 			'enable_regex'  => (bool) $redirect['enable_regex'],
-			'force_https'   => (bool) $redirect['force_https'],
-			'message'       => $redirect['message'],
-			'status'        => $redirect['post_status'],
+			'post_status'   => $redirect['post_status'],
 		);
 	}
 
@@ -205,7 +217,7 @@ class SRM_Export {
 		$handle = fopen( 'php://output', 'w' );
 
 		// phpcs:disable WordPressVIPMinimum.Functions.RestrictedFunctions.file_ops_fputcsv -- Writing to php://output stream, not the filesystem.
-		fputcsv( $handle, array( 'ID', 'Redirect From', 'Redirect To', 'HTTP Status Code', 'Enable Regex', 'Force HTTPS', 'Message', 'Status' ) );
+		fputcsv( $handle, array( 'ID', 'redirect_from', 'redirect_to', 'status_code', 'enable_regex', 'post_status' ) );
 
 		foreach ( $redirects as $redirect ) {
 			$row = $this->normalize_redirect( $redirect );
@@ -217,9 +229,7 @@ class SRM_Export {
 					$this->escape_csv( $row['redirect_to'] ),
 					$row['status_code'],
 					$row['enable_regex'] ? '1' : '0',
-					$row['force_https'] ? '1' : '0',
-					$this->escape_csv( $row['message'] ),
-					$row['status'],
+					$row['post_status'],
 				)
 			);
 		}
