@@ -207,10 +207,10 @@ class SRM_Export {
 		$handle = fopen( 'php://output', 'w' );
 
 		// phpcs:disable WordPressVIPMinimum.Functions.RestrictedFunctions.file_ops_fputcsv -- Writing to php://output stream, not the filesystem.
-		fputcsv( $handle, srm_get_export_fields() );
+		fputcsv( $handle, srm_get_export_fields(), ',', '"', '\\' );
 
 		foreach ( $redirects as $redirect ) {
-			fputcsv( $handle, array_map( 'srm_escape_csv', $this->normalize_redirect( $redirect ) ) );
+			fputcsv( $handle, array_map( 'srm_escape_csv', $this->normalize_redirect( $redirect ) ), ',', '"', '\\' );
 		}
 		// phpcs:enable WordPressVIPMinimum.Functions.RestrictedFunctions.file_ops_fputcsv
 
