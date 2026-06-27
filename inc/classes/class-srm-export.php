@@ -15,7 +15,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 class SRM_Export {
 
 	/**
-	 * Supported export formats. Add new format keys here as they are implemented.
+	 * Supported export formats.
 	 *
 	 * @since 2.2.3
 	 * @var string[]
@@ -71,15 +71,9 @@ class SRM_Export {
 			return;
 		}
 
-		// Hide the button when there are no redirects to export. wp_count_posts() is cached.
 		if ( ! array_sum( (array) wp_count_posts( 'redirect_rule' ) ) ) {
 			return;
 		}
-
-		$format_labels = array(
-			'csv'  => __( 'CSV', 'safe-redirect-manager' ),
-			'json' => __( 'JSON', 'safe-redirect-manager' ),
-		);
 		?>
 		<div class="alignleft actions">
 			<label for="srm-export-format" class="screen-reader-text">
@@ -88,7 +82,7 @@ class SRM_Export {
 			<select id="srm-export-format">
 				<?php foreach ( $this->supported_formats as $format ) : ?>
 					<option value="<?php echo esc_attr( $this->get_export_url( $format ) ); ?>">
-						<?php echo esc_html( $format_labels[ $format ] ?? strtoupper( $format ) ); ?>
+						<?php echo esc_html( strtoupper( $format ) ); ?>
 					</option>
 				<?php endforeach; ?>
 			</select>
@@ -148,12 +142,10 @@ class SRM_Export {
 			wp_die( esc_html__( 'You do not have permission to export redirects.', 'safe-redirect-manager' ) );
 		}
 
-		// Validate format against whitelist; fall back to csv for unknown values.
 		if ( ! in_array( $export_format, $this->supported_formats, true ) ) {
 			$export_format = 'csv';
 		}
 
-		// Raise the redirect cap so the export includes every record. Filterable via srm_export_max_redirects.
 		$export_limit = apply_filters( 'srm_export_max_redirects', PHP_INT_MAX );
 		add_filter( 'srm_max_redirects', fn() => $export_limit );
 		$redirects = srm_get_redirects( array( 'post_status' => 'any' ), true );
@@ -164,7 +156,6 @@ class SRM_Export {
 			wp_die( esc_html__( 'There are no redirects to export.', 'safe-redirect-manager' ) );
 		}
 
-		// Clear any existing output buffers to prevent content from corrupting the download.
 		while ( ob_get_level() ) {
 			ob_end_clean();
 		}
