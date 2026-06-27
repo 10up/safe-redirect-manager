@@ -98,7 +98,7 @@ function srm_get_redirects( $args = array(), $hard = false ) {
 function srm_get_export_fields() {
 	return apply_filters(
 		'srm_export_fields',
-		array( 'ID', 'redirect_from', 'redirect_to', 'status_code', 'enable_regex', 'notes', 'post_status' )
+		array( 'ID', 'redirect_from', 'redirect_to', 'status_code', 'enable_regex', 'post_status', 'notes' )
 	);
 }
 
