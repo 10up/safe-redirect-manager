@@ -66,6 +66,7 @@ function srm_get_redirects( $args = array(), $hard = false ) {
 					'redirect_to'   => get_post_meta( $redirect_id, '_redirect_rule_to', true ),
 					'status_code'   => (int) get_post_meta( $redirect_id, '_redirect_rule_status_code', true ),
 					'message'       => get_post_meta( $redirect_id, '_redirect_rule_message', true ),
+					'notes'         => get_post_meta( $redirect_id, '_redirect_rule_notes', true ),
 					'enable_regex'  => (bool) get_post_meta( $redirect_id, '_redirect_rule_from_regex', true ),
 					'force_https'   => get_post_meta( $redirect_id, '_force_https', true ),
 				);
@@ -86,6 +87,34 @@ function srm_get_redirects( $args = array(), $hard = false ) {
 	}
 
 	return $redirects;
+}
+
+/**
+ * Returns the shared list of fields used by the admin and WP-CLI exports.
+ *
+ * @since 2.2.3
+ * @return string[]
+ */
+function srm_get_export_fields() {
+	return apply_filters(
+		'srm_export_fields',
+		array( 'ID', 'redirect_from', 'redirect_to', 'status_code', 'enable_regex', 'notes', 'post_status' )
+	);
+}
+
+/**
+ * Escapes a value against CSV formula injection.
+ *
+ * @since 2.2.3
+ * @param mixed $value Field value.
+ * @return string
+ */
+function srm_escape_csv( $value ) {
+	$value = (string) $value;
+	if ( '' !== $value && in_array( $value[0], array( '=', '+', '-', '@', "\t", "\r" ), true ) ) {
+		$value = "'" . $value;
+	}
+	return $value;
 }
 
 /**

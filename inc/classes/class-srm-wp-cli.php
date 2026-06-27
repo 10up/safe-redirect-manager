@@ -324,13 +324,13 @@ class SRM_WP_CLI extends WP_CLI_Command {
 			WP_CLI::error( 'There are no redirects available. Please add some first and then try again.' );
 		}
 
-		$fields = array(
-			'ID',
-			'redirect_from',
-			'redirect_to',
-			'status_code',
-			'enable_regex',
-			'post_status',
+		$fields = srm_get_export_fields();
+
+		$redirects = array_map(
+			function ( $redirect ) {
+				return array_map( 'srm_escape_csv', $redirect );
+			},
+			$redirects
 		);
 
 		$file_name = $assoc_args['filename'] . '.csv';

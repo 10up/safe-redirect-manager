@@ -195,14 +195,13 @@ class SRM_Export {
 	 * @return array
 	 */
 	protected function normalize_redirect( $redirect ) {
-		return array(
-			'ID'            => $redirect['ID'],
-			'redirect_from' => $redirect['redirect_from'],
-			'redirect_to'   => $redirect['redirect_to'],
-			'status_code'   => (int) $redirect['status_code'],
-			'enable_regex'  => (bool) $redirect['enable_regex'],
-			'post_status'   => $redirect['post_status'],
-		);
+		$normalized = array();
+
+		foreach ( srm_get_export_fields() as $field ) {
+			$normalized[ $field ] = $redirect[ $field ] ?? '';
+		}
+
+		return $normalized;
 	}
 
 	/**
@@ -217,21 +216,10 @@ class SRM_Export {
 		$handle = fopen( 'php://output', 'w' );
 
 		// phpcs:disable WordPressVIPMinimum.Functions.RestrictedFunctions.file_ops_fputcsv -- Writing to php://output stream, not the filesystem.
-		fputcsv( $handle, array( 'ID', 'redirect_from', 'redirect_to', 'status_code', 'enable_regex', 'post_status' ) );
+		fputcsv( $handle, srm_get_export_fields() );
 
 		foreach ( $redirects as $redirect ) {
-			$row = $this->normalize_redirect( $redirect );
-			fputcsv(
-				$handle,
-				array(
-					$row['ID'],
-					$this->escape_csv( $row['redirect_from'] ),
-					$this->escape_csv( $row['redirect_to'] ),
-					$row['status_code'],
-					$row['enable_regex'] ? '1' : '0',
-					$row['post_status'],
-				)
-			);
+			fputcsv( $handle, array_map( 'srm_escape_csv', $this->normalize_redirect( $redirect ) ) );
 		}
 		// phpcs:enable WordPressVIPMinimum.Functions.RestrictedFunctions.file_ops_fputcsv
 
@@ -249,20 +237,5 @@ class SRM_Export {
 	protected function export_json( $redirects ) {
 		// phpcs:ignore WordPress.WP.AlternativeFunctions.json_encode_json_encode
 		echo wp_json_encode( array_map( array( $this, 'normalize_redirect' ), $redirects ), JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES );
-	}
-
-	/**
-	 * Escapes a CSV field value against formula injection.
-	 *
-	 * @since 2.2.3
-	 * @param string $value Field value.
-	 * @return string
-	 */
-	protected function escape_csv( $value ) {
-		$value = (string) $value;
-		if ( '' !== $value && in_array( $value[0], array( '=', '+', '-', '@', "\t", "\r" ), true ) ) {
-			$value = "'" . $value;
-		}
-		return $value;
 	}
 }
