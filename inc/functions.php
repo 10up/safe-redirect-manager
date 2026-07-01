@@ -60,22 +60,7 @@ function srm_get_redirects( $args = array(), $hard = false ) {
 					break 2;
 				}
 
-				$redirect_data = array(
-					'ID'            => $redirect_id,
-					'redirect_from' => get_post_meta( $redirect_id, '_redirect_rule_from', true ),
-					'redirect_to'   => get_post_meta( $redirect_id, '_redirect_rule_to', true ),
-					'status_code'   => (int) get_post_meta( $redirect_id, '_redirect_rule_status_code', true ),
-					'message'       => get_post_meta( $redirect_id, '_redirect_rule_message', true ),
-					'notes'         => get_post_meta( $redirect_id, '_redirect_rule_notes', true ),
-					'enable_regex'  => (bool) get_post_meta( $redirect_id, '_redirect_rule_from_regex', true ),
-					'force_https'   => get_post_meta( $redirect_id, '_force_https', true ),
-				);
-
-				if ( $include_post_status_in_result ) {
-					$redirect_data['post_status'] = get_post_status( $redirect_id );
-				}
-
-				$redirects[] = $redirect_data;
+				$redirects[] = srm_get_redirect_data( $redirect_id, $include_post_status_in_result );
 			}
 
 			++$i;
@@ -90,6 +75,33 @@ function srm_get_redirects( $args = array(), $hard = false ) {
 }
 
 /**
+ * Builds the normalized data array for a single redirect post.
+ *
+ * @since 2.2.3
+ * @param int  $redirect_id         Redirect post ID.
+ * @param bool $include_post_status Whether to include the post_status field.
+ * @return array
+ */
+function srm_get_redirect_data( $redirect_id, $include_post_status = false ) {
+	$redirect_data = array(
+		'ID'            => $redirect_id,
+		'redirect_from' => get_post_meta( $redirect_id, '_redirect_rule_from', true ),
+		'redirect_to'   => get_post_meta( $redirect_id, '_redirect_rule_to', true ),
+		'status_code'   => (int) get_post_meta( $redirect_id, '_redirect_rule_status_code', true ),
+		'message'       => get_post_meta( $redirect_id, '_redirect_rule_message', true ),
+		'notes'         => get_post_meta( $redirect_id, '_redirect_rule_notes', true ),
+		'enable_regex'  => (bool) get_post_meta( $redirect_id, '_redirect_rule_from_regex', true ),
+		'force_https'   => get_post_meta( $redirect_id, '_force_https', true ),
+	);
+
+	if ( $include_post_status ) {
+		$redirect_data['post_status'] = get_post_status( $redirect_id );
+	}
+
+	return $redirect_data;
+}
+
+/**
  * Returns the shared list of fields used by the admin and WP-CLI exports.
  *
  * @since 2.2.3
@@ -98,7 +110,7 @@ function srm_get_redirects( $args = array(), $hard = false ) {
 function srm_get_export_fields() {
 	return apply_filters(
 		'srm_export_fields',
-		array( 'ID', 'redirect_from', 'redirect_to', 'status_code', 'enable_regex', 'post_status', 'notes' )
+		array( 'ID', 'redirect_from', 'redirect_to', 'status_code', 'enable_regex', 'post_status', 'notes', 'message', 'force_https' )
 	);
 }
 

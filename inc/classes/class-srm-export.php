@@ -146,13 +146,7 @@ class SRM_Export {
 			$export_format = 'csv';
 		}
 
-		$export_limit = apply_filters( 'srm_export_max_redirects', PHP_INT_MAX );
-		add_filter( 'srm_max_redirects', fn() => $export_limit );
-		$redirects = srm_get_redirects( array( 'post_status' => 'any' ), true );
-
-		delete_transient( '_srm_redirects_' . $export_limit );
-
-		if ( empty( $redirects ) ) {
+		if ( ! $this->query_redirects_page( 1 )->have_posts() ) {
 			wp_die( esc_html__( 'There are no redirects to export.', 'safe-redirect-manager' ) );
 		}
 
@@ -167,22 +161,44 @@ class SRM_Export {
 			case 'json':
 				header( 'Content-Type: application/json; charset=utf-8' );
 				header( 'Content-Disposition: attachment; filename="safe-redirect-manager-export-' . gmdate( 'Y-m-d' ) . '.json"' );
-				$this->export_json( $redirects );
+				$this->export_json();
 				break;
 			default:
 				header( 'Content-Type: text/csv; charset=utf-8' );
 				header( 'Content-Disposition: attachment; filename="safe-redirect-manager-export-' . gmdate( 'Y-m-d' ) . '.csv"' );
-				$this->export_csv( $redirects );
+				$this->export_csv();
 		}
 
 		exit;
 	}
 
 	/**
+	 * Queries a single page of redirect IDs, ordered like the admin list table.
+	 *
+	 * @since 2.2.3
+	 * @param int $paged Page number to query.
+	 * @return WP_Query
+	 */
+	protected function query_redirects_page( $paged ) {
+		return new WP_Query(
+			array(
+				'post_type'         => 'redirect_rule',
+				'post_status'       => 'any',
+				'posts_per_page'    => 100,
+				'paged'             => $paged,
+				'fields'            => 'ids',
+				'orderby'           => 'menu_order ID',
+				'order'             => 'ASC',
+				'update_term_cache' => false,
+			)
+		);
+	}
+
+	/**
 	 * Returns a normalized array for a single redirect.
 	 *
 	 * @since 2.2.3
-	 * @param array $redirect Redirect data from srm_get_redirects().
+	 * @param array $redirect Redirect data from srm_get_redirect_data().
 	 * @return array
 	 */
 	protected function normalize_redirect( $redirect ) {
@@ -196,22 +212,34 @@ class SRM_Export {
 	}
 
 	/**
-	 * Outputs redirects as CSV rows to php://output.
+	 * Streams redirects as CSV rows to php://output, one page at a time.
 	 *
 	 * @since 2.2.3
-	 * @param array[] $redirects Redirect data from srm_get_redirects().
 	 * @return void
 	 */
-	protected function export_csv( $redirects ) {
+	protected function export_csv() {
 		// phpcs:ignore WordPress.WP.AlternativeFunctions.file_system_operations_fopen
 		$handle = fopen( 'php://output', 'w' );
+
+		if ( ! $handle ) {
+			return;
+		}
 
 		// phpcs:disable WordPressVIPMinimum.Functions.RestrictedFunctions.file_ops_fputcsv -- Writing to php://output stream, not the filesystem.
 		fputcsv( $handle, srm_get_export_fields(), ',', '"', '\\' );
 
-		foreach ( $redirects as $redirect ) {
-			fputcsv( $handle, array_map( 'srm_escape_csv', $this->normalize_redirect( $redirect ) ), ',', '"', '\\' );
-		}
+		$paged = 1;
+
+		do {
+			$query = $this->query_redirects_page( $paged );
+
+			foreach ( $query->posts as $redirect_id ) {
+				$redirect = srm_get_redirect_data( $redirect_id, true );
+				fputcsv( $handle, array_map( 'srm_escape_csv', $this->normalize_redirect( $redirect ) ), ',', '"', '\\' );
+			}
+
+			++$paged;
+		} while ( $paged <= $query->max_num_pages );
 		// phpcs:enable WordPressVIPMinimum.Functions.RestrictedFunctions.file_ops_fputcsv
 
 		// phpcs:ignore WordPress.WP.AlternativeFunctions.file_system_operations_fclose
@@ -219,14 +247,33 @@ class SRM_Export {
 	}
 
 	/**
-	 * Outputs redirects as a JSON array to php://output.
+	 * Streams redirects as a JSON array to php://output, one page at a time.
 	 *
 	 * @since 2.2.3
-	 * @param array[] $redirects Redirect data from srm_get_redirects().
 	 * @return void
 	 */
-	protected function export_json( $redirects ) {
-		// phpcs:ignore WordPress.WP.AlternativeFunctions.json_encode_json_encode
-		echo wp_json_encode( array_map( array( $this, 'normalize_redirect' ), $redirects ), JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES );
+	protected function export_json() {
+		echo "[\n";
+
+		$first = true;
+		$paged = 1;
+
+		do {
+			$query = $this->query_redirects_page( $paged );
+
+			foreach ( $query->posts as $redirect_id ) {
+				$redirect = srm_get_redirect_data( $redirect_id, true );
+				// phpcs:ignore WordPress.WP.AlternativeFunctions.json_encode_json_encode
+				$row = wp_json_encode( $this->normalize_redirect( $redirect ), JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES );
+				$row = false === $row ? '{}' : $row;
+
+				echo ( $first ? '' : ",\n" ) . preg_replace( '/^/m', '    ', $row ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Raw file download stream, not HTML output.
+				$first = false;
+			}
+
+			++$paged;
+		} while ( $paged <= $query->max_num_pages );
+
+		echo "\n]\n";
 	}
 }
