@@ -5,7 +5,11 @@
  * @package safe-redirect-manager
  */
 
-use \WP_CLI\Utils;
+use WP_CLI\Utils;
+
+if ( ! defined( 'ABSPATH' ) ) {
+	exit; // Run in WP context only.
+}
 
 /**
  * WP CLI command class
@@ -37,10 +41,10 @@ class SRM_WP_CLI extends WP_CLI_Command {
 	public function cli_list( $args, $assoc_args ) {
 		$assoc_args = wp_parse_args(
 			$assoc_args,
-			[
+			array(
 				'show_total' => true,
 				'format'     => 'table',
-			]
+			)
 		);
 
 		if ( 'false' === $assoc_args['show_total'] ) {
@@ -58,7 +62,7 @@ class SRM_WP_CLI extends WP_CLI_Command {
 
 		$redirects = srm_get_redirects( array( 'post_status' => 'any' ), true );
 		$redirects = array_map(
-			function( $item ) use ( $assoc_args ) {
+			function ( $item ) use ( $assoc_args ) {
 				if ( 'table' === $assoc_args['format'] ) {
 					$item['enable_regex'] = $item['enable_regex'] ? 'true' : 'false';
 				} else {
@@ -155,13 +159,13 @@ class SRM_WP_CLI extends WP_CLI_Command {
 	 * Import .htaccess file redirects
 	 *
 	 * @param array $args Array of arguments
-	 * @param array $assoc_args Array of associate arguments
 	 * @subcommand import-htaccess
 	 * @synopsis <file>
 	 */
-	public function import_htaccess( $args, $assoc_args ) {
+	public function import_htaccess( $args ) {
 		list( $file ) = $args;
 
+		// phpcs:ignore WordPressVIPMinimum.Performance.FetchingRemoteData.FileGetContentsUnknown
 		$contents = file_get_contents( $file );
 		if ( ! $contents ) {
 			WP_CLI::error( 'Error retrieving .htaccess file' );
@@ -207,10 +211,10 @@ class SRM_WP_CLI extends WP_CLI_Command {
 			$id = srm_create_redirect( $sanitized_redirect_from, $sanitized_redirect_to, $http_status );
 			if ( is_wp_error( $id ) ) {
 				WP_CLI::warning( 'Error - ' . $id->get_error_message() );
-				$skipped++;
+				++$skipped;
 			} else {
 				WP_CLI::line( "Success - Created redirect from '{$sanitized_redirect_from}' to '{$sanitized_redirect_to}'" );
-				$created++;
+				++$created;
 			}
 		}
 		WP_CLI::success( "All done! {$created} redirects were created, {$skipped} were skipped" );
@@ -313,25 +317,25 @@ class SRM_WP_CLI extends WP_CLI_Command {
 
 		$assoc_args = wp_parse_args(
 			$assoc_args,
-			[
+			array(
 				'filename' => 'srm-redirects',
-			]
+			)
 		);
 
-		$redirects = srm_get_redirects( [ 'post_status' => 'any' ], true );
+		$redirects = srm_get_redirects( array( 'post_status' => 'any' ), true );
 
 		if ( empty( $redirects ) ) {
 			WP_CLI::error( 'There are no redirects available. Please add some first and then try again.' );
 		}
 
-		$fields = [
+		$fields = array(
 			'ID',
 			'redirect_from',
 			'redirect_to',
 			'status_code',
 			'enable_regex',
 			'post_status',
-		];
+		);
 
 		$file_name = $assoc_args['filename'] . '.csv';
 
@@ -340,7 +344,8 @@ class SRM_WP_CLI extends WP_CLI_Command {
 			WP_CLI::confirm( 'Proceed with rewriting the existing file?' );
 		}
 
-		$file_resource = fopen( $file_name, 'w' ); //phpcs:ignore
+		// phpcs:ignore WordPress.WP.AlternativeFunctions.file_system_operations_fopen
+		$file_resource = fopen( $file_name, 'w' );
 
 		Utils\write_csv( $file_resource, $redirects, $fields );
 

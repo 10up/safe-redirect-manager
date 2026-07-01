@@ -1,7 +1,8 @@
 === Safe Redirect Manager ===
 Contributors:      10up, tlovett1, tollmanz, taylorde, jakemgold, danielbachhuber, jeffpaul
 Tags:              http redirects, redirect manager, url redirection, safe http redirection, multisite redirects
-Tested up to:      6.8
+Requires at least: 6.6
+Tested up to:      7.0
 Stable tag:        2.2.2
 License:           GPLv2 or later
 License URI:       http://www.gnu.org/licenses/gpl-2.0.html
@@ -53,6 +54,12 @@ This should be a path (i.e. `/test`) or a URL (i.e. `http://example.com/wp/test`
 === Developer Documentation ===
 
 Safe Redirect Manager includes a number of actions and filters developers can make use of. These are documented on the [Safe Redirect Manager developer documentation](http://10up.github.io/safe-redirect-manager/) micro-site.
+
+== Frequently Asked Questions ==
+
+= Where do I report security bugs found in this plugin? =
+
+Please report security bugs found in the source code of the Safe Redirect Manager plugin through the [Patchstack Vulnerability Disclosure  Program](https://patchstack.com/database/vdp/3fab514f-46ce-4b71-ab53-450228f73bde).  The Patchstack team will assist you with verification, CVE assignment, and notify the developers of this plugin.
 
 == Screenshots ==
 

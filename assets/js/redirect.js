@@ -41,13 +41,12 @@
 			}
 		})
 		.autocomplete("instance")._renderItem = function (ul, item) {
-			return $(`<li class="srm-autocomplete__item">`)
-				.append(`
-					<div class="srm-autocomplete__item-title">${item.post_title}</div>
-					<div class="srm-autocomplete__item-url">${item.relative_url}</div>
-					<div class="srm-autocomplete__item-type">${item.post_type}</div>
-				`)
-				.appendTo(ul);
+			var $rendered = $( '<li class="srm-autocomplete__item"><div class="srm-autocomplete__item-title"></div><div class="srm-autocomplete__item-url"></div><div class="srm-autocomplete__item-type"></div></li>' );
+			$rendered.find('.srm-autocomplete__item-title').text(item.post_title);
+			$rendered.find('.srm-autocomplete__item-url').text(item.relative_url);
+			$rendered.find('.srm-autocomplete__item-type').text(item.post_type);
+
+			return $rendered.appendTo(ul);
 		};
 
 		// Disable the 'Redirect To:' field if a 4xx status code is set.
@@ -96,7 +95,8 @@
 				data : {
 					action: 'srm_validate_from_url',
 					from: fromRule.val(),
-					_wpnonce: $('#srm_redirect_nonce').val()
+					_wpnonce: $('#srm_redirect_nonce').val(),
+					current_post_id: redirectValidation.current_post_id || null
 				},
 				beforeSend : function() {
 					if ( currentRequest !== null ) {

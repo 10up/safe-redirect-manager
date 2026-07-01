@@ -3,6 +3,8 @@
 All notable changes to this project will be documented in this file, per [the Keep a Changelog standard](http://keepachangelog.com/).
 
 ## [Unreleased] - TBD
+### Fixed
+- Fix wildcard redirect replace dropping the leading slash when the redirect-from rule has no trailing slash before the wildcard (e.g. `/from*` to `https://example.com*` with request `/from/abc` now correctly produces `https://example.com/abc` instead of `https://example.comabc`) (props [@thisismyurl](https://github.com/thisismyurl) via [#381](https://github.com/10up/safe-redirect-manager/issues/381)).
 
 ## [2.2.2] - 2025-02-05
 ### Added
