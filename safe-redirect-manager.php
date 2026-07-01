@@ -17,6 +17,10 @@
 
 namespace SafeRedirectManager;
 
+if ( ! defined( 'ABSPATH' ) ) {
+	exit; // Run in WP context only.
+}
+
 /**
  * Get the minimum version of PHP required by this plugin.
  *

@@ -1,0 +1,40 @@
+name: Plugin Check
+
+on:
+  push:
+    branches:
+      - develop
+      - trunk
+  pull_request:
+    branches:
+      - develop
+
+# Disable permissions for all available scopes by default.
+# Any needed permissions should be configured at the job level.
+permissions: {}
+
+jobs:
+  plugin-check:
+    name: Run Plugin Check
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pull-requests: write
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+
+      - name: Export to temporary directory
+        run: |
+          mkdir -p tmp-build/safe-redirect-manager
+          git archive HEAD -o safe-redirect-manager.zip
+          unzip safe-redirect-manager.zip -d tmp-build/safe-redirect-manager
+
+      - name: Run plugin check
+        uses: wordpress/plugin-check-action@6f5a57e173c065a394b78688f75df543e4011902 # v1.1.5
+        with:
+          build-dir: './tmp-build/safe-redirect-manager'
+          # Prefix: Plugin uses `srm_` as the prefix rather than the full plugin name. It was submitted to wp.org 14 years ago.
+          # InputNotSanitized: Tested by phpcs workflow. Fails in plugin check due to custom sanitization functions.
+          ignore-codes: 'WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedFunctionFound,WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound,WordPress.Security.ValidatedSanitizedInput.InputNotSanitized,Squiz.PHP.DiscouragedFunctions.Discouraged'

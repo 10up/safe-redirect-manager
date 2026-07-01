@@ -7,6 +7,10 @@
 
 use WP_CLI\Utils;
 
+if ( ! defined( 'ABSPATH' ) ) {
+	exit; // Run in WP context only.
+}
+
 /**
  * WP CLI command class
  */
