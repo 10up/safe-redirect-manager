@@ -146,6 +146,11 @@ class SRM_Export {
 			$export_format = 'csv';
 		}
 
+		// Large redirect sets can take a while to stream; avoid the default 30s FastCGI cutoff.
+		if ( function_exists( 'set_time_limit' ) ) {
+			set_time_limit( apply_filters( 'srm_export_time_limit', 5 * MINUTE_IN_SECONDS ) );
+		}
+
 		if ( ! $this->query_redirects_page( 1 )->have_posts() ) {
 			wp_die( esc_html__( 'There are no redirects to export.', 'safe-redirect-manager' ) );
 		}
@@ -173,14 +178,14 @@ class SRM_Export {
 	}
 
 	/**
-	 * Queries a single page of redirect IDs, ordered like the admin list table.
+	 * Queries a single page of redirect IDs and bulk-primes the post/meta caches.
 	 *
 	 * @since 2.2.3
 	 * @param int $paged Page number to query.
 	 * @return WP_Query
 	 */
 	protected function query_redirects_page( $paged ) {
-		return new WP_Query(
+		$query = new WP_Query(
 			array(
 				'post_type'         => 'redirect_rule',
 				'post_status'       => 'any',
@@ -190,8 +195,39 @@ class SRM_Export {
 				'orderby'           => 'menu_order ID',
 				'order'             => 'ASC',
 				'update_term_cache' => false,
+				'no_found_rows'     => true,
 			)
 		);
+
+		_prime_post_caches( $query->posts, false, true );
+
+		return $query;
+	}
+
+	/**
+	 * Iterates over all redirects in pages, passing each page's IDs to the callback.
+	 * Flushes the runtime cache after each page to keep memory bounded.
+	 *
+	 * @since 2.2.3
+	 * @param callable $callback Receives a page's array of redirect IDs.
+	 * @return void
+	 */
+	protected function each_redirect_page( $callback ) {
+		$paged = 1;
+
+		while ( true ) {
+			$query = $this->query_redirects_page( $paged );
+
+			if ( ! $query->have_posts() ) {
+				break;
+			}
+
+			$callback( $query->posts );
+
+			wp_cache_flush_runtime();
+
+			++$paged;
+		}
 	}
 
 	/**
@@ -228,18 +264,14 @@ class SRM_Export {
 		// phpcs:disable WordPressVIPMinimum.Functions.RestrictedFunctions.file_ops_fputcsv -- Writing to php://output stream, not the filesystem.
 		fputcsv( $handle, srm_get_export_fields(), ',', '"', '\\' );
 
-		$paged = 1;
-
-		do {
-			$query = $this->query_redirects_page( $paged );
-
-			foreach ( $query->posts as $redirect_id ) {
-				$redirect = srm_get_redirect_data( $redirect_id, true );
-				fputcsv( $handle, array_map( 'srm_escape_csv', $this->normalize_redirect( $redirect ) ), ',', '"', '\\' );
+		$this->each_redirect_page(
+			function ( $redirect_ids ) use ( $handle ) {
+				foreach ( $redirect_ids as $redirect_id ) {
+					$redirect = srm_get_redirect_data( $redirect_id, true );
+					fputcsv( $handle, array_map( 'srm_escape_csv', $this->normalize_redirect( $redirect ) ), ',', '"', '\\' );
+				}
 			}
-
-			++$paged;
-		} while ( $paged <= $query->max_num_pages );
+		);
 		// phpcs:enable WordPressVIPMinimum.Functions.RestrictedFunctions.file_ops_fputcsv
 
 		// phpcs:ignore WordPress.WP.AlternativeFunctions.file_system_operations_fclose
@@ -256,23 +288,20 @@ class SRM_Export {
 		echo "[\n";
 
 		$first = true;
-		$paged = 1;
 
-		do {
-			$query = $this->query_redirects_page( $paged );
+		$this->each_redirect_page(
+			function ( $redirect_ids ) use ( &$first ) {
+				foreach ( $redirect_ids as $redirect_id ) {
+					$redirect = srm_get_redirect_data( $redirect_id, true );
+					// phpcs:ignore WordPress.WP.AlternativeFunctions.json_encode_json_encode
+					$row = wp_json_encode( $this->normalize_redirect( $redirect ), JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES );
+					$row = false === $row ? '{}' : $row;
 
-			foreach ( $query->posts as $redirect_id ) {
-				$redirect = srm_get_redirect_data( $redirect_id, true );
-				// phpcs:ignore WordPress.WP.AlternativeFunctions.json_encode_json_encode
-				$row = wp_json_encode( $this->normalize_redirect( $redirect ), JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES );
-				$row = false === $row ? '{}' : $row;
-
-				echo ( $first ? '' : ",\n" ) . preg_replace( '/^/m', '    ', $row ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Raw file download stream, not HTML output.
-				$first = false;
+					echo ( $first ? '' : ",\n" ) . preg_replace( '/^/m', '    ', $row ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Raw file download stream, not HTML output.
+					$first = false;
+				}
 			}
-
-			++$paged;
-		} while ( $paged <= $query->max_num_pages );
+		);
 
 		echo "\n]\n";
 	}
