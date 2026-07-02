@@ -29,7 +29,7 @@ class SRM_Export {
 	 * @return void
 	 */
 	public function setup() {
-		add_action( 'admin_init', array( $this, 'handle_export' ) );
+		add_action( 'wp_ajax_srm_export', array( $this, 'handle_export' ) );
 		add_action( 'manage_posts_extra_tablenav', array( $this, 'add_export_button' ) );
 	}
 
@@ -105,11 +105,10 @@ class SRM_Export {
 		return wp_nonce_url(
 			add_query_arg(
 				array(
-					'post_type'     => 'redirect_rule',
 					'action'        => 'srm_export',
 					'export_format' => $format,
 				),
-				admin_url( 'edit.php' )
+				admin_url( 'admin-ajax.php' )
 			),
 			'srm_export'
 		);
@@ -124,15 +123,9 @@ class SRM_Export {
 	 */
 	public function handle_export() {
 		// phpcs:disable WordPress.Security.NonceVerification.Recommended -- Nonce verified below.
-		$action        = sanitize_key( wp_unslash( $_GET['action'] ?? '' ) );
-		$post_type     = sanitize_key( wp_unslash( $_GET['post_type'] ?? '' ) );
 		$nonce         = sanitize_key( wp_unslash( $_GET['_wpnonce'] ?? '' ) );
 		$export_format = sanitize_key( wp_unslash( $_GET['export_format'] ?? 'csv' ) );
 		// phpcs:enable WordPress.Security.NonceVerification.Recommended
-
-		if ( 'srm_export' !== $action || 'redirect_rule' !== $post_type ) {
-			return;
-		}
 
 		if ( ! wp_verify_nonce( $nonce, 'srm_export' ) ) {
 			wp_die( esc_html__( 'Security check failed.', 'safe-redirect-manager' ) );
@@ -154,13 +147,6 @@ class SRM_Export {
 		if ( ! $this->query_redirects_page( 1 )->have_posts() ) {
 			wp_die( esc_html__( 'There are no redirects to export.', 'safe-redirect-manager' ) );
 		}
-
-		while ( ob_get_level() ) {
-			ob_end_clean();
-		}
-
-		header( 'Pragma: no-cache' );
-		header( 'Expires: 0' );
 
 		switch ( $export_format ) {
 			case 'json':
@@ -206,7 +192,7 @@ class SRM_Export {
 
 	/**
 	 * Iterates over all redirects in pages, passing each page's IDs to the callback.
-	 * Flushes the runtime cache after each page to keep memory bounded.
+	 * Clears the post/postmeta cache entries primed for each page to keep memory bounded.
 	 *
 	 * @since 2.2.3
 	 * @param callable $callback Receives a page's array of redirect IDs.
@@ -224,7 +210,8 @@ class SRM_Export {
 
 			$callback( $query->posts );
 
-			wp_cache_flush_runtime();
+			wp_cache_delete_multiple( $query->posts, 'posts' );
+			wp_cache_delete_multiple( $query->posts, 'post_meta' );
 
 			++$paged;
 		}
@@ -272,37 +259,33 @@ class SRM_Export {
 				}
 			}
 		);
-		// phpcs:enable WordPressVIPMinimum.Functions.RestrictedFunctions.file_ops_fputcsv
+		// phpcs:enable
 
 		// phpcs:ignore WordPress.WP.AlternativeFunctions.file_system_operations_fclose
 		fclose( $handle );
 	}
 
 	/**
-	 * Streams redirects as a JSON array to php://output, one page at a time.
+	 * Builds the full redirect list (paged internally to bound memory) and
+	 * outputs it as a single JSON array.
 	 *
 	 * @since 2.2.3
 	 * @return void
 	 */
 	protected function export_json() {
-		echo "[\n";
-
-		$first = true;
+		$results = array();
 
 		$this->each_redirect_page(
-			function ( $redirect_ids ) use ( &$first ) {
+			function ( $redirect_ids ) use ( &$results ) {
 				foreach ( $redirect_ids as $redirect_id ) {
-					$redirect = srm_get_redirect_data( $redirect_id, true );
-					// phpcs:ignore WordPress.WP.AlternativeFunctions.json_encode_json_encode
-					$row = wp_json_encode( $this->normalize_redirect( $redirect ), JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES );
-					$row = false === $row ? '{}' : $row;
-
-					echo ( $first ? '' : ",\n" ) . preg_replace( '/^/m', '    ', $row ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Raw file download stream, not HTML output.
-					$first = false;
+					$redirect  = srm_get_redirect_data( $redirect_id, true );
+					$results[] = $this->normalize_redirect( $redirect );
 				}
 			}
 		);
 
-		echo "\n]\n";
+		$json = wp_json_encode( $results );
+
+		echo false === $json ? '[]' : $json; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Raw file download stream, not HTML output.
 	}
 }
