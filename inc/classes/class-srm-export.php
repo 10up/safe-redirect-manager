@@ -23,6 +23,14 @@ class SRM_Export {
 	protected $supported_formats = array( 'csv', 'json' );
 
 	/**
+	 * Optional srm_get_redirect_data() fields the export needs beyond the front-end defaults.
+	 *
+	 * @since 2.2.3
+	 * @var string[]
+	 */
+	protected $export_optional_fields = array( 'post_status', 'notes' );
+
+	/**
 	 * Sets up export hooks.
 	 *
 	 * @since 2.2.3
@@ -122,12 +130,7 @@ class SRM_Export {
 	 * @return void
 	 */
 	public function handle_export() {
-		// phpcs:disable WordPress.Security.NonceVerification.Recommended -- Nonce verified below.
-		$nonce         = sanitize_key( wp_unslash( $_GET['_wpnonce'] ?? '' ) );
-		$export_format = sanitize_key( wp_unslash( $_GET['export_format'] ?? 'csv' ) );
-		// phpcs:enable WordPress.Security.NonceVerification.Recommended
-
-		if ( ! wp_verify_nonce( $nonce, 'srm_export' ) ) {
+		if ( ! wp_verify_nonce( sanitize_key( wp_unslash( $_GET['_wpnonce'] ?? '' ) ), 'srm_export' ) ) {
 			wp_die( esc_html__( 'Security check failed.', 'safe-redirect-manager' ) );
 		}
 
@@ -135,6 +138,7 @@ class SRM_Export {
 			wp_die( esc_html__( 'You do not have permission to export redirects.', 'safe-redirect-manager' ) );
 		}
 
+		$export_format = sanitize_key( wp_unslash( $_GET['export_format'] ?? 'csv' ) );
 		if ( ! in_array( $export_format, $this->supported_formats, true ) ) {
 			$export_format = 'csv';
 		}
@@ -191,8 +195,8 @@ class SRM_Export {
 	}
 
 	/**
-	 * Iterates over all redirects in pages, passing each page's IDs to the callback.
-	 * Clears the post/postmeta cache entries primed for each page to keep memory bounded.
+	 * Iterates over redirects in pages, passing each page's IDs to the callback,
+	 * stopping once srm_get_max_redirects() has been reached.
 	 *
 	 * @since 2.2.3
 	 * @param callable $callback Receives a page's array of redirect IDs.
@@ -200,6 +204,7 @@ class SRM_Export {
 	 */
 	protected function each_redirect_page( $callback ) {
 		$paged = 1;
+		$count = 0;
 
 		while ( true ) {
 			$query = $this->query_redirects_page( $paged );
@@ -208,11 +213,12 @@ class SRM_Export {
 				break;
 			}
 
+			$count += count( $query->posts );
 			$callback( $query->posts );
 
-			wp_cache_delete_multiple( $query->posts, 'posts' );
-			wp_cache_delete_multiple( $query->posts, 'post_meta' );
-
+			if ( $count >= srm_get_max_redirects() ) {
+				break;
+			}
 			++$paged;
 		}
 	}
@@ -254,7 +260,7 @@ class SRM_Export {
 		$this->each_redirect_page(
 			function ( $redirect_ids ) use ( $handle ) {
 				foreach ( $redirect_ids as $redirect_id ) {
-					$redirect = srm_get_redirect_data( $redirect_id, true );
+					$redirect = srm_get_redirect_data( $redirect_id, $this->export_optional_fields );
 					fputcsv( $handle, array_map( 'srm_escape_csv', $this->normalize_redirect( $redirect ) ), ',', '"', '\\' );
 				}
 			}
@@ -278,7 +284,7 @@ class SRM_Export {
 		$this->each_redirect_page(
 			function ( $redirect_ids ) use ( &$results ) {
 				foreach ( $redirect_ids as $redirect_id ) {
-					$redirect  = srm_get_redirect_data( $redirect_id, true );
+					$redirect  = srm_get_redirect_data( $redirect_id, $this->export_optional_fields );
 					$results[] = $this->normalize_redirect( $redirect );
 				}
 			}

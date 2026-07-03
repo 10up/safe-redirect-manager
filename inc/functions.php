@@ -64,7 +64,7 @@ function srm_get_redirects( $args = array(), $hard = false ) {
 					break 2;
 				}
 
-				$redirects[] = srm_get_redirect_data( $redirect_id, $include_post_status_in_result );
+				$redirects[] = srm_get_redirect_data( $redirect_id, $include_post_status_in_result ? array( 'post_status' ) : array() );
 			}
 
 			++$i;
@@ -82,23 +82,27 @@ function srm_get_redirects( $args = array(), $hard = false ) {
  * Builds the normalized data array for a single redirect post.
  *
  * @since 2.2.3
- * @param int  $redirect_id         Redirect post ID.
- * @param bool $include_post_status Whether to include the post_status field.
+ * @param int   $redirect_id     Redirect post ID.
+ * @param array $optional_fields Extra field keys to include beyond the front-end
+ *                               defaults, e.g. array( 'post_status', 'notes' ).
  * @return array
  */
-function srm_get_redirect_data( $redirect_id, $include_post_status = false ) {
+function srm_get_redirect_data( $redirect_id, $optional_fields = array() ) {
 	$redirect_data = array(
 		'ID'            => $redirect_id,
 		'redirect_from' => get_post_meta( $redirect_id, '_redirect_rule_from', true ),
 		'redirect_to'   => get_post_meta( $redirect_id, '_redirect_rule_to', true ),
 		'status_code'   => (int) get_post_meta( $redirect_id, '_redirect_rule_status_code', true ),
 		'message'       => get_post_meta( $redirect_id, '_redirect_rule_message', true ),
-		'notes'         => get_post_meta( $redirect_id, '_redirect_rule_notes', true ),
 		'enable_regex'  => (bool) get_post_meta( $redirect_id, '_redirect_rule_from_regex', true ),
 		'force_https'   => get_post_meta( $redirect_id, '_force_https', true ),
 	);
 
-	if ( $include_post_status ) {
+	if ( in_array( 'notes', $optional_fields, true ) ) {
+		$redirect_data['notes'] = get_post_meta( $redirect_id, '_redirect_rule_notes', true );
+	}
+
+	if ( in_array( 'post_status', $optional_fields, true ) ) {
 		$redirect_data['post_status'] = get_post_status( $redirect_id );
 	}
 
