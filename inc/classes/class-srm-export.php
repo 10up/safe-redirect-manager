@@ -23,14 +23,6 @@ class SRM_Export {
 	protected $supported_formats = array( 'csv', 'json' );
 
 	/**
-	 * Optional srm_get_redirect_data() fields the export needs beyond the front-end defaults.
-	 *
-	 * @since 2.2.3
-	 * @var string[]
-	 */
-	protected $export_optional_fields = array( 'post_status', 'notes' );
-
-	/**
 	 * Sets up export hooks.
 	 *
 	 * @since 2.2.3
@@ -148,7 +140,7 @@ class SRM_Export {
 			set_time_limit( apply_filters( 'srm_export_time_limit', 5 * MINUTE_IN_SECONDS ) );
 		}
 
-		if ( ! $this->query_redirects_page( 1 )->have_posts() ) {
+		if ( ! srm_query_redirect_page( 1 )->have_posts() ) {
 			wp_die( esc_html__( 'There are no redirects to export.', 'safe-redirect-manager' ) );
 		}
 
@@ -168,79 +160,6 @@ class SRM_Export {
 	}
 
 	/**
-	 * Queries a single page of redirect IDs and bulk-primes the post/meta caches.
-	 *
-	 * @since 2.2.3
-	 * @param int $paged Page number to query.
-	 * @return WP_Query
-	 */
-	protected function query_redirects_page( $paged ) {
-		$query = new WP_Query(
-			array(
-				'post_type'         => 'redirect_rule',
-				'post_status'       => 'any',
-				'posts_per_page'    => 100,
-				'paged'             => $paged,
-				'fields'            => 'ids',
-				'orderby'           => 'menu_order ID',
-				'order'             => 'ASC',
-				'update_term_cache' => false,
-				'no_found_rows'     => true,
-			)
-		);
-
-		_prime_post_caches( $query->posts, false, true );
-
-		return $query;
-	}
-
-	/**
-	 * Iterates over redirects in pages, passing each page's IDs to the callback,
-	 * stopping once srm_get_max_redirects() has been reached.
-	 *
-	 * @since 2.2.3
-	 * @param callable $callback Receives a page's array of redirect IDs.
-	 * @return void
-	 */
-	protected function each_redirect_page( $callback ) {
-		$paged = 1;
-		$count = 0;
-
-		while ( true ) {
-			$query = $this->query_redirects_page( $paged );
-
-			if ( ! $query->have_posts() ) {
-				break;
-			}
-
-			$count += count( $query->posts );
-			$callback( $query->posts );
-
-			if ( $count >= srm_get_max_redirects() ) {
-				break;
-			}
-			++$paged;
-		}
-	}
-
-	/**
-	 * Returns a normalized array for a single redirect.
-	 *
-	 * @since 2.2.3
-	 * @param array $redirect Redirect data from srm_get_redirect_data().
-	 * @return array
-	 */
-	protected function normalize_redirect( $redirect ) {
-		$normalized = array();
-
-		foreach ( srm_get_export_fields() as $field ) {
-			$normalized[ $field ] = $redirect[ $field ] ?? '';
-		}
-
-		return $normalized;
-	}
-
-	/**
 	 * Streams redirects as CSV rows to php://output, one page at a time.
 	 *
 	 * @since 2.2.3
@@ -257,12 +176,9 @@ class SRM_Export {
 		// phpcs:disable WordPressVIPMinimum.Functions.RestrictedFunctions.file_ops_fputcsv -- Writing to php://output stream, not the filesystem.
 		fputcsv( $handle, srm_get_export_fields(), ',', '"', '\\' );
 
-		$this->each_redirect_page(
-			function ( $redirect_ids ) use ( $handle ) {
-				foreach ( $redirect_ids as $redirect_id ) {
-					$redirect = srm_get_redirect_data( $redirect_id, $this->export_optional_fields );
-					fputcsv( $handle, array_map( 'srm_escape_csv', $this->normalize_redirect( $redirect ) ), ',', '"', '\\' );
-				}
+		srm_each_export_redirect(
+			function ( $row ) use ( $handle ) {
+				fputcsv( $handle, array_map( 'srm_escape_csv', $row ), ',', '"', '\\' );
 			}
 		);
 		// phpcs:enable
@@ -281,12 +197,9 @@ class SRM_Export {
 	protected function export_json() {
 		$results = array();
 
-		$this->each_redirect_page(
-			function ( $redirect_ids ) use ( &$results ) {
-				foreach ( $redirect_ids as $redirect_id ) {
-					$redirect  = srm_get_redirect_data( $redirect_id, $this->export_optional_fields );
-					$results[] = $this->normalize_redirect( $redirect );
-				}
+		srm_each_export_redirect(
+			function ( $row ) use ( &$results ) {
+				$results[] = $row;
 			}
 		);
 

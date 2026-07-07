@@ -138,6 +138,73 @@ function srm_escape_csv( $value ) {
 }
 
 /**
+ * Queries a single page of redirect IDs and bulk-primes the post/meta caches.
+ *
+ * @since 2.2.3
+ * @param int $paged Page number to query.
+ * @return WP_Query
+ */
+function srm_query_redirect_page( $paged ) {
+	$query = new WP_Query(
+		array(
+			'post_type'         => 'redirect_rule',
+			'post_status'       => 'any',
+			'posts_per_page'    => 100,
+			'paged'             => $paged,
+			'fields'            => 'ids',
+			'orderby'           => 'menu_order ID',
+			'order'             => 'ASC',
+			'update_term_cache' => false,
+			'no_found_rows'     => true,
+		)
+	);
+
+	_prime_post_caches( $query->posts, false, true );
+
+	return $query;
+}
+
+/**
+ * Streams each redirect (up to srm_get_max_redirects()) as a normalized export row.
+ *
+ * @since 2.2.3
+ * @param callable $callback Receives one export row keyed by srm_get_export_fields().
+ * @return void
+ */
+function srm_each_export_redirect( $callback ) {
+	$paged  = 1;
+	$count  = 0;
+	$max    = srm_get_max_redirects();
+	$fields = srm_get_export_fields();
+
+	while ( $count < $max ) {
+		$query = srm_query_redirect_page( $paged );
+
+		if ( ! $query->have_posts() ) {
+			break;
+		}
+
+		foreach ( $query->posts as $redirect_id ) {
+			if ( $count >= $max ) {
+				break 2;
+			}
+
+			$redirect = srm_get_redirect_data( $redirect_id, array( 'post_status', 'notes' ) );
+			$row      = array();
+
+			foreach ( $fields as $field ) {
+				$row[ $field ] = $redirect[ $field ] ?? '';
+			}
+
+			$callback( $row );
+			++$count;
+		}
+
+		++$paged;
+	}
+}
+
+/**
  * Returns true if max redirects have been reached
  *
  * @since 1.8

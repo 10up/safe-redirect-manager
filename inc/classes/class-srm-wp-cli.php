@@ -5,8 +5,6 @@
  * @package safe-redirect-manager
  */
 
-use WP_CLI\Utils;
-
 if ( ! defined( 'ABSPATH' ) ) {
 	exit; // Run in WP context only.
 }
@@ -322,20 +320,9 @@ class SRM_WP_CLI extends WP_CLI_Command {
 			)
 		);
 
-		$redirects = srm_get_redirects( array( 'post_status' => 'any' ), true );
-
-		if ( empty( $redirects ) ) {
+		if ( ! srm_query_redirect_page( 1 )->have_posts() ) {
 			WP_CLI::error( 'There are no redirects available. Please add some first and then try again.' );
 		}
-
-		$fields = srm_get_export_fields();
-
-		$redirects = array_map(
-			function ( $redirect ) {
-				return array_map( 'srm_escape_csv', $redirect );
-			},
-			$redirects
-		);
 
 		$file_name = $assoc_args['filename'] . '.csv';
 
@@ -347,7 +334,22 @@ class SRM_WP_CLI extends WP_CLI_Command {
 		// phpcs:ignore WordPress.WP.AlternativeFunctions.file_system_operations_fopen
 		$file_resource = fopen( $file_name, 'w' );
 
-		Utils\write_csv( $file_resource, $redirects, $fields );
+		if ( ! $file_resource ) {
+			WP_CLI::error( sprintf( 'Could not open %s for writing.', $file_name ) );
+		}
+
+		// phpcs:disable WordPressVIPMinimum.Functions.RestrictedFunctions.file_ops_fputcsv -- Writing to a CLI-supplied file path.
+		fputcsv( $file_resource, srm_get_export_fields(), ',', '"', '\\' );
+
+		srm_each_export_redirect(
+			function ( $row ) use ( $file_resource ) {
+				fputcsv( $file_resource, array_map( 'srm_escape_csv', $row ), ',', '"', '\\' );
+			}
+		);
+		// phpcs:enable
+
+		// phpcs:ignore WordPress.WP.AlternativeFunctions.file_system_operations_fclose
+		fclose( $file_resource );
 
 		WP_CLI::success( sprintf( 'Redirects exported to csv file %s', $file_name ) );
 	}
