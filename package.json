@@ -30,7 +30,7 @@
   "devDependencies": {
     "@10up/cypress-wp-utils": "^0.2.0",
     "@wordpress/env": "^10.27.0",
-    "cypress": "^13.1.0",
+    "cypress": "^15.18.1",
     "cypress-mochawesome-reporter": "^3.5.1",
     "jsdoc": "^4.0.3",
     "mochawesome-json-to-md": "^0.7.2",
