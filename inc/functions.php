@@ -64,21 +64,7 @@ function srm_get_redirects( $args = array(), $hard = false ) {
 					break 2;
 				}
 
-				$redirect_data = array(
-					'ID'            => $redirect_id,
-					'redirect_from' => get_post_meta( $redirect_id, '_redirect_rule_from', true ),
-					'redirect_to'   => get_post_meta( $redirect_id, '_redirect_rule_to', true ),
-					'status_code'   => (int) get_post_meta( $redirect_id, '_redirect_rule_status_code', true ),
-					'message'       => get_post_meta( $redirect_id, '_redirect_rule_message', true ),
-					'enable_regex'  => (bool) get_post_meta( $redirect_id, '_redirect_rule_from_regex', true ),
-					'force_https'   => get_post_meta( $redirect_id, '_force_https', true ),
-				);
-
-				if ( $include_post_status_in_result ) {
-					$redirect_data['post_status'] = get_post_status( $redirect_id );
-				}
-
-				$redirects[] = $redirect_data;
+				$redirects[] = srm_get_redirect_data( $redirect_id, $include_post_status_in_result ? array( 'post_status' ) : array() );
 			}
 
 			++$i;
@@ -90,6 +76,132 @@ function srm_get_redirects( $args = array(), $hard = false ) {
 	}
 
 	return $redirects;
+}
+
+/**
+ * Builds the normalized data array for a single redirect post.
+ *
+ * @since 2.2.3
+ * @param int   $redirect_id     Redirect post ID.
+ * @param array $optional_fields Extra field keys to include beyond the front-end
+ *                               defaults, e.g. array( 'post_status', 'notes' ).
+ * @return array
+ */
+function srm_get_redirect_data( $redirect_id, $optional_fields = array() ) {
+	$redirect_data = array(
+		'ID'            => $redirect_id,
+		'redirect_from' => get_post_meta( $redirect_id, '_redirect_rule_from', true ),
+		'redirect_to'   => get_post_meta( $redirect_id, '_redirect_rule_to', true ),
+		'status_code'   => (int) get_post_meta( $redirect_id, '_redirect_rule_status_code', true ),
+		'message'       => get_post_meta( $redirect_id, '_redirect_rule_message', true ),
+		'enable_regex'  => (bool) get_post_meta( $redirect_id, '_redirect_rule_from_regex', true ),
+		'force_https'   => get_post_meta( $redirect_id, '_force_https', true ),
+	);
+
+	if ( in_array( 'notes', $optional_fields, true ) ) {
+		$redirect_data['notes'] = get_post_meta( $redirect_id, '_redirect_rule_notes', true );
+	}
+
+	if ( in_array( 'post_status', $optional_fields, true ) ) {
+		$redirect_data['post_status'] = get_post_status( $redirect_id );
+	}
+
+	return $redirect_data;
+}
+
+/**
+ * Returns the shared list of fields used by the admin and WP-CLI exports.
+ *
+ * @since 2.2.3
+ * @return string[]
+ */
+function srm_get_export_fields() {
+	return apply_filters(
+		'srm_export_fields',
+		array( 'ID', 'redirect_from', 'redirect_to', 'status_code', 'enable_regex', 'post_status', 'notes', 'message', 'force_https' )
+	);
+}
+
+/**
+ * Escapes a value against CSV formula injection.
+ *
+ * @since 2.2.3
+ * @param mixed $value Field value.
+ * @return string
+ */
+function srm_escape_csv( $value ) {
+	$value = (string) $value;
+	if ( '' !== $value && in_array( $value[0], array( '=', '+', '-', '@', "\t", "\r" ), true ) ) {
+		$value = "'" . $value;
+	}
+	return $value;
+}
+
+/**
+ * Queries a single page of redirect IDs and bulk-primes the post/meta caches.
+ *
+ * @since 2.2.3
+ * @param int $paged Page number to query.
+ * @return WP_Query
+ */
+function srm_query_redirect_page( $paged ) {
+	$query = new WP_Query(
+		array(
+			'post_type'         => 'redirect_rule',
+			'post_status'       => 'any',
+			'posts_per_page'    => 100,
+			'paged'             => $paged,
+			'fields'            => 'ids',
+			'orderby'           => 'menu_order ID',
+			'order'             => 'ASC',
+			'update_term_cache' => false,
+			'no_found_rows'     => true,
+		)
+	);
+
+	_prime_post_caches( $query->posts, false, true );
+
+	return $query;
+}
+
+/**
+ * Streams each redirect (up to srm_get_max_redirects()) as a normalized export row.
+ *
+ * @since 2.2.3
+ * @param callable $callback Receives one export row keyed by srm_get_export_fields().
+ * @return void
+ */
+function srm_each_export_redirect( $callback ) {
+	$paged  = 1;
+	$count  = 0;
+	$max    = srm_get_max_redirects();
+	$fields = srm_get_export_fields();
+
+	while ( $count < $max ) {
+		$query = srm_query_redirect_page( $paged );
+
+		if ( ! $query->have_posts() ) {
+			break;
+		}
+
+		foreach ( $query->posts as $redirect_id ) {
+			if ( $count >= $max ) {
+				break 2;
+			}
+
+			$redirect = srm_get_redirect_data( $redirect_id, array( 'post_status', 'notes' ) );
+			$row      = array();
+
+			foreach ( $fields as $field ) {
+				$row[ $field ] = $redirect[ $field ] ?? '';
+			}
+
+			$callback( $row );
+			++$count;
+		}
+
+		++$paged;
+	}
 }
 
 /**

@@ -871,6 +871,7 @@ class SRM_Post_Type {
 			wp_enqueue_script( 'bulk-select', SRM_PLUGIN_URL . 'assets/js/bulk-select.js', array( 'jquery' ), SRM_VERSION, true );
 			wp_enqueue_script( 'redirectjs', SRM_PLUGIN_URL . 'assets/js/redirect.js', array( 'jquery' ), SRM_VERSION, true );
 			wp_enqueue_script( 'quick-bulk-editjs', SRM_PLUGIN_URL . 'assets/js/quick-bulk-edit.js', array( 'jquery', 'inline-edit-post' ), SRM_VERSION, true );
+			wp_enqueue_script( 'srm-export', SRM_PLUGIN_URL . 'assets/js/export.js', array( 'jquery' ), SRM_VERSION, true );
 			wp_localize_script(
 				'redirectjs',
 				'redirectValidation',
