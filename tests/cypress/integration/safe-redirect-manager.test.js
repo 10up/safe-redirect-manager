@@ -9,7 +9,7 @@ describe('Test redirect rules', () => {
 
 		// Validate created rule in list table.
 		cy.visit('/wp-admin/edit.php?post_type=redirect_rule');
-		cy.get('#the-list td.title a').first().should('have.text', '/test');
+		cy.get('#the-list .title a').first().should('have.text', '/test');
 		cy.get('#the-list td.srm_redirect_rule_to')
 			.first()
 			.should('have.text', '/test2');
@@ -144,7 +144,7 @@ describe('Test redirect rules', () => {
 		);
 
 		cy.visit('/wp-admin/edit.php?post_type=redirect_rule');
-		cy.get('#the-list td.title a').contains('/duplicates-not-flagged-own-duplicate-test/').click();
+		cy.get('#the-list .title a').contains('/duplicates-not-flagged-own-duplicate-test/').click();
 
 		cy.intercept('GET', '/wp-admin/admin-ajax.php?action=srm_validate_from_url&**').as('validate')
 
