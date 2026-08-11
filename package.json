@@ -31,7 +31,7 @@
     "@10up/cypress-wp-utils": "^0.2.0",
     "@wordpress/env": "^10.27.0",
     "cypress": "^15.18.1",
-    "cypress-mochawesome-reporter": "^3.5.1",
+    "cypress-mochawesome-reporter": "^5.0.0",
     "jsdoc": "^4.0.3",
     "mochawesome-json-to-md": "^0.7.2",
     "node-wp-i18n": "^1.2.7",
