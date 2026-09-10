@@ -967,6 +967,12 @@ class SRM_Post_Type {
 			die();
 		}
 
+		// Ensure the caller is allowed to make this request.
+		if ( ! current_user_can( $this->get_redirect_capability() ) ) {
+			echo 0;
+			die();
+		}
+
 		$from = srm_sanitize_redirect_from( wp_unslash( $_GET['from'] ) );
 
 		/**
