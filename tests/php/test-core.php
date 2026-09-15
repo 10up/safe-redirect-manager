@@ -226,6 +226,67 @@ class SRMTestCore extends WP_UnitTestCase {
 	}
 
 	/**
+	 * Test that a wildcard cannot extend the destination host.
+	 *
+	 * @dataProvider dataWildcardCannotExtendHost
+	 *
+	 * @param string $requested_path Requested path.
+	 * @param string $expected       Expected redirect destination.
+	 */
+	public function testWildcardCannotExtendHost( $requested_path, $expected ) {
+		$_SERVER['REQUEST_URI'] = $requested_path;
+		$redirected_to_actual   = '';
+		srm_create_redirect( '/from*', 'https://example.com*' );
+
+		add_action(
+			'srm_do_redirect',
+			function ( $requested_path, $redirected_to, $status_code ) use ( &$redirected_to_actual ) {
+				$redirected_to_actual = $redirected_to;
+			},
+			10,
+			3
+		);
+
+		SRM_Redirect::factory()->maybe_redirect();
+
+		$this->assertSame( $expected, $redirected_to_actual );
+		$this->assertSame(
+			'example.com',
+			wp_parse_url( $redirected_to_actual, PHP_URL_HOST ),
+			'The wildcard suffix must land in the path, never in the authority.'
+		);
+	}
+
+	/**
+	 * Data provider for testWildcardCannotExtendHost.
+	 *
+	 * @return array
+	 */
+	public function dataWildcardCannotExtendHost() {
+		return array(
+			'userinfo'         => array( '/from@fueled.com/x', 'https://example.com/@fueled.com/x' ),
+			'userinfo w/ port' => array( '/from:@fueled.com/x', 'https://example.com/:@fueled.com/x' ),
+			'subdomain'        => array( '/from.fueled.com/x', 'https://example.com/.fueled.com/x' ),
+			'bare suffix'      => array( '/fromfueled.com', 'https://example.com/fueled.com' ),
+		);
+	}
+
+	/**
+	 * Test that the redirect host allowlist comes from the configured destination.
+	 */
+	public function testAllowedRedirectHostsUseConfiguredTarget() {
+		$_SERVER['REQUEST_URI'] = '/from@fueled.com/x';
+		srm_create_redirect( '/from*', 'https://example.com*' );
+
+		SRM_Redirect::factory()->maybe_redirect();
+
+		$hosts = apply_filters( 'allowed_redirect_hosts', array(), 'fueled.com' );
+
+		$this->assertNotContains( 'fueled.com', $hosts, 'A request must never be able to add a host to the allowlist.' );
+		$this->assertContains( 'example.com', $hosts );
+	}
+
+	/**
 	 * Test lots of permutations of URL trailing slashes with and without regex
 	 *
 	 * @since 1.7.3
