@@ -1,5 +1,10 @@
 ( function ($) {
 	$( '#srm-export-format' ).on( 'change', function () {
-		$( '#srm-export-btn' ).attr( 'href', $( this ).val() );
+		var urls = ( window.srmExport && window.srmExport.urls ) ? window.srmExport.urls : {};
+		var url  = urls[ $( this ).val() ];
+
+		if ( url ) {
+			$( '#srm-export-btn' ).attr( 'href', url );
+		}
 	} );
 }(jQuery) );
