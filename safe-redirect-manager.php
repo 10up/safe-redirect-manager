@@ -3,7 +3,7 @@
  * Plugin Name:       Safe Redirect Manager
  * Plugin URI:        https://wordpress.org/plugins/safe-redirect-manager
  * Description:       Easily and safely manage HTTP redirects.
- * Version:           2.2.2
+ * Version:           2.3.0
  * Requires at least: 6.9
  * Requires PHP:      7.4
  * Author:            10up
@@ -75,7 +75,7 @@ require_once __DIR__ . '/inc/classes/class-srm-redirect.php';
 require_once __DIR__ . '/inc/classes/class-srm-loop-detection.php';
 require_once __DIR__ . '/inc/classes/class-srm-export.php';
 
-define( 'SRM_VERSION', '2.2.2' );
+define( 'SRM_VERSION', '2.3.0' );
 define( 'SRM_PLUGIN_FULL_FILE', __FILE__ );
 define( 'SRM_PLUGIN_URL', plugin_dir_url( SRM_PLUGIN_FULL_FILE ) );
 
