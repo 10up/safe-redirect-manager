@@ -4,6 +4,54 @@ All notable changes to this project will be documented in this file, per [the Ke
 
 ## [Unreleased] - TBD
 
+## [2.3.0] - 2026-09-21
+**Note that this version bumps the WordPress minimum from 6.5 to 6.9.**
+
+### Security
+- Resolve GHSA-xxq8-pr9f-w3c6 (props [@dkotter](https://github.com/dkotter), [@peterwilsoncc](https://github.com/peterwilsoncc) via [GHSA-xxq8-pr9f-w3c6 ](https://github.com/10up/safe-redirect-manager/security/advisories/GHSA-xxq8-pr9f-w3c6)).
+
+### Added
+- Export redirect rules as CSV or JSON from the admin redirect list table (props [@nhrrob](https://github.com/nhrrob), [@thrijith](https://github.com/thrijith), [@peterwilsoncc](https://github.com/peterwilsoncc) via [#452](https://github.com/10up/safe-redirect-manager/pull/452)).
+- Run a `current_user_can` check when we validate a URL to ensure the user has proper permissions (props [@dkotter](https://github.com/dkotter), [@peterwilsoncc](https://github.com/peterwilsoncc) via [#464](https://github.com/10up/safe-redirect-manager/pull/464)).
+
+### Changed
+- Bump WordPress tested-up-to version 7.1 (props [@Rishabh-fueled](https://github.com/Rishabh-fueled), [@dkotter](https://github.com/dkotter), [@peterwilsoncc](https://github.com/peterwilsoncc), [@phpbits](https://github.com/phpbits), [@zamanq](https://github.com/zamanq) via [#418](https://github.com/10up/safe-redirect-manager/pull/418), [#429](https://github.com/10up/safe-redirect-manager/pull/429), [#444](https://github.com/10up/safe-redirect-manager/pull/444), [#458](https://github.com/10up/safe-redirect-manager/pull/458)).
+- Bump WordPress minimum supported version to 6.9 (props [@Rishabh-fueled](https://github.com/Rishabh-fueled), [@jeffpaul](https://github.com/jeffpaul), [@dkotter](https://github.com/dkotter) via [#419](https://github.com/10up/safe-redirect-manager/pull/419), [#461](https://github.com/10up/safe-redirect-manager/pull/461)).
+- Update NPM dependencies via `npm audit fix` (props [@peterwilsoncc](https://github.com/peterwilsoncc), [@dkotter](https://github.com/dkotter) via [#434](https://github.com/10up/safe-redirect-manager/pull/434)).
+
+### Fixed
+- Prevent duplicate redirect detection from flagging own post as a duplicate (props [@peterwilsoncc](https://github.com/peterwilsoncc), [@dkotter](https://github.com/dkotter) via [#438](https://github.com/10up/safe-redirect-manager/pull/438)).
+- PHP 8.4 deprecation warnings (props [@dkotter](https://github.com/dkotter), [@jeffpaul](https://github.com/jeffpaul), [@peterwilsoncc](https://github.com/peterwilsoncc) via [#440](https://github.com/10up/safe-redirect-manager/pull/440)).
+- Prevent wildcard redirects from dropping the leading slash when the source and destination bases do not include a trailing slash (props [@thisismyurl](https://github.com/thisismyurl), [@thrijith](https://github.com/thrijith), [@dkotter](https://github.com/dkotter), [@earthlingdavey](https://github.com/earthlingdavey) via [#453](https://github.com/10up/safe-redirect-manager/pull/453)).
+
+### Developer
+- Documentation updates (props [@szepeviktor](https://github.com/szepeviktor), [@dkotter](https://github.com/dkotter), [@badasswp](https://github.com/badasswp), [@pabamato](https://github.com/pabamato), [@mi5t4n](https://github.com/mi5t4n), [@iamdharmesh](https://github.com/iamdharmesh) via [#412](https://github.com/10up/safe-redirect-manager/pull/412), [#417](https://github.com/10up/safe-redirect-manager/pull/417)).
+- Update all third-party actions our workflows rely on to use versions based on specific commit hashes (props [@dkotter](https://github.com/dkotter), [@jeffpaul](https://github.com/jeffpaul) via [#415](https://github.com/10up/safe-redirect-manager/pull/415)).
+- Update workflow permissions (props [@jeffpaul](https://github.com/jeffpaul), [@github-advanced-security](https://github.com/apps/github-advanced-security), [@dkotter](https://github.com/dkotter) via [#421](https://github.com/10up/safe-redirect-manager/pull/421), [#424](https://github.com/10up/safe-redirect-manager/pull/424)).
+- Add Patchstack security-reporting FAQ (props [@jeffpaul](https://github.com/jeffpaul) via [#433](https://github.com/10up/safe-redirect-manager/pull/433)).
+- Update our PHPUnit workflow (props [@dkotter](https://github.com/dkotter), [@jeffpaul](https://github.com/jeffpaul), [@peterwilsoncc](https://github.com/peterwilsoncc) via [#440](https://github.com/10up/safe-redirect-manager/pull/440)).
+- Merge `trunk` into `develop` branch (props [@peterwilsoncc](https://github.com/peterwilsoncc), [@dkotter](https://github.com/dkotter) via [#447](https://github.com/10up/safe-redirect-manager/pull/447)).
+- Updated to follow WordPress Coding Standards (props [@peterwilsoncc](https://github.com/peterwilsoncc), [@dkotter](https://github.com/dkotter) via [#449](https://github.com/10up/safe-redirect-manager/pull/449)).
+- Add WordPress Plugin Check workflow (props [@peterwilsoncc](https://github.com/peterwilsoncc), [@dkotter](https://github.com/dkotter), [@jeffpaul](https://github.com/jeffpaul) via [#451](https://github.com/10up/safe-redirect-manager/pull/451)).
+- E2E tests: update `10up/cypress-wp-utils` to 0.7.2 (props [@peterwilsoncc](https://github.com/peterwilsoncc), [@dkotter](https://github.com/dkotter) via [#462](https://github.com/10up/safe-redirect-manager/pull/462)).
+- Bump `brace-expansion` from 2.0.2 to 2.1.4 and `brace-expansion` from 1.1.12 to 1.1.18 (props [@dependabot](https://github.com/apps/dependabot), [@dkotter](https://github.com/dkotter) via [#457](https://github.com/10up/safe-redirect-manager/pull/457)).
+- Bump `@cypress/request` from 3.0.1 to 3.0.8 (props [@dependabot](https://github.com/apps/dependabot), [@faisal-alvi](https://github.com/faisal-alvi) via [#422](https://github.com/10up/safe-redirect-manager/pull/422)).
+- Bump `form-data` from 2.3.3 to 4.0.6 (props [@dependabot](https://github.com/apps/dependabot), [@faisal-alvi](https://github.com/faisal-alvi), [@dkotter](https://github.com/dkotter) via [#422](https://github.com/10up/safe-redirect-manager/pull/422), [#454](https://github.com/10up/safe-redirect-manager/pull/454)).
+- Bump `js-yaml` from 3.14.2 to 3.15.2 (props [@dependabot](https://github.com/apps/dependabot), [@dkotter](https://github.com/dkotter) via [#463](https://github.com/10up/safe-redirect-manager/pull/463)).
+- Bump `lodash` from 4.17.21 to 4.18.1 (props [@dependabot](https://github.com/apps/dependabot), [@dkotter](https://github.com/dkotter) via [#435](https://github.com/10up/safe-redirect-manager/pull/435), [#454](https://github.com/10up/safe-redirect-manager/pull/454)).
+- Bump `markdown-it` from 14.1.0 to 14.3.0 (props [@dependabot](https://github.com/apps/dependabot), [@dkotter](https://github.com/dkotter) via [#454](https://github.com/10up/safe-redirect-manager/pull/454)).
+- Bump `minimatch` from 3.1.2 to 3.1.5 (props [@dependabot](https://github.com/apps/dependabot), [@dkotter](https://github.com/dkotter) via [#463](https://github.com/10up/safe-redirect-manager/pull/463)).
+- Bump `mocha` from 10.2.0 to 11.1.0 (props [@dependabot](https://github.com/apps/dependabot), [@faisal-alvi](https://github.com/faisal-alvi) via [#413](https://github.com/10up/safe-redirect-manager/pull/413)).
+- Bump `picomatch` from 2.3.1 to 2.3.2 (props [@dependabot](https://github.com/apps/dependabot), [@dkotter](https://github.com/dkotter) via [#454](https://github.com/10up/safe-redirect-manager/pull/454)).
+- Bump `qs` from 6.14.1 to 6.15.3 (props [@dependabot](https://github.com/apps/dependabot), [@dkotter](https://github.com/dkotter) via [#439](https://github.com/10up/safe-redirect-manager/pull/439), [#454](https://github.com/10up/safe-redirect-manager/pull/454)).
+- Bump `serialize-javascript` from 6.0.0 to 7.1.1 (props [@dependabot](https://github.com/apps/dependabot), [@faisal-alvi](https://github.com/faisal-alvi), [@dkotter](https://github.com/dkotter) via [#413](https://github.com/10up/safe-redirect-manager/pull/413), [#463](https://github.com/10up/safe-redirect-manager/pull/463)).
+- Bump `simple-git` from 3.19.1 to 3.36.0 (props [@dependabot](https://github.com/apps/dependabot), [@dkotter](https://github.com/dkotter) via [#454](https://github.com/10up/safe-redirect-manager/pull/454)).
+- Bump `tmp` from 0.2.1 to 0.2.7 (props [@dependabot](https://github.com/apps/dependabot), [@Sidsector9](https://github.com/Sidsector9), [@dkotter](https://github.com/dkotter) via [#423](https://github.com/10up/safe-redirect-manager/pull/423), [#454](https://github.com/10up/safe-redirect-manager/pull/454)).
+- Bump `@wordpress/env` from 9.2.0 to 10.27.0 (props [@dependabot](https://github.com/apps/dependabot), [@Sidsector9](https://github.com/Sidsector9) via [#423](https://github.com/10up/safe-redirect-manager/pull/423)).
+- Bump `wp-coding-standards/wpcs` from 3.3.0 to 3.4.1 (props [@dependabot](https://github.com/apps/dependabot), [@dkotter](https://github.com/dkotter) via [#455](https://github.com/10up/safe-redirect-manager/pull/455)).
+- Removes `extract-zip` (props [@dependabot](https://github.com/apps/dependabot), [@dkotter](https://github.com/dkotter) via [#463](https://github.com/10up/safe-redirect-manager/pull/463)).
+- Removes `uuid` (props [@dependabot](https://github.com/apps/dependabot), [@dkotter](https://github.com/dkotter) via [#457](https://github.com/10up/safe-redirect-manager/pull/457)).
+
 ## [2.2.2] - 2025-02-05
 ### Added
 - Add author ID as a new, optional argument to the `srm_create_redirect` function. If passed, will associate this author ID to the newly created redirect (props [@norcross](https://github.com/norcross), [@dkotter](https://github.com/dkotter) via [#408](https://github.com/10up/safe-redirect-manager/pull/408)).
@@ -45,7 +93,6 @@ All notable changes to this project will be documented in this file, per [the Ke
 - Bump `jsdoc` from 3.6.11 to 4.0.3 (props [@dependabot](https://github.com/apps/dependabot), [@faisal-alvi](https://github.com/faisal-alvi) via [#383](https://github.com/10up/safe-redirect-manager/pull/383)).
 
 ## [2.1.2] - 2024-06-19
-
 ### Added
 - Provide example for modifying the default redirect status code (props [@peterwilsoncc](https://github.com/peterwilsoncc), [@jeffpaul](https://github.com/jeffpaul), [@JosVelasco](https://github.com/JosVelasco), [@dkotter](https://github.com/dkotter) via [#365](https://github.com/10up/safe-redirect-manager/pull/365)).
 - "Testing" section in the "CONTRIBUTING.md" file (props [@kmgalanakis](https://github.com/kmgalanakis), [@jeffpaul](https://github.com/jeffpaul) via [#379](https://github.com/10up/safe-redirect-manager/pull/379)).
@@ -381,6 +428,7 @@ All notable changes to this project will be documented in this file, per [the Ke
 - Plugin released
 
 [Unreleased]: https://github.com/10up/safe-redirect-manager/compare/trunk...develop
+[2.3.0]: https://github.com/10up/safe-redirect-manager/compare/2.2.2...2.3.0
 [2.2.2]: https://github.com/10up/safe-redirect-manager/compare/2.2.1...2.2.2
 [2.2.1]: https://github.com/10up/safe-redirect-manager/compare/2.2.0...2.2.1
 [2.2.0]: https://github.com/10up/safe-redirect-manager/compare/2.1.2...2.2.0

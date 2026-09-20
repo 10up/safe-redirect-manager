@@ -1,6 +1,6 @@
 {
   "name": "safe-redirect-manager",
-  "version": "2.2.2",
+  "version": "2.3.0",
   "description": "Safely manage your website's HTTP redirects.",
   "homepage": "https://github.com/10up/safe-redirect-manager",
   "bugs": {
@@ -20,6 +20,7 @@
   "scripts": {
     "cypress:open": "cypress open --config-file tests/cypress/config.config.js",
     "cypress:run": "cypress run --config-file tests/cypress/config.config.js",
+    "test:php": "wp-env run tests-cli --env-cwd=wp-content/plugins/safe-redirect-manager vendor/bin/phpunit -c phpunit.xml.dist",
     "env": "wp-env",
     "env:start": "wp-env start",
     "env:stop": "wp-env stop",
@@ -27,14 +28,14 @@
     "build:docs": "rm -rf docs-built && jsdoc -c hookdoc-conf.json safe-redirect-manager.php inc"
   },
   "devDependencies": {
-    "@10up/cypress-wp-utils": "^0.2.0",
-    "@wordpress/env": "^9.2.0",
-    "cypress": "^13.1.0",
-    "cypress-mochawesome-reporter": "^3.5.1",
+    "@10up/cypress-wp-utils": "^0.7.2",
+    "@wordpress/env": "^11.15.0",
+    "cypress": "^15.18.1",
+    "cypress-mochawesome-reporter": "^5.0.0",
     "jsdoc": "^4.0.3",
     "mochawesome-json-to-md": "^0.7.2",
     "node-wp-i18n": "^1.2.7",
-    "wp-hookdoc": "^0.2.0",
-    "taffydb": "2.7.3"
+    "taffydb": "2.7.3",
+    "wp-hookdoc": "^0.2.0"
   }
 }

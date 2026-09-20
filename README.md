@@ -66,10 +66,10 @@ add_filter(
 
 ### Redirect loops detection
 
-By default redirect loop detection is disabled. To prevent redirect loops you can filter `srm_check_for_possible_redirect_loops`.
+By default redirect loop detection is enabled. To disable it, you can use the  `srm_check_for_possible_redirect_loops` filter.
 
 ```php
-add_filter( 'srm_check_for_possible_redirect_loops', '__return_true' );
+add_filter( 'srm_check_for_possible_redirect_loops', '__return_false' );
 ```
 
 ### Only redirect if 404 occurs
@@ -152,13 +152,15 @@ Run the plugin tests:
 phpunit
 ```
 
-#### Issues
-
-If you identify any errors or have an idea for improving the plugin, please [open an issue](https://github.com/10up/safe-redirect-manager/issues?state=open).
-
 ## Translations
 
 Safe Redirect Manager is available in English and other languages.  A listing of those languages and instructions for translating the plugin into other languages is available on [Translating WordPress](https://translate.wordpress.org/projects/wp-plugins/safe-redirect-manager/).  Many thanks to the [contributors on the translation teams](https://translate.wordpress.org/projects/wp-plugins/safe-redirect-manager/contributors/)!
+
+## Frequently Asked Questions
+
+### Where do I report security bugs found in this plugin?
+
+Please report security bugs found in the source code of the Safe Redirect Manager plugin through the [Patchstack Vulnerability Disclosure  Program](https://patchstack.com/database/vdp/3fab514f-46ce-4b71-ab53-450228f73bde).  The Patchstack team will assist you with verification, CVE assignment, and notify the developers of this plugin.
 
 ## Support Level
 
@@ -174,6 +176,4 @@ Please read [CODE_OF_CONDUCT.md](https://github.com/10up/safe-redirect-manager/b
 
 ## Like what you see?
 
-<p align="center">
-<a href="http://10up.com/contact/"><img src="https://10up.com/uploads/2016/10/10up-Github-Banner.png" width="850"></a>
-</p>
+<a href="http://10up.com/contact/"><img src="https://github.com/10up/.github/blob/trunk/profile/10up-github-banner.jpg" width="850" alt="Work with the 10up WordPress Practice at Fueled"></a>

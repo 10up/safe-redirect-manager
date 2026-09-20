@@ -5,7 +5,9 @@
  * @package safe-redirect-manager
  */
 
-use \WP_CLI\Utils;
+if ( ! defined( 'ABSPATH' ) ) {
+	exit; // Run in WP context only.
+}
 
 /**
  * WP CLI command class
@@ -18,10 +20,10 @@ class SRM_WP_CLI extends WP_CLI_Command {
 	 * Available fields: 'ID', 'redirect_from', 'redirect_to', 'status_code', 'enable_regex', 'post_status'.
 	 *
 	 * [--field=<field>]
-	 * : Single field to dipslay, should be one of available fields.
+	 * : Single field to display, should be one of available fields.
 	 *
 	 * [--fields=<field1,field2>]
-	 * : Multiple fields to dipslay, should be a list of available fields.
+	 * : Multiple fields to display, should be a list of available fields.
 	 *
 	 * [--format=<format>]
 	 * : The command output format. Can be table, json, csv, yaml. Default to table.
@@ -37,10 +39,10 @@ class SRM_WP_CLI extends WP_CLI_Command {
 	public function cli_list( $args, $assoc_args ) {
 		$assoc_args = wp_parse_args(
 			$assoc_args,
-			[
+			array(
 				'show_total' => true,
 				'format'     => 'table',
-			]
+			)
 		);
 
 		if ( 'false' === $assoc_args['show_total'] ) {
@@ -58,7 +60,7 @@ class SRM_WP_CLI extends WP_CLI_Command {
 
 		$redirects = srm_get_redirects( array( 'post_status' => 'any' ), true );
 		$redirects = array_map(
-			function( $item ) use ( $assoc_args ) {
+			function ( $item ) use ( $assoc_args ) {
 				if ( 'table' === $assoc_args['format'] ) {
 					$item['enable_regex'] = $item['enable_regex'] ? 'true' : 'false';
 				} else {
@@ -155,13 +157,13 @@ class SRM_WP_CLI extends WP_CLI_Command {
 	 * Import .htaccess file redirects
 	 *
 	 * @param array $args Array of arguments
-	 * @param array $assoc_args Array of associate arguments
 	 * @subcommand import-htaccess
 	 * @synopsis <file>
 	 */
-	public function import_htaccess( $args, $assoc_args ) {
+	public function import_htaccess( $args ) {
 		list( $file ) = $args;
 
+		// phpcs:ignore WordPressVIPMinimum.Performance.FetchingRemoteData.FileGetContentsUnknown
 		$contents = file_get_contents( $file );
 		if ( ! $contents ) {
 			WP_CLI::error( 'Error retrieving .htaccess file' );
@@ -207,10 +209,10 @@ class SRM_WP_CLI extends WP_CLI_Command {
 			$id = srm_create_redirect( $sanitized_redirect_from, $sanitized_redirect_to, $http_status );
 			if ( is_wp_error( $id ) ) {
 				WP_CLI::warning( 'Error - ' . $id->get_error_message() );
-				$skipped++;
+				++$skipped;
 			} else {
 				WP_CLI::line( "Success - Created redirect from '{$sanitized_redirect_from}' to '{$sanitized_redirect_to}'" );
-				$created++;
+				++$created;
 			}
 		}
 		WP_CLI::success( "All done! {$created} redirects were created, {$skipped} were skipped" );
@@ -313,25 +315,14 @@ class SRM_WP_CLI extends WP_CLI_Command {
 
 		$assoc_args = wp_parse_args(
 			$assoc_args,
-			[
+			array(
 				'filename' => 'srm-redirects',
-			]
+			)
 		);
 
-		$redirects = srm_get_redirects( [ 'post_status' => 'any' ], true );
-
-		if ( empty( $redirects ) ) {
+		if ( ! srm_query_redirect_page( 1 )->have_posts() ) {
 			WP_CLI::error( 'There are no redirects available. Please add some first and then try again.' );
 		}
-
-		$fields = [
-			'ID',
-			'redirect_from',
-			'redirect_to',
-			'status_code',
-			'enable_regex',
-			'post_status',
-		];
 
 		$file_name = $assoc_args['filename'] . '.csv';
 
@@ -340,9 +331,25 @@ class SRM_WP_CLI extends WP_CLI_Command {
 			WP_CLI::confirm( 'Proceed with rewriting the existing file?' );
 		}
 
-		$file_resource = fopen( $file_name, 'w' ); //phpcs:ignore
+		// phpcs:ignore WordPress.WP.AlternativeFunctions.file_system_operations_fopen
+		$file_resource = fopen( $file_name, 'w' );
 
-		Utils\write_csv( $file_resource, $redirects, $fields );
+		if ( ! $file_resource ) {
+			WP_CLI::error( sprintf( 'Could not open %s for writing.', $file_name ) );
+		}
+
+		// phpcs:disable WordPressVIPMinimum.Functions.RestrictedFunctions.file_ops_fputcsv -- Writing to a CLI-supplied file path.
+		fputcsv( $file_resource, srm_get_export_fields(), ',', '"', '\\' );
+
+		srm_each_export_redirect(
+			function ( $row ) use ( $file_resource ) {
+				fputcsv( $file_resource, array_map( 'srm_escape_csv', $row ), ',', '"', '\\' );
+			}
+		);
+		// phpcs:enable
+
+		// phpcs:ignore WordPress.WP.AlternativeFunctions.file_system_operations_fclose
+		fclose( $file_resource );
 
 		WP_CLI::success( sprintf( 'Redirects exported to csv file %s', $file_name ) );
 	}

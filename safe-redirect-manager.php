@@ -3,8 +3,8 @@
  * Plugin Name:       Safe Redirect Manager
  * Plugin URI:        https://wordpress.org/plugins/safe-redirect-manager
  * Description:       Easily and safely manage HTTP redirects.
- * Version:           2.2.2
- * Requires at least: 6.5
+ * Version:           2.3.0
+ * Requires at least: 6.9
  * Requires PHP:      7.4
  * Author:            10up
  * Author URI:        https://10up.com
@@ -16,6 +16,10 @@
  */
 
 namespace SafeRedirectManager;
+
+if ( ! defined( 'ABSPATH' ) ) {
+	exit; // Run in WP context only.
+}
 
 /**
  * Get the minimum version of PHP required by this plugin.
@@ -43,7 +47,7 @@ function site_meets_php_requirements(): bool {
 if ( ! site_meets_php_requirements() ) {
 	add_action(
 		'admin_notices',
-		function() {
+		function () {
 			?>
 			<div class="notice notice-error">
 				<p>
@@ -65,19 +69,21 @@ if ( ! site_meets_php_requirements() ) {
 }
 
 // Load helper functions and classes
-require_once dirname( __FILE__ ) . '/inc/functions.php';
-require_once dirname( __FILE__ ) . '/inc/classes/class-srm-post-type.php';
-require_once dirname( __FILE__ ) . '/inc/classes/class-srm-redirect.php';
-require_once dirname( __FILE__ ) . '/inc/classes/class-srm-loop-detection.php';
+require_once __DIR__ . '/inc/functions.php';
+require_once __DIR__ . '/inc/classes/class-srm-post-type.php';
+require_once __DIR__ . '/inc/classes/class-srm-redirect.php';
+require_once __DIR__ . '/inc/classes/class-srm-loop-detection.php';
+require_once __DIR__ . '/inc/classes/class-srm-export.php';
 
-define( 'SRM_VERSION', '2.2.2' );
+define( 'SRM_VERSION', '2.3.0' );
 define( 'SRM_PLUGIN_FULL_FILE', __FILE__ );
 define( 'SRM_PLUGIN_URL', plugin_dir_url( SRM_PLUGIN_FULL_FILE ) );
 
 if ( defined( 'WP_CLI' ) && WP_CLI ) {
-	require_once dirname( __FILE__ ) . '/inc/classes/class-srm-wp-cli.php';
+	require_once __DIR__ . '/inc/classes/class-srm-wp-cli.php';
 	\WP_CLI::add_command( 'safe-redirect-manager', 'SRM_WP_CLI' );
 }
 
 \SRM_Post_Type::factory();
 \SRM_Redirect::factory();
+\SRM_Export::factory();
