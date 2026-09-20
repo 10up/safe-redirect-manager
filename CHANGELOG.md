@@ -7,6 +7,9 @@ All notable changes to this project will be documented in this file, per [the Ke
 ## [2.3.0] - 2026-09-21
 **Note that this version bumps the WordPress minimum from 6.5 to 6.9.**
 
+### Security
+- Resolve GHSA-xxq8-pr9f-w3c6 (props [@dkotter](https://github.com/dkotter), [@peterwilsoncc](https://github.com/peterwilsoncc) via [GHSA-xxq8-pr9f-w3c6 ](https://github.com/10up/safe-redirect-manager/security/advisories/GHSA-xxq8-pr9f-w3c6)).
+
 ### Added
 - Export redirect rules as CSV or JSON from the admin redirect list table (props [@nhrrob](https://github.com/nhrrob), [@thrijith](https://github.com/thrijith), [@peterwilsoncc](https://github.com/peterwilsoncc) via [#452](https://github.com/10up/safe-redirect-manager/pull/452)).
 - Run a `current_user_can` check when we validate a URL to ensure the user has proper permissions (props [@dkotter](https://github.com/dkotter), [@peterwilsoncc](https://github.com/peterwilsoncc) via [#464](https://github.com/10up/safe-redirect-manager/pull/464)).
