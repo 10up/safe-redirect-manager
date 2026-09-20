@@ -17,7 +17,7 @@ class SRM_Export {
 	/**
 	 * Supported export formats.
 	 *
-	 * @since x.x.x
+	 * @since 2.3.0
 	 * @var string[]
 	 */
 	protected $supported_formats = array( 'csv', 'json' );
@@ -25,7 +25,7 @@ class SRM_Export {
 	/**
 	 * Sets up export hooks.
 	 *
-	 * @since x.x.x
+	 * @since 2.3.0
 	 * @return void
 	 */
 	public function setup() {
@@ -37,7 +37,7 @@ class SRM_Export {
 	/**
 	 * Passes the signed export URLs to the export script, keyed by format.
 	 *
-	 * @since x.x.x
+	 * @since 2.3.0
 	 */
 	public function localize_export_urls() {
 		if ( ! wp_script_is( 'srm-export', 'enqueued' ) ) {
@@ -55,7 +55,7 @@ class SRM_Export {
 	/**
 	 * Factory method.
 	 *
-	 * @since x.x.x
+	 * @since 2.3.0
 	 * @return self
 	 */
 	public static function factory() {
@@ -72,7 +72,7 @@ class SRM_Export {
 	/**
 	 * Renders the export format dropdown after the filter bar in the redirect list table.
 	 *
-	 * @since x.x.x
+	 * @since 2.3.0
 	 * @param string $which Position in the table ('top' or 'bottom').
 	 * @return void
 	 */
@@ -116,7 +116,7 @@ class SRM_Export {
 	/**
 	 * Builds a signed export URL for the given format.
 	 *
-	 * @since x.x.x
+	 * @since 2.3.0
 	 * @param string $format Export format key (e.g. 'csv', 'json').
 	 * @return string
 	 */
@@ -135,7 +135,7 @@ class SRM_Export {
 	 * Handles the export download request, validates auth, and dispatches to the
 	 * appropriate format handler.
 	 *
-	 * @since x.x.x
+	 * @since 2.3.0
 	 * @return void
 	 */
 	public function handle_export() {
@@ -179,7 +179,7 @@ class SRM_Export {
 	/**
 	 * Streams redirects as CSV rows to php://output, one page at a time.
 	 *
-	 * @since x.x.x
+	 * @since 2.3.0
 	 * @return void
 	 */
 	protected function export_csv() {
@@ -208,7 +208,7 @@ class SRM_Export {
 	 * Builds the full redirect list (paged internally to bound memory) and
 	 * outputs it as a single JSON array.
 	 *
-	 * @since x.x.x
+	 * @since 2.3.0
 	 * @return void
 	 */
 	protected function export_json() {
