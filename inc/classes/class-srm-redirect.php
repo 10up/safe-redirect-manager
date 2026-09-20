@@ -203,6 +203,13 @@ class SRM_Redirect {
 					if ( ( strrpos( $redirect_to, '*' ) === strlen( $redirect_to ) - 1 ) ) {
 						$suffix        = substr( $requested_path, strlen( $wildcard_base ) );
 						$redirect_base = rtrim( $redirect_to, '*' );
+
+						// A wildcard may only extend the path, never the host.
+						$parsed_base = wp_parse_url( $redirect_base );
+						if ( ! empty( $parsed_base['host'] ) && empty( $parsed_base['path'] ) ) {
+							$redirect_base = trailingslashit( $redirect_base );
+						}
+
 						// Avoid double slash: only strip leading slash from suffix when
 						// redirect_base already ends with one (e.g. /from/* -> /to/*).
 						// Without this guard, /from* -> https://example.com* would produce
@@ -218,7 +225,7 @@ class SRM_Redirect {
 				/*
 				 * Whitelist redirect host
 				 */
-				$parsed_redirect = wp_parse_url( $redirect_to );
+				$parsed_redirect = wp_parse_url( rtrim( $redirect['redirect_to'], '*' ) );
 
 				if ( is_array( $parsed_redirect ) && ! empty( $parsed_redirect['host'] ) ) {
 					$this->whitelist_host = $parsed_redirect['host'];
