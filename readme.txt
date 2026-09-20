@@ -72,6 +72,10 @@ Please report security bugs found in the source code of the Safe Redirect Manage
 
 = 2.3.0 - 2026-09-21 =
 
+**Security**
+
+- Resolve GHSA-xxq8-pr9f-w3c6 (props [@dkotter](https://github.com/dkotter), [@peterwilsoncc](https://github.com/peterwilsoncc) via [GHSA-xxq8-pr9f-w3c6 ](https://github.com/10up/safe-redirect-manager/security/advisories/GHSA-xxq8-pr9f-w3c6)).
+
 **Added**
 
 - Export redirect rules as CSV or JSON from the admin redirect list table (props [@nhrrob](https://github.com/nhrrob), [@thrijith](https://github.com/thrijith), [@peterwilsoncc](https://github.com/peterwilsoncc) via [#452](https://github.com/10up/safe-redirect-manager/pull/452)).
