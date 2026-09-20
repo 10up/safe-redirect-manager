@@ -68,6 +68,11 @@ Please report security bugs found in the source code of the Safe Redirect Manage
 3. Bulk Edit view of multiple Redirect rules
 4. Bulk Edit to enable Force HTTPs
 
+== Upgrade Notice ==
+
+= 2.3.0 =
+This is a security release, it is recommended to upgrade immediately.
+
 == Changelog ==
 
 = 2.3.0 - 2026-09-21 =
