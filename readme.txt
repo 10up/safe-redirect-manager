@@ -83,7 +83,7 @@ This is a security release, it is recommended to upgrade immediately.
 
 **Added**
 
-- Export redirect rules as CSV or JSON from the admin redirect list table (props [@nhrrob](https://github.com/nhrrob), [@thrijith](https://github.com/thrijith), [@peterwilsoncc](https://github.com/peterwilsoncc) via [#452](https://github.com/10up/safe-redirect-manager/pull/452)).
+- Export redirect rules as CSV or JSON from the admin redirect list table (props [@nhrrob](https://github.com/nhrrob), [@thrijith](https://github.com/thrijith), [@peterwilsoncc](https://github.com/peterwilsoncc), [@dkotter](https://github.com/dkotter) via [#452](https://github.com/10up/safe-redirect-manager/pull/452), [#469](https://github.com/10up/safe-redirect-manager/pull/469)).
 - Run a `current_user_can` check when we validate a URL to ensure the user has proper permissions (props [@dkotter](https://github.com/dkotter), [@peterwilsoncc](https://github.com/peterwilsoncc) via [#464](https://github.com/10up/safe-redirect-manager/pull/464)).
 
 **Changed**
