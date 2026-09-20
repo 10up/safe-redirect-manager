@@ -16,6 +16,31 @@ describe('Admin can login and make sure plugin is activated', () => {
 			.should('have.length', 1);
 	});
 
+	it('Can switch the export format and get a matching download link', () => {
+		cy.createRedirectRule('/export-test', '/export-test-2', 'export rule note');
+		cy.visit('/wp-admin/edit.php?post_type=redirect_rule');
+
+		// Option values are opaque format keys, never the URLs themselves.
+		cy.get('#srm-export-format option').should(($options) => {
+			expect(
+				[...$options].map((option) => option.value)
+			).to.deep.equal(['csv', 'json']);
+		});
+
+		// The href comes from the localized map, not from the option value.
+		cy.get('#srm-export-btn')
+			.should('have.attr', 'href')
+			.and('include', 'export_format=csv')
+			.and('include', '_wpnonce=');
+
+		cy.get('#srm-export-format').select('json');
+
+		cy.get('#srm-export-btn')
+			.should('have.attr', 'href')
+			.and('include', 'export_format=json')
+			.and('include', '_wpnonce=');
+	});
+
 	it('Can visit "Safe Redirect Manager" page', () => {
 		cy.visit('/wp-admin/edit.php?post_type=redirect_rule');
 

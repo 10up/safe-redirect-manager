@@ -17,7 +17,7 @@ class SRM_Export {
 	/**
 	 * Supported export formats.
 	 *
-	 * @since 2.2.3
+	 * @since 2.3.0
 	 * @var string[]
 	 */
 	protected $supported_formats = array( 'csv', 'json' );
@@ -25,18 +25,37 @@ class SRM_Export {
 	/**
 	 * Sets up export hooks.
 	 *
-	 * @since 2.2.3
+	 * @since 2.3.0
 	 * @return void
 	 */
 	public function setup() {
 		add_action( 'wp_ajax_srm_export', array( $this, 'handle_export' ) );
 		add_action( 'manage_posts_extra_tablenav', array( $this, 'add_export_button' ) );
+		add_action( 'admin_enqueue_scripts', array( $this, 'localize_export_urls' ), 20 );
+	}
+
+	/**
+	 * Passes the signed export URLs to the export script, keyed by format.
+	 *
+	 * @since 2.3.0
+	 */
+	public function localize_export_urls() {
+		if ( ! wp_script_is( 'srm-export', 'enqueued' ) ) {
+			return;
+		}
+
+		$urls = array();
+		foreach ( $this->supported_formats as $format ) {
+			$urls[ $format ] = $this->get_export_url( $format );
+		}
+
+		wp_localize_script( 'srm-export', 'srmExport', array( 'urls' => $urls ) );
 	}
 
 	/**
 	 * Factory method.
 	 *
-	 * @since 2.2.3
+	 * @since 2.3.0
 	 * @return self
 	 */
 	public static function factory() {
@@ -53,7 +72,7 @@ class SRM_Export {
 	/**
 	 * Renders the export format dropdown after the filter bar in the redirect list table.
 	 *
-	 * @since 2.2.3
+	 * @since 2.3.0
 	 * @param string $which Position in the table ('top' or 'bottom').
 	 * @return void
 	 */
@@ -81,7 +100,7 @@ class SRM_Export {
 			</label>
 			<select id="srm-export-format">
 				<?php foreach ( $this->supported_formats as $format ) : ?>
-					<option value="<?php echo esc_attr( $this->get_export_url( $format ) ); ?>">
+					<option value="<?php echo esc_attr( $format ); ?>">
 						<?php echo esc_html( strtoupper( $format ) ); ?>
 					</option>
 				<?php endforeach; ?>
@@ -97,20 +116,18 @@ class SRM_Export {
 	/**
 	 * Builds a signed export URL for the given format.
 	 *
-	 * @since 2.2.3
+	 * @since 2.3.0
 	 * @param string $format Export format key (e.g. 'csv', 'json').
 	 * @return string
 	 */
 	protected function get_export_url( $format ) {
-		return wp_nonce_url(
-			add_query_arg(
-				array(
-					'action'        => 'srm_export',
-					'export_format' => $format,
-				),
-				admin_url( 'admin-ajax.php' )
+		return add_query_arg(
+			array(
+				'action'        => 'srm_export',
+				'export_format' => $format,
+				'_wpnonce'      => wp_create_nonce( 'srm_export' ),
 			),
-			'srm_export'
+			admin_url( 'admin-ajax.php' )
 		);
 	}
 
@@ -118,7 +135,7 @@ class SRM_Export {
 	 * Handles the export download request, validates auth, and dispatches to the
 	 * appropriate format handler.
 	 *
-	 * @since 2.2.3
+	 * @since 2.3.0
 	 * @return void
 	 */
 	public function handle_export() {
@@ -162,7 +179,7 @@ class SRM_Export {
 	/**
 	 * Streams redirects as CSV rows to php://output, one page at a time.
 	 *
-	 * @since 2.2.3
+	 * @since 2.3.0
 	 * @return void
 	 */
 	protected function export_csv() {
@@ -191,7 +208,7 @@ class SRM_Export {
 	 * Builds the full redirect list (paged internally to bound memory) and
 	 * outputs it as a single JSON array.
 	 *
-	 * @since 2.2.3
+	 * @since 2.3.0
 	 * @return void
 	 */
 	protected function export_json() {

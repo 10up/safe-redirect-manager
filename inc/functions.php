@@ -81,7 +81,7 @@ function srm_get_redirects( $args = array(), $hard = false ) {
 /**
  * Builds the normalized data array for a single redirect post.
  *
- * @since 2.2.3
+ * @since 2.3.0
  * @param int   $redirect_id     Redirect post ID.
  * @param array $optional_fields Extra field keys to include beyond the front-end
  *                               defaults, e.g. array( 'post_status', 'notes' ).
@@ -112,7 +112,7 @@ function srm_get_redirect_data( $redirect_id, $optional_fields = array() ) {
 /**
  * Returns the shared list of fields used by the admin and WP-CLI exports.
  *
- * @since 2.2.3
+ * @since 2.3.0
  * @return string[]
  */
 function srm_get_export_fields() {
@@ -125,7 +125,7 @@ function srm_get_export_fields() {
 /**
  * Escapes a value against CSV formula injection.
  *
- * @since 2.2.3
+ * @since 2.3.0
  * @param mixed $value Field value.
  * @return string
  */
@@ -140,7 +140,7 @@ function srm_escape_csv( $value ) {
 /**
  * Queries a single page of redirect IDs and bulk-primes the post/meta caches.
  *
- * @since 2.2.3
+ * @since 2.3.0
  * @param int $paged Page number to query.
  * @return WP_Query
  */
@@ -167,7 +167,7 @@ function srm_query_redirect_page( $paged ) {
 /**
  * Streams each redirect (up to srm_get_max_redirects()) as a normalized export row.
  *
- * @since 2.2.3
+ * @since 2.3.0
  * @param callable $callback Receives one export row keyed by srm_get_export_fields().
  * @return void
  */
