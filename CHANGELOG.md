@@ -7,9 +7,6 @@ All notable changes to this project will be documented in this file, per [the Ke
 ## [2.3.0] - 2026-09-21
 **Note that this version bumps the WordPress minimum from 6.5 to 6.9.**
 
-### Security
-- Resolve GHSA-xxq8-pr9f-w3c6 (props [@dkotter](https://github.com/dkotter), [@peterwilsoncc](https://github.com/peterwilsoncc) via [GHSA-xxq8-pr9f-w3c6 ](https://github.com/10up/safe-redirect-manager/security/advisories/GHSA-xxq8-pr9f-w3c6)).
-
 ### Added
 - Export redirect rules as CSV or JSON from the admin redirect list table (props [@nhrrob](https://github.com/nhrrob), [@thrijith](https://github.com/thrijith), [@peterwilsoncc](https://github.com/peterwilsoncc), [@dkotter](https://github.com/dkotter) via [#452](https://github.com/10up/safe-redirect-manager/pull/452), [#469](https://github.com/10up/safe-redirect-manager/pull/469)).
 - Run a `current_user_can` check when we validate a URL to ensure the user has proper permissions (props [@dkotter](https://github.com/dkotter), [@peterwilsoncc](https://github.com/peterwilsoncc) via [#464](https://github.com/10up/safe-redirect-manager/pull/464)).
@@ -23,6 +20,9 @@ All notable changes to this project will be documented in this file, per [the Ke
 - Prevent duplicate redirect detection from flagging own post as a duplicate (props [@peterwilsoncc](https://github.com/peterwilsoncc), [@dkotter](https://github.com/dkotter) via [#438](https://github.com/10up/safe-redirect-manager/pull/438)).
 - PHP 8.4 deprecation warnings (props [@dkotter](https://github.com/dkotter), [@jeffpaul](https://github.com/jeffpaul), [@peterwilsoncc](https://github.com/peterwilsoncc) via [#440](https://github.com/10up/safe-redirect-manager/pull/440)).
 - Prevent wildcard redirects from dropping the leading slash when the source and destination bases do not include a trailing slash (props [@thisismyurl](https://github.com/thisismyurl), [@thrijith](https://github.com/thrijith), [@dkotter](https://github.com/dkotter), [@earthlingdavey](https://github.com/earthlingdavey) via [#453](https://github.com/10up/safe-redirect-manager/pull/453)).
+
+### Security
+- Resolve GHSA-xxq8-pr9f-w3c6 (props [@dkotter](https://github.com/dkotter), [@peterwilsoncc](https://github.com/peterwilsoncc) via [GHSA-xxq8-pr9f-w3c6 ](https://github.com/10up/safe-redirect-manager/security/advisories/GHSA-xxq8-pr9f-w3c6)).
 
 ### Developer
 - Documentation updates (props [@szepeviktor](https://github.com/szepeviktor), [@dkotter](https://github.com/dkotter), [@badasswp](https://github.com/badasswp), [@pabamato](https://github.com/pabamato), [@mi5t4n](https://github.com/mi5t4n), [@iamdharmesh](https://github.com/iamdharmesh) via [#412](https://github.com/10up/safe-redirect-manager/pull/412), [#417](https://github.com/10up/safe-redirect-manager/pull/417)).
