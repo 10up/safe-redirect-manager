@@ -77,10 +77,6 @@ This is a security release, it is recommended to upgrade immediately.
 
 = 2.3.0 - 2026-09-21 =
 
-**Security**
-
-- Resolve GHSA-xxq8-pr9f-w3c6 (props [@dkotter](https://github.com/dkotter), [@peterwilsoncc](https://github.com/peterwilsoncc) via [GHSA-xxq8-pr9f-w3c6 ](https://github.com/10up/safe-redirect-manager/security/advisories/GHSA-xxq8-pr9f-w3c6)).
-
 **Added**
 
 - Export redirect rules as CSV or JSON from the admin redirect list table (props [@nhrrob](https://github.com/nhrrob), [@thrijith](https://github.com/thrijith), [@peterwilsoncc](https://github.com/peterwilsoncc), [@dkotter](https://github.com/dkotter) via [#452](https://github.com/10up/safe-redirect-manager/pull/452), [#469](https://github.com/10up/safe-redirect-manager/pull/469)).
@@ -97,6 +93,10 @@ This is a security release, it is recommended to upgrade immediately.
 - Prevent duplicate redirect detection from flagging own post as a duplicate (props [@peterwilsoncc](https://github.com/peterwilsoncc), [@dkotter](https://github.com/dkotter) via [#438](https://github.com/10up/safe-redirect-manager/pull/438)).
 - PHP 8.4 deprecation warnings (props [@dkotter](https://github.com/dkotter), [@jeffpaul](https://github.com/jeffpaul), [@peterwilsoncc](https://github.com/peterwilsoncc) via [#440](https://github.com/10up/safe-redirect-manager/pull/440)).
 - Prevent wildcard redirects from dropping the leading slash when the source and destination bases do not include a trailing slash (props [@thisismyurl](https://github.com/thisismyurl), [@thrijith](https://github.com/thrijith), [@dkotter](https://github.com/dkotter), [@earthlingdavey](https://github.com/earthlingdavey) via [#453](https://github.com/10up/safe-redirect-manager/pull/453)).
+
+**Security**
+
+- Resolve GHSA-xxq8-pr9f-w3c6 (props [@dkotter](https://github.com/dkotter), [@peterwilsoncc](https://github.com/peterwilsoncc) via [GHSA-xxq8-pr9f-w3c6 ](https://github.com/10up/safe-redirect-manager/security/advisories/GHSA-xxq8-pr9f-w3c6)).
 
 = 2.2.2 - 2025-02-05 =
 
