@@ -377,6 +377,8 @@ function srm_create_redirect( $redirect_from, $redirect_to, $status_code = 302, 
 				notesMeta.meta_value AS _redirect_rule_notes
 			FROM
 				$wpdb->postmeta AS fromMeta
+			INNER JOIN
+				$wpdb->posts AS posts ON fromMeta.post_id = posts.ID
 			LEFT JOIN
     			$wpdb->postmeta AS toMeta ON fromMeta.post_id = toMeta.post_id AND toMeta.meta_key = %s
 			LEFT JOIN
@@ -386,7 +388,8 @@ function srm_create_redirect( $redirect_from, $redirect_to, $status_code = 302, 
 			LEFT JOIN
    				$wpdb->postmeta AS notesMeta ON fromMeta.post_id = notesMeta.post_id AND notesMeta.meta_key = %s
 			WHERE
-    			fromMeta.meta_key = %s AND fromMeta.meta_value = %s",
+    			fromMeta.meta_key = %s AND fromMeta.meta_value = %s
+				AND posts.post_type = 'redirect_rule'",
 			'_redirect_rule_to',
 			'_redirect_rule_status_code',
 			'_redirect_rule_from_regex',

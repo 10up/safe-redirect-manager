@@ -45,6 +45,7 @@ class SRM_Post_Type {
 		add_action( 'bulk_edit_custom_box', array( $this, 'action_quick_edit_custom_redirect_columns' ), 10, 2 );
 		add_action( 'transition_post_status', array( $this, 'action_transition_post_status' ), 10, 3 );
 		add_filter( 'post_updated_messages', array( $this, 'filter_redirect_updated_messages' ) );
+		add_filter( '_wp_post_revision_fields', array( $this, 'filter_revision_fields' ), 10, 2 );
 		add_action( 'admin_notices', array( $this, 'action_redirect_chain_alert' ) );
 		add_filter( 'the_title', array( $this, 'filter_admin_title' ), 100, 2 );
 		add_action( 'admin_print_styles-edit.php', array( $this, 'action_print_logo_css' ), 10, 1 );
@@ -709,9 +710,134 @@ class SRM_Post_Type {
 			'hierarchical'         => false,
 			'register_meta_box_cb' => array( $this, 'action_redirect_rule_metabox' ),
 			'menu_position'        => 80,
-			'supports'             => array( 'page-attributes' ),
+			'supports'             => array( 'page-attributes', 'revisions' ),
 		);
 		register_post_type( 'redirect_rule', $redirect_args );
+
+		$this->register_revisioned_meta();
+	}
+
+	/**
+	 * Returns the meta keys stored with redirect rule revisions.
+	 *
+	 * Redirect rules keep all of their data in meta, so core needs to be told which
+	 * keys belong in a revision. Both the registration and the revision screen use
+	 * this list so the two never drift apart.
+	 *
+	 * @since 2.4.0
+	 * @return array Meta keys with their label and registered type.
+	 */
+	public static function get_revisioned_meta_keys() {
+		return array(
+			'_redirect_rule_from'        => array(
+				'label' => __( 'Redirect From', 'safe-redirect-manager' ),
+				'type'  => 'string',
+			),
+			'_redirect_rule_to'          => array(
+				'label' => __( 'Redirect To', 'safe-redirect-manager' ),
+				'type'  => 'string',
+			),
+			'_redirect_rule_status_code' => array(
+				'label' => __( 'HTTP Status Code', 'safe-redirect-manager' ),
+				'type'  => 'integer',
+			),
+			'_redirect_rule_from_regex'  => array(
+				'label' => __( 'Enable Regular Expressions', 'safe-redirect-manager' ),
+				'type'  => 'boolean',
+			),
+			'_force_https'               => array(
+				'label' => __( 'Force HTTPS', 'safe-redirect-manager' ),
+				'type'  => 'boolean',
+			),
+			'_redirect_rule_message'     => array(
+				'label' => __( 'Message', 'safe-redirect-manager' ),
+				'type'  => 'string',
+			),
+			'_redirect_rule_notes'       => array(
+				'label' => __( 'Notes', 'safe-redirect-manager' ),
+				'type'  => 'string',
+			),
+		);
+	}
+
+	/**
+	 * Registers redirect rule meta as revisioned.
+	 *
+	 * Each key is registered within the post type it belongs to, so it can opt into
+	 * revisions. Meta only becomes revisioned when the post type supports revisions,
+	 * which is why this runs after register_post_type().
+	 *
+	 * @since 2.4.0
+	 * @uses register_post_meta, add_filter
+	 * @return void
+	 */
+	protected function register_revisioned_meta() {
+		foreach ( self::get_revisioned_meta_keys() as $meta_key => $args ) {
+			register_post_meta(
+				'redirect_rule',
+				$meta_key,
+				array(
+					'label'             => $args['label'],
+					'type'              => $args['type'],
+					'single'            => true,
+					'revisions_enabled' => true,
+				)
+			);
+
+			add_filter( '_wp_post_revision_field_' . $meta_key, array( $this, 'filter_revision_field' ), 10, 3 );
+		}
+	}
+
+	/**
+	 * Adds redirect meta to the fields shown on the revision screen.
+	 *
+	 * Without this the diff screen only knows about title, content and excerpt,
+	 * none of which redirect rules use, so nothing would be displayed.
+	 *
+	 * @since 2.4.0
+	 * @param array $fields Revision fields, keyed by field name.
+	 * @param array $post   Post array being revisioned.
+	 * @return array
+	 */
+	public function filter_revision_fields( $fields, $post ) {
+		if ( ! is_array( $post ) || empty( $post['post_type'] ) || 'redirect_rule' !== $post['post_type'] ) {
+			return $fields;
+		}
+
+		foreach ( self::get_revisioned_meta_keys() as $meta_key => $args ) {
+			$fields[ $meta_key ] = $args['label'];
+		}
+
+		return $fields;
+	}
+
+	/**
+	 * Reads a redirect meta value from the revision being displayed.
+	 *
+	 * The revision stores its own copy of the meta, so the value is read from the
+	 * revision rather than the post the revision belongs to. Checkbox values are
+	 * stored as `1` or an empty string, which reads poorly in a diff, so those are
+	 * shown as Yes or No.
+	 *
+	 * @since 2.4.0
+	 * @param string  $value    Value of the field.
+	 * @param string  $field    Name of the field.
+	 * @param WP_Post $revision Revision post object.
+	 * @return string
+	 */
+	public function filter_revision_field( $value, $field, $revision ) {
+		if ( ! $revision instanceof WP_Post ) {
+			return $value;
+		}
+
+		$meta_value = get_metadata( 'post', $revision->ID, $field, true );
+
+		$meta_keys = self::get_revisioned_meta_keys();
+		if ( isset( $meta_keys[ $field ] ) && 'boolean' === $meta_keys[ $field ]['type'] ) {
+			return $meta_value ? __( 'Yes', 'safe-redirect-manager' ) : __( 'No', 'safe-redirect-manager' );
+		}
+
+		return (string) $meta_value;
 	}
 
 	/**
