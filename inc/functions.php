@@ -459,6 +459,25 @@ function srm_sanitize_redirect_to( $path ) {
 }
 
 /**
+ * Decode percent-encoded non-ASCII characters, leaving ASCII octets such as %2F and %3F encoded.
+ *
+ * @since x.x.x
+ * @param string $path Path to decode.
+ * @return string
+ */
+function srm_decode_non_ascii( $path ) {
+	return preg_replace_callback(
+		'/(?:%[89a-f][0-9a-f])+/i',
+		function ( $matches ) {
+			$decoded = rawurldecode( $matches[0] );
+
+			return preg_match( '//u', $decoded ) ? $decoded : $matches[0];
+		},
+		$path
+	);
+}
+
+/**
  * Sanitize redirect from path
  *
  * @since 1.8
