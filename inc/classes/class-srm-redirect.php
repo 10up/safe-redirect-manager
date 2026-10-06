@@ -98,6 +98,7 @@ class SRM_Redirect {
 		 * If WordPress resides in a directory that is not the public root, we have to chop
 		 * the pre-WP path off the requested path.
 		 */
+		$requested_path  = srm_decode_non_ascii( $requested_path );
 		$parsed_home_url = wp_parse_url( home_url() );
 
 		if ( isset( $parsed_home_url['path'] ) && '/' !== $parsed_home_url['path'] ) {
@@ -153,7 +154,7 @@ class SRM_Redirect {
 
 		foreach ( (array) $redirects as $redirect ) {
 
-			$redirect_from = untrailingslashit( $redirect['redirect_from'] );
+			$redirect_from = untrailingslashit( srm_decode_non_ascii( $redirect['redirect_from'] ) );
 			if ( empty( $redirect_from ) ) {
 				$redirect_from = '/'; // this only happens in the case where there is a redirect on the root
 			}
@@ -297,10 +298,11 @@ class SRM_Redirect {
 		 * Filter requested path.
 		 *
 		 * @hook srm_requested_path
-		 * @param {string} $request_path Request path. Default `$_SERVER['REQUEST_URI']`.
+		 * @param {string} $request_path Request path. Default sanitized `$_SERVER['REQUEST_URI']` with non-ASCII characters decoded.
 		 * @returns {string} Request path.
 		 */
-		$requested_path   = esc_url_raw( apply_filters( 'srm_requested_path', sanitize_text_field( wp_unslash( $_SERVER['REQUEST_URI'] ?? '' ) ) ) );
+		// phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- sanitize_text_field() runs after decoding.
+		$requested_path   = esc_url_raw( apply_filters( 'srm_requested_path', sanitize_text_field( srm_decode_non_ascii( wp_unslash( $_SERVER['REQUEST_URI'] ?? '' ) ) ) ) );
 		$requested_path   = untrailingslashit( stripslashes( $requested_path ) );
 		$matched_redirect = $this->match_redirect( $requested_path );
 
