@@ -37,5 +37,8 @@
     "node-wp-i18n": "^1.2.7",
     "taffydb": "2.7.3",
     "wp-hookdoc": "^0.2.0"
+  },
+  "overrides": {
+    "fast-uri": "3.1.8"
   }
 }
