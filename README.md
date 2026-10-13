@@ -80,6 +80,14 @@ By default every matched URL is redirected. To only redirect matched but not fou
 add_filter( 'srm_redirect_only_on_404', '__return_true' );
 ```
 
+### Permalink conflict notice
+
+When a post is published with a permalink that already matches a redirect rule, an admin notice is shown to the author, since the plugin redirects that URL on the front end even though the content exists. To turn the check off, use `srm_redirect_conflict_check`.
+
+```php
+add_filter( 'srm_redirect_conflict_check', '__return_false' );
+```
+
 ## CLI commands
 
 The following WP-CLI commands are supported by Safe Redirect Manager:
