@@ -39,11 +39,10 @@ class SRM_Import {
 	 */
 	public function setup() {
 		add_action( 'wp_ajax_srm_import', array( $this, 'ajax_import' ) );
-		add_action( 'manage_posts_extra_tablenav', array( $this, 'add_import_button' ) );
 		add_action( 'admin_enqueue_scripts', array( $this, 'enqueue_assets' ) );
+		add_action( 'manage_posts_extra_tablenav', array( $this, 'add_import_button' ) );
 		add_action( 'admin_footer', array( $this, 'render_import_form' ) );
 		add_action( 'admin_notices', array( $this, 'import_notice' ) );
-		add_filter( 'removable_query_args', array( $this, 'removable_query_args' ) );
 	}
 
 	/**
@@ -59,19 +58,16 @@ class SRM_Import {
 	}
 
 	/**
-	 * Loads the importer script and styles on the redirect list, including
-	 * when it is empty (SRM_Post_Type::load_resources() needs a post).
+	 * Loads the importer assets on the redirect list, including when it is empty.
 	 *
 	 * @since 2.4.0
 	 * @return void
 	 */
 	public function enqueue_assets() {
-		if ( ! $this->is_redirect_list() ) {
-			return;
+		if ( $this->is_redirect_list() ) {
+			wp_enqueue_style( 'redirectjs', SRM_PLUGIN_URL . 'assets/css/redirect.css', array(), SRM_VERSION );
+			wp_enqueue_script( 'srm-import', SRM_PLUGIN_URL . 'assets/js/import.js', array( 'jquery' ), SRM_VERSION, true );
 		}
-
-		wp_enqueue_style( 'redirectjs', SRM_PLUGIN_URL . 'assets/css/redirect.css', array(), SRM_VERSION );
-		wp_enqueue_script( 'srm-import', SRM_PLUGIN_URL . 'assets/js/import.js', array( 'jquery' ), SRM_VERSION, true );
 	}
 
 	/**
@@ -96,9 +92,8 @@ class SRM_Import {
 
 	/**
 	 * Renders the hidden drop zone, styled like the Media Library uploader.
-	 * assets/js/import.js moves it below the page title, toggles it, reads
-	 * the picked or dropped CSV and sends it to ajax_import() in batches.
-	 * Printed in the footer because the list table is already inside a form.
+	 * Printed in the footer because the list table is already inside a form;
+	 * assets/js/import.js moves it below the page title.
 	 *
 	 * @since 2.4.0
 	 * @return void
@@ -136,8 +131,7 @@ class SRM_Import {
 	}
 
 	/**
-	 * Imports one batch of CSV rows (the header line plus up to a few hundred
-	 * rows) sent by assets/js/import.js, so no single request runs long.
+	 * Imports one batch of CSV rows sent by assets/js/import.js.
 	 *
 	 * @since 2.4.0
 	 * @return void
@@ -149,44 +143,30 @@ class SRM_Import {
 			wp_send_json_error( null, 403 );
 		}
 
-		// phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- Raw CSV; srm_create_redirect() sanitizes every field it stores.
-		$csv = isset( $_POST['csv'] ) && is_string( $_POST['csv'] ) ? wp_unslash( $_POST['csv'] ) : '';
-
-		// phpcs:ignore WordPress.WP.AlternativeFunctions.file_system_operations_fopen -- In-memory stream, not the filesystem.
-		$handle = '' !== $csv ? fopen( 'php://temp', 'r+' ) : false;
-
-		if ( ! $handle ) {
-			wp_send_json_error( null, 400 );
-		}
-
-		// phpcs:disable WordPress.WP.AlternativeFunctions, WordPressVIPMinimum.Functions.RestrictedFunctions.file_ops_fwrite -- In-memory stream, not the filesystem.
-		fwrite( $handle, $csv );
-		rewind( $handle );
-
-		$result = $this->import_csv( $handle );
-
-		fclose( $handle );
+		// phpcs:disable WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- Raw CSV; srm_create_redirect() sanitizes every field it stores.
+		$header = isset( $_POST['header'] ) && is_string( $_POST['header'] ) ? str_getcsv( wp_unslash( $_POST['header'] ), ',', '"', '\\' ) : array();
+		$rows   = isset( $_POST['rows'] ) ? array_filter( (array) wp_unslash( $_POST['rows'] ), 'is_string' ) : array();
 		// phpcs:enable
 
-		wp_send_json_success( $result );
+		wp_send_json_success( $this->import_rows( $header, $rows ) );
 	}
 
 	/**
-	 * Creates or updates a redirect for each row of a CSV in the export format
-	 * (srm_get_export_fields()), keeping every exported setting.
+	 * Creates or updates a redirect for each CSV row in the export format,
+	 * keeping its status and regex source.
 	 *
 	 * @since 2.4.0
-	 * @param resource $handle CSV stream positioned at the header row.
+	 * @param string[] $header Column names.
+	 * @param string[] $rows   CSV rows.
 	 * @return array Counts of 'created' (created or updated) and 'skipped' rows.
 	 */
-	public function import_csv( $handle ) {
+	public function import_rows( $header, $rows ) {
 		$created = 0;
 		$skipped = 0;
-		$headers = fgetcsv( $handle, null, ',', '"', '\\' );
 
-		// phpcs:ignore Generic.CodeAnalysis.AssignmentInCondition.FoundInWhileCondition -- Intended.
-		while ( ( $row = fgetcsv( $handle, null, ',', '"', '\\' ) ) ) {
-			$rule = is_array( $headers ) && count( $row ) === count( $headers ) ? array_combine( $headers, array_map( array( $this, 'unescape_csv' ), $row ) ) : array();
+		foreach ( $rows as $row ) {
+			$row  = str_getcsv( $row, ',', '"', '\\' );
+			$rule = count( $row ) === count( $header ) ? array_combine( $header, $row ) : array();
 			$to   = $rule['redirect_to'] ?? '';
 			$code = absint( $rule['status_code'] ?? 0 ) ? absint( $rule['status_code'] ) : 302;
 
@@ -198,7 +178,7 @@ class SRM_Import {
 
 			$regex  = filter_var( $rule['enable_regex'] ?? false, FILTER_VALIDATE_BOOLEAN );
 			$status = in_array( $rule['post_status'] ?? '', array( 'publish', 'draft', 'pending', 'private' ), true ) ? $rule['post_status'] : 'publish';
-			$id     = srm_create_redirect( $rule['redirect_from'], $to, $code, $regex, $status, absint( $rule['menu_order'] ?? 0 ), $rule['notes'] ?? '', get_current_user_id(), true );
+			$id     = srm_create_redirect( $rule['redirect_from'], $to, $code, $regex, $status, 0, $rule['notes'] ?? '', get_current_user_id(), true );
 
 			if ( is_wp_error( $id ) ) {
 				++$skipped;
@@ -208,42 +188,16 @@ class SRM_Import {
 			// srm_create_redirect() stores '/' for an empty destination.
 			if ( '' === $to ) {
 				delete_post_meta( $id, '_redirect_rule_to' );
-			}
-
-			if ( isset( $rule['message'] ) ) {
-				$message = sanitize_text_field( $rule['message'] );
-				'' !== $message ? update_post_meta( $id, '_redirect_rule_message', $message ) : delete_post_meta( $id, '_redirect_rule_message' );
-			}
-
-			if ( isset( $rule['force_https'] ) ) {
-				filter_var( $rule['force_https'], FILTER_VALIDATE_BOOLEAN ) ? update_post_meta( $id, '_force_https', true ) : delete_post_meta( $id, '_force_https' );
+				srm_flush_cache();
 			}
 
 			++$created;
 		}
 
-		// Meta changed after srm_create_redirect() flushed the cache.
-		srm_flush_cache();
-
 		return array(
 			'created' => $created,
 			'skipped' => $skipped,
 		);
-	}
-
-	/**
-	 * Reverses srm_escape_csv() so exported values import unchanged.
-	 *
-	 * @since 2.4.0
-	 * @param string $value Field value.
-	 * @return string
-	 */
-	protected function unescape_csv( $value ) {
-		if ( strlen( $value ) > 1 && "'" === $value[0] && in_array( $value[1], array( '=', '+', '-', '@', "\t", "\r" ), true ) ) {
-			$value = substr( $value, 1 );
-		}
-
-		return $value;
 	}
 
 	/**
@@ -253,53 +207,22 @@ class SRM_Import {
 	 * @return void
 	 */
 	public function import_notice() {
-		if ( ! $this->is_redirect_list() ) {
+		// phpcs:disable WordPress.Security.NonceVerification.Recommended -- Display-only counts set by assets/js/import.js.
+		if ( ! $this->is_redirect_list() || ! isset( $_GET['srm_imported'], $_GET['srm_skipped'] ) ) {
 			return;
 		}
-
-		// phpcs:disable WordPress.Security.NonceVerification.Recommended -- Display-only result args set by assets/js/import.js.
-		if ( ! isset( $_GET['srm_imported'], $_GET['srm_skipped'] ) ) {
-			return;
-		}
-
-		$message = sprintf(
-			/* translators: 1: number of imported redirects, 2: number of skipped rows */
-			__( 'Import complete. Imported: %1$d. Skipped: %2$d.', 'safe-redirect-manager' ),
-			absint( $_GET['srm_imported'] ),
-			absint( $_GET['srm_skipped'] )
-		);
-		// phpcs:enable
 
 		wp_admin_notice(
-			esc_html( $message ),
-			array(
-				'type'        => 'success',
-				'dismissible' => true,
-			)
+			esc_html(
+				sprintf(
+					/* translators: 1: number of imported redirects, 2: number of skipped rows */
+					__( 'Import complete. Imported: %1$d. Skipped: %2$d.', 'safe-redirect-manager' ),
+					absint( $_GET['srm_imported'] ),
+					absint( $_GET['srm_skipped'] )
+				)
+			),
+			array( 'type' => 'success' )
 		);
-
-		if ( (int) wp_count_posts( 'redirect_rule' )->publish > srm_get_max_redirects() ) {
-			wp_admin_notice(
-				esc_html(
-					sprintf(
-						/* translators: %d: maximum number of redirects */
-						__( 'There are now more published redirects than the maximum of %d. Redirects beyond the maximum are not used.', 'safe-redirect-manager' ),
-						srm_get_max_redirects()
-					)
-				),
-				array( 'type' => 'warning' )
-			);
-		}
-	}
-
-	/**
-	 * Removes the import result args from the address bar once shown.
-	 *
-	 * @since 2.4.0
-	 * @param string[] $args Query args WordPress removes from admin URLs.
-	 * @return string[]
-	 */
-	public function removable_query_args( $args ) {
-		return array_merge( $args, array( 'srm_imported', 'srm_skipped' ) );
+		// phpcs:enable
 	}
 }

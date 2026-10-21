@@ -81,7 +81,8 @@
 			$.post( $wrap.data( 'ajax-url' ), {
 				action: 'srm_import',
 				_ajax_nonce: $wrap.data( 'nonce' ),
-				csv: header + '\n' + batch.join( '\n' ) + '\n'
+				header: header,
+				rows: batch
 			} ).done( function ( response ) {
 				if ( ! response || ! response.success ) {
 					showError( $status.data( 'failed' ) );

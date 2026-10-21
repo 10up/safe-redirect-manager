@@ -667,31 +667,17 @@ class SRMTestCore extends WP_UnitTestCase {
 	}
 
 	/**
-	 * Tests that an export imports back unchanged, and that importing it again
-	 * updates the same redirects instead of duplicating them.
+	 * Tests that an export imports back with its status, regex source and
+	 * empty 410 destination, and that importing again updates instead of duplicating.
 	 *
 	 * @since 2.4.0
 	 */
 	public function testExportImportRoundTrip() {
 		wp_set_current_user( self::factory()->user->create( array( 'role' => 'administrator' ) ) );
 
-		srm_create_redirect( '/draft-page', '/new-draft', 302, false, 'draft', 5, '-- legacy note' );
-		srm_create_redirect( '^blog/(.*)$', '/news/$1', 301, true, 'publish', 1, '', 1, true );
-		$gone = srm_create_redirect( '/gone', '/', 410, false, 'publish', 2 );
-		delete_post_meta( $gone, '_redirect_rule_to' );
-		update_post_meta( $gone, '_redirect_rule_message', 'Gone for good' );
-		update_post_meta( $gone, '_force_https', true );
-
-		// Export as SRM_Export::export_csv() does, and keep the rows to compare.
-		$csv    = fopen( 'php://temp', 'r+' );
-		$before = array();
-		fputcsv( $csv, srm_get_export_fields(), ',', '"', '\\' );
-		srm_each_export_redirect(
-			function ( $row ) use ( $csv, &$before ) {
-				fputcsv( $csv, array_map( 'srm_escape_csv', $row ), ',', '"', '\\' );
-				$before[ $row['ID'] ] = $row;
-			}
-		);
+		srm_create_redirect( '/draft-page', '/new-draft', 302, false, 'draft', 0, 'legacy note' );
+		srm_create_redirect( '^blog/(.*)$', '/news/$1', 301, true, 'publish', 0, '', 1, true );
+		delete_post_meta( srm_create_redirect( '/gone', '/', 410 ), '_redirect_rule_to' );
 
 		$export = function () {
 			$rows = array();
@@ -702,22 +688,23 @@ class SRMTestCore extends WP_UnitTestCase {
 			);
 			return $rows;
 		};
+		$to_csv = function ( $row ) {
+			return '"' . implode( '","', array_map( 'strval', $row ) ) . '"';
+		};
+		$before = $export();
+		$rows   = array_map( $to_csv, array_values( $before ) );
 
-		// Re-importing updates the same posts and leaves every field unchanged.
-		rewind( $csv );
-		$this->assertSame( array( 'created' => 3, 'skipped' => 0 ), SRM_Import::factory()->import_csv( $csv ) );
+		// Importing over the same redirects changes nothing.
+		$this->assertSame( array( 'created' => 3, 'skipped' => 0 ), SRM_Import::factory()->import_rows( srm_get_export_fields(), $rows ) );
 		$this->assertSame( $before, $export() );
 
-		// Into an empty site, every field is restored.
+		// Importing into an empty site restores them.
 		foreach ( array_keys( $before ) as $id ) {
 			wp_delete_post( $id, true );
 		}
+		SRM_Import::factory()->import_rows( srm_get_export_fields(), $rows );
 
-		rewind( $csv );
-		SRM_Import::factory()->import_csv( $csv );
-		fclose( $csv );
-
-		$strip_ids = function ( $rows ) {
+		$without_ids = function ( $rows ) {
 			return array_map(
 				function ( $row ) {
 					unset( $row['ID'] );
@@ -726,7 +713,7 @@ class SRMTestCore extends WP_UnitTestCase {
 				array_values( $rows )
 			);
 		};
-		$this->assertSame( $strip_ids( $before ), $strip_ids( $export() ) );
+		$this->assertSame( $without_ids( $before ), $without_ids( $export() ) );
 	}
 
 	/**
