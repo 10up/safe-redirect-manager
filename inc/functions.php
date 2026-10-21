@@ -542,7 +542,7 @@ function srm_import_file( $file, $args ) {
 	// phpcs:ignore Generic.CodeAnalysis.AssignmentInCondition.FoundInWhileCondition -- Intended.
 	while ( ( $row = fgetcsv( $handle, null, ',', '"', '\\' ) ) ) {
 		// validate
-		$rule = is_array( $row ) ? array_combine( $headers, $row ) : array();
+		$rule = is_array( $row ) && count( $row ) === count( $headers ) ? array_combine( $headers, $row ) : array();
 		if ( empty( $rule ) || empty( $rule[ $args['source'] ] ) || empty( $rule[ $args['target'] ] ) ) {
 			$doing_wp_cli && WP_CLI::warning( 'Skipping - redirection rule is formatted improperly.' );
 			++$skipped;
