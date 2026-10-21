@@ -63,17 +63,12 @@
     text-align: center;
 }
 
-.srm-import[hidden] {
-    display: none;
-}
-
 .srm-import.drag-over {
     border-color: #9ec2e6;
 }
 
 .srm-import__status {
     display: none;
-    margin: 24px 0;
 }
 
 .srm-import.is-uploading .srm-import__ui,
@@ -115,7 +110,8 @@
     width: 0;
 }
 
-.srm-import__ui {
+.srm-import__ui,
+.srm-import__status {
     margin: 24px 0;
 }
 
@@ -139,7 +135,6 @@
     background-color: transparent;
     border: 0;
     cursor: pointer;
-    font: normal 20px/1 dashicons;
     height: 48px;
     padding: 0;
     position: absolute;
@@ -153,8 +148,6 @@
     content: "\f335";
     content: "\f335" / "";
     display: inline-block;
-    font: normal 30px/1 dashicons;
+    font-size: 30px;
     margin-top: 1px;
-    -webkit-font-smoothing: antialiased;
-    -moz-osx-font-smoothing: grayscale;
 }

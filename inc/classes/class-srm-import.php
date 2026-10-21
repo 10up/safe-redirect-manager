@@ -107,7 +107,7 @@ class SRM_Import {
 			data-ajax-url="<?php echo esc_url( admin_url( 'admin-ajax.php' ) ); ?>"
 			data-nonce="<?php echo esc_attr( wp_create_nonce( 'srm_import' ) ); ?>"
 			data-done-url="<?php echo esc_url( admin_url( 'edit.php?post_type=redirect_rule' ) ); ?>">
-			<button type="button" class="srm-import__close">
+			<button type="button" class="srm-import__close dashicons">
 				<span class="screen-reader-text"><?php esc_html_e( 'Close importer', 'safe-redirect-manager' ); ?></span>
 			</button>
 			<input type="file" id="srm-import-file" accept=".csv,text/csv" class="screen-reader-text" />
