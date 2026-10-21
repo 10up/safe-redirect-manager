@@ -110,23 +110,27 @@
 			return;
 		}
 
-		$wrap.removeClass( 'has-error' );
+		if ( ! /\.csv$/i.test( file.name ) ) {
+			showError( $status.data( 'invalid' ) );
+			return;
+		}
+
+		$wrap.removeClass( 'has-error' ).addClass( 'is-uploading' );
 		$status.find( '.srm-import__filename' ).text( file.name );
 
 		reader.onload = function () {
 			var records = splitRecords( String( reader.result ) );
-			var header  = records.shift() || '';
-			var columns = header.split( ',' ).map( function ( column ) {
+			var columns = ( records.shift() || '' ).split( ',' ).map( function ( column ) {
 				return column.trim().replace( /^"|"$/g, '' );
 			} );
 
-			if ( ! /\.csv$/i.test( file.name ) || -1 === columns.indexOf( 'redirect_from' ) || -1 === columns.indexOf( 'redirect_to' ) || ! records.length ) {
+			if ( -1 === columns.indexOf( 'redirect_from' ) || -1 === columns.indexOf( 'redirect_to' ) || ! records.length ) {
 				showError( $status.data( 'invalid' ) );
 				return;
 			}
 
-			$wrap.addClass( 'is-uploading' );
-			importRows( header, records );
+			// Send the cleaned-up header so PHP matches the same column names.
+			importRows( columns.join( ',' ), records );
 		};
 		reader.onerror = function () {
 			showError( $status.data( 'failed' ) );
