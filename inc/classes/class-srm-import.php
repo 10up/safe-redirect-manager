@@ -163,22 +163,87 @@ class SRM_Import {
 		fwrite( $handle, $csv );
 		rewind( $handle );
 
-		$result = srm_import_file(
-			$handle,
-			array(
-				'source' => 'redirect_from',
-				'target' => 'redirect_to',
-				'regex'  => 'enable_regex',
-				'code'   => 'status_code',
-				'order'  => 'menu_order',
-				'notes'  => 'notes',
-			)
-		);
+		$result = $this->import_csv( $handle );
 
 		fclose( $handle );
 		// phpcs:enable
 
 		wp_send_json_success( $result );
+	}
+
+	/**
+	 * Creates or updates a redirect for each row of a CSV in the export format
+	 * (srm_get_export_fields()), keeping every exported setting.
+	 *
+	 * @since 2.4.0
+	 * @param resource $handle CSV stream positioned at the header row.
+	 * @return array Counts of 'created' (created or updated) and 'skipped' rows.
+	 */
+	public function import_csv( $handle ) {
+		$created = 0;
+		$skipped = 0;
+		$headers = fgetcsv( $handle, null, ',', '"', '\\' );
+
+		// phpcs:ignore Generic.CodeAnalysis.AssignmentInCondition.FoundInWhileCondition -- Intended.
+		while ( ( $row = fgetcsv( $handle, null, ',', '"', '\\' ) ) ) {
+			$rule = is_array( $headers ) && count( $row ) === count( $headers ) ? array_combine( $headers, array_map( array( $this, 'unescape_csv' ), $row ) ) : array();
+			$to   = $rule['redirect_to'] ?? '';
+			$code = absint( $rule['status_code'] ?? 0 ) ? absint( $rule['status_code'] ) : 302;
+
+			// 403, 404 and 410 rules have no destination.
+			if ( empty( $rule['redirect_from'] ) || ( '' === $to && ! in_array( $code, array( 403, 404, 410 ), true ) ) ) {
+				++$skipped;
+				continue;
+			}
+
+			$regex  = filter_var( $rule['enable_regex'] ?? false, FILTER_VALIDATE_BOOLEAN );
+			$status = in_array( $rule['post_status'] ?? '', array( 'publish', 'draft', 'pending', 'private' ), true ) ? $rule['post_status'] : 'publish';
+			$id     = srm_create_redirect( $rule['redirect_from'], $to, $code, $regex, $status, absint( $rule['menu_order'] ?? 0 ), $rule['notes'] ?? '', get_current_user_id(), true );
+
+			if ( is_wp_error( $id ) ) {
+				++$skipped;
+				continue;
+			}
+
+			// srm_create_redirect() stores '/' for an empty destination.
+			if ( '' === $to ) {
+				delete_post_meta( $id, '_redirect_rule_to' );
+			}
+
+			if ( isset( $rule['message'] ) ) {
+				$message = sanitize_text_field( $rule['message'] );
+				'' !== $message ? update_post_meta( $id, '_redirect_rule_message', $message ) : delete_post_meta( $id, '_redirect_rule_message' );
+			}
+
+			if ( isset( $rule['force_https'] ) ) {
+				filter_var( $rule['force_https'], FILTER_VALIDATE_BOOLEAN ) ? update_post_meta( $id, '_force_https', true ) : delete_post_meta( $id, '_force_https' );
+			}
+
+			++$created;
+		}
+
+		// Meta changed after srm_create_redirect() flushed the cache.
+		srm_flush_cache();
+
+		return array(
+			'created' => $created,
+			'skipped' => $skipped,
+		);
+	}
+
+	/**
+	 * Reverses srm_escape_csv() so exported values import unchanged.
+	 *
+	 * @since 2.4.0
+	 * @param string $value Field value.
+	 * @return string
+	 */
+	protected function unescape_csv( $value ) {
+		if ( strlen( $value ) > 1 && "'" === $value[0] && in_array( $value[1], array( '=', '+', '-', '@', "\t", "\r" ), true ) ) {
+			$value = substr( $value, 1 );
+		}
+
+		return $value;
 	}
 
 	/**

@@ -106,6 +106,10 @@ function srm_get_redirect_data( $redirect_id, $optional_fields = array() ) {
 		$redirect_data['post_status'] = get_post_status( $redirect_id );
 	}
 
+	if ( in_array( 'menu_order', $optional_fields, true ) ) {
+		$redirect_data['menu_order'] = (int) get_post_field( 'menu_order', $redirect_id );
+	}
+
 	return $redirect_data;
 }
 
@@ -118,7 +122,7 @@ function srm_get_redirect_data( $redirect_id, $optional_fields = array() ) {
 function srm_get_export_fields() {
 	return apply_filters(
 		'srm_export_fields',
-		array( 'ID', 'redirect_from', 'redirect_to', 'status_code', 'enable_regex', 'post_status', 'notes', 'message', 'force_https' )
+		array( 'ID', 'redirect_from', 'redirect_to', 'status_code', 'enable_regex', 'post_status', 'notes', 'message', 'force_https', 'menu_order' )
 	);
 }
 
@@ -189,7 +193,7 @@ function srm_each_export_redirect( $callback ) {
 				break 2;
 			}
 
-			$redirect = srm_get_redirect_data( $redirect_id, array( 'post_status', 'notes' ) );
+			$redirect = srm_get_redirect_data( $redirect_id, array( 'post_status', 'notes', 'menu_order' ) );
 			$row      = array();
 
 			foreach ( $fields as $field ) {
@@ -338,15 +342,16 @@ function srm_check_for_possible_redirect_loops() {
  * @param string $post_status Post status
  * @param int    $menu_order Menu order
  * @param string $notes Notes
- * @param int    $author_id Author ID
+ * @param int    $author_id Author ID, used only when a new redirect is created
+ * @param bool   $keep_regex_source Since 2.4.0. Store a regex "from" as entered, as the edit screen does. Default false.
  * @since 1.8
  * @uses wp_insert_post, update_post_meta
  * @return int|WP_Error
  */
-function srm_create_redirect( $redirect_from, $redirect_to, $status_code = 302, $enable_regex = false, $post_status = 'publish', $menu_order = 0, $notes = '', $author_id = 1 ) {
+function srm_create_redirect( $redirect_from, $redirect_to, $status_code = 302, $enable_regex = false, $post_status = 'publish', $menu_order = 0, $notes = '', $author_id = 1, $keep_regex_source = false ) {
 	global $wpdb;
 
-	$sanitized_redirect_from = srm_sanitize_redirect_from( $redirect_from );
+	$sanitized_redirect_from = srm_sanitize_redirect_from( $redirect_from, $keep_regex_source && $enable_regex );
 	$sanitized_redirect_to   = srm_sanitize_redirect_to( $redirect_to );
 	$sanitized_status_code   = absint( $status_code );
 	$sanitized_enable_regex  = (bool) $enable_regex;
@@ -400,7 +405,6 @@ function srm_create_redirect( $redirect_from, $redirect_to, $status_code = 302, 
 	$post_args = array(
 		'post_type'   => 'redirect_rule',
 		'post_status' => $sanitized_post_status,
-		'post_author' => $sanitized_author_id,
 		'menu_order'  => $sanitized_menu_order,
 	);
 
@@ -413,7 +417,8 @@ function srm_create_redirect( $redirect_from, $redirect_to, $status_code = 302, 
 			return new WP_Error( 'error-updating', esc_html__( 'An error occurred updating the redirect.', 'safe-redirect-manager' ) );
 		}
 	} else {
-		$post_id = wp_insert_post( $post_args );
+		$post_args['post_author'] = $sanitized_author_id;
+		$post_id                  = wp_insert_post( $post_args );
 		if ( 0 >= $post_id ) {
 			return new WP_Error( 'error-creating', esc_html__( 'An error occurred creating the redirect.', 'safe-redirect-manager' ) );
 		}

@@ -667,6 +667,69 @@ class SRMTestCore extends WP_UnitTestCase {
 	}
 
 	/**
+	 * Tests that an export imports back unchanged, and that importing it again
+	 * updates the same redirects instead of duplicating them.
+	 *
+	 * @since 2.4.0
+	 */
+	public function testExportImportRoundTrip() {
+		wp_set_current_user( self::factory()->user->create( array( 'role' => 'administrator' ) ) );
+
+		srm_create_redirect( '/draft-page', '/new-draft', 302, false, 'draft', 5, '-- legacy note' );
+		srm_create_redirect( '^blog/(.*)$', '/news/$1', 301, true, 'publish', 1, '', 1, true );
+		$gone = srm_create_redirect( '/gone', '/', 410, false, 'publish', 2 );
+		delete_post_meta( $gone, '_redirect_rule_to' );
+		update_post_meta( $gone, '_redirect_rule_message', 'Gone for good' );
+		update_post_meta( $gone, '_force_https', true );
+
+		// Export as SRM_Export::export_csv() does, and keep the rows to compare.
+		$csv    = fopen( 'php://temp', 'r+' );
+		$before = array();
+		fputcsv( $csv, srm_get_export_fields(), ',', '"', '\\' );
+		srm_each_export_redirect(
+			function ( $row ) use ( $csv, &$before ) {
+				fputcsv( $csv, array_map( 'srm_escape_csv', $row ), ',', '"', '\\' );
+				$before[ $row['ID'] ] = $row;
+			}
+		);
+
+		$export = function () {
+			$rows = array();
+			srm_each_export_redirect(
+				function ( $row ) use ( &$rows ) {
+					$rows[ $row['ID'] ] = $row;
+				}
+			);
+			return $rows;
+		};
+
+		// Re-importing updates the same posts and leaves every field unchanged.
+		rewind( $csv );
+		$this->assertSame( array( 'created' => 3, 'skipped' => 0 ), SRM_Import::factory()->import_csv( $csv ) );
+		$this->assertSame( $before, $export() );
+
+		// Into an empty site, every field is restored.
+		foreach ( array_keys( $before ) as $id ) {
+			wp_delete_post( $id, true );
+		}
+
+		rewind( $csv );
+		SRM_Import::factory()->import_csv( $csv );
+		fclose( $csv );
+
+		$strip_ids = function ( $rows ) {
+			return array_map(
+				function ( $row ) {
+					unset( $row['ID'] );
+					return $row;
+				},
+				array_values( $rows )
+			);
+		};
+		$this->assertSame( $strip_ids( $before ), $strip_ids( $export() ) );
+	}
+
+	/**
 	 * Test a redirect rule that ends with a trailing slash followed by an asterisk.
 	 *
 	 * @since 1.9.3
