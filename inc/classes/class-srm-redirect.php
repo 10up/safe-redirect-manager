@@ -243,6 +243,11 @@ class SRM_Redirect {
 					}
 				}
 
+				// Resolve root-relative targets against a home URL with a path (e.g. subdirectory multisite subsite).
+				if ( isset( $parsed_home_url['path'] ) && '/' !== $parsed_home_url['path'] && 0 === strpos( $redirect_to, '/' ) && 0 !== strpos( $redirect_to, '//' ) ) {
+					$redirect_to = home_url( $redirect_to );
+				}
+
 				// re-add the query params if they've not already been added by the wildcard
 				// query params are forwarded to allow for attribution and marketing params to be maintained
 				if ( ! $match_query_params && ! empty( $requested_query_params ) && ! strpos( $redirect_to, '?' ) ) {
