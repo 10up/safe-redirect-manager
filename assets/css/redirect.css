@@ -54,3 +54,100 @@
 .margin-top-0 {
     margin-top: 0 !important;
 }
+
+/* CSV import drop zone, matching the Media Library uploader (wp-admin/css/media.css, wp-includes/css/media-views.css). */
+.srm-import {
+    border: 4px dashed #c3c4c7;
+    margin: 20px 0;
+    position: relative;
+    text-align: center;
+}
+
+.srm-import.drag-over {
+    border-color: #9ec2e6;
+}
+
+.srm-import__status {
+    display: none;
+}
+
+.srm-import.is-uploading .srm-import__ui,
+.srm-import.is-uploading .srm-import__help {
+    display: none;
+}
+
+.srm-import.is-uploading .srm-import__status,
+.srm-import.has-error .srm-import__status {
+    display: block;
+}
+
+.srm-import.has-error .srm-import__filename,
+.srm-import.has-error .srm-import__progress {
+    display: none;
+}
+
+.srm-import.has-error .srm-import__status-text {
+    color: #d63638;
+    font-size: 14px;
+}
+
+/* Same look as core's .media-progress-bar. */
+.srm-import__progress {
+    background: rgba(0, 0, 0, 0.1);
+    border-radius: 10px;
+    height: 10px;
+    margin: 10px auto;
+    max-width: 300px;
+    width: 70%;
+}
+
+.srm-import__progress div {
+    background: var(--wp-admin-theme-color, #3858e9);
+    border-radius: 10px;
+    height: 10px;
+    min-width: 20px;
+    transition: width 300ms;
+    width: 0;
+}
+
+.srm-import__ui,
+.srm-import__status {
+    margin: 24px 0;
+}
+
+.srm-import h2 {
+    font-size: 20px;
+    font-weight: 400;
+    line-height: 1.4;
+    margin: 0;
+    padding: 0;
+}
+
+.srm-import p {
+    margin: 0.5em 0;
+}
+
+.srm-import .srm-import__help {
+    margin-bottom: 24px;
+}
+
+.srm-import__close {
+    background-color: transparent;
+    border: 0;
+    cursor: pointer;
+    height: 48px;
+    padding: 0;
+    position: absolute;
+    right: 2px;
+    top: 2px;
+    width: 48px;
+}
+
+.srm-import__close:before {
+    color: #50575e;
+    content: "\f335";
+    content: "\f335" / "";
+    display: inline-block;
+    font-size: 30px;
+    margin-top: 1px;
+}

@@ -339,14 +339,15 @@ function srm_check_for_possible_redirect_loops() {
  * @param int    $menu_order Menu order
  * @param string $notes Notes
  * @param int    $author_id Author ID
+ * @param bool   $keep_regex_source Since 2.4.0. Store a regex "from" as entered, as the edit screen does. Default false.
  * @since 1.8
  * @uses wp_insert_post, update_post_meta
  * @return int|WP_Error
  */
-function srm_create_redirect( $redirect_from, $redirect_to, $status_code = 302, $enable_regex = false, $post_status = 'publish', $menu_order = 0, $notes = '', $author_id = 1 ) {
+function srm_create_redirect( $redirect_from, $redirect_to, $status_code = 302, $enable_regex = false, $post_status = 'publish', $menu_order = 0, $notes = '', $author_id = 1, $keep_regex_source = false ) {
 	global $wpdb;
 
-	$sanitized_redirect_from = srm_sanitize_redirect_from( $redirect_from );
+	$sanitized_redirect_from = srm_sanitize_redirect_from( $redirect_from, $keep_regex_source && $enable_regex );
 	$sanitized_redirect_to   = srm_sanitize_redirect_to( $redirect_to );
 	$sanitized_status_code   = absint( $status_code );
 	$sanitized_enable_regex  = (bool) $enable_regex;
@@ -542,7 +543,7 @@ function srm_import_file( $file, $args ) {
 	// phpcs:ignore Generic.CodeAnalysis.AssignmentInCondition.FoundInWhileCondition -- Intended.
 	while ( ( $row = fgetcsv( $handle, null, ',', '"', '\\' ) ) ) {
 		// validate
-		$rule = is_array( $row ) ? array_combine( $headers, $row ) : array();
+		$rule = is_array( $row ) && count( $row ) === count( $headers ) ? array_combine( $headers, $row ) : array();
 		if ( empty( $rule ) || empty( $rule[ $args['source'] ] ) || empty( $rule[ $args['target'] ] ) ) {
 			$doing_wp_cli && WP_CLI::warning( 'Skipping - redirection rule is formatted improperly.' );
 			++$skipped;

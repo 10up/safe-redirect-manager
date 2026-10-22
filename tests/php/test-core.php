@@ -667,6 +667,56 @@ class SRMTestCore extends WP_UnitTestCase {
 	}
 
 	/**
+	 * Tests that an export imports back with its status, regex source and
+	 * empty 410 destination, and that importing again updates instead of duplicating.
+	 *
+	 * @since 2.4.0
+	 */
+	public function testExportImportRoundTrip() {
+		wp_set_current_user( self::factory()->user->create( array( 'role' => 'administrator' ) ) );
+
+		srm_create_redirect( '/draft-page', '/new-draft', 302, false, 'draft', 0, 'legacy note' );
+		srm_create_redirect( '^blog/(.*)$', '/news/$1', 301, true, 'publish', 0, '', 1, true );
+		delete_post_meta( srm_create_redirect( '/gone', '/', 410 ), '_redirect_rule_to' );
+
+		$export = function () {
+			$rows = array();
+			srm_each_export_redirect(
+				function ( $row ) use ( &$rows ) {
+					$rows[ $row['ID'] ] = $row;
+				}
+			);
+			return $rows;
+		};
+		$to_csv = function ( $row ) {
+			return '"' . implode( '","', array_map( 'strval', $row ) ) . '"';
+		};
+		$before = $export();
+		$rows   = array_map( $to_csv, array_values( $before ) );
+
+		// Importing over the same redirects changes nothing.
+		$this->assertSame( array( 'created' => 3, 'skipped' => 0 ), SRM_Import::factory()->import_rows( srm_get_export_fields(), $rows ) );
+		$this->assertSame( $before, $export() );
+
+		// Importing into an empty site restores them.
+		foreach ( array_keys( $before ) as $id ) {
+			wp_delete_post( $id, true );
+		}
+		SRM_Import::factory()->import_rows( srm_get_export_fields(), $rows );
+
+		$without_ids = function ( $rows ) {
+			return array_map(
+				function ( $row ) {
+					unset( $row['ID'] );
+					return $row;
+				},
+				array_values( $rows )
+			);
+		};
+		$this->assertSame( $without_ids( $before ), $without_ids( $export() ) );
+	}
+
+	/**
 	 * Test a redirect rule that ends with a trailing slash followed by an asterisk.
 	 *
 	 * @since 1.9.3
