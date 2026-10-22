@@ -4,6 +4,9 @@ All notable changes to this project will be documented in this file, per [the Ke
 
 ## [Unreleased] - TBD
 
+### Added
+- Show an admin notice when a published post's permalink collides with an existing redirect rule, so unreachable content can be spotted and fixed. The check can be turned off with the new `srm_redirect_conflict_check` filter (props [@szepeviktor](https://github.com/szepeviktor) via [#103](https://github.com/10up/safe-redirect-manager/issues/103)).
+
 ## [2.3.0] - 2026-09-21
 **Note that this version bumps the WordPress minimum from 6.5 to 6.9.**
 
