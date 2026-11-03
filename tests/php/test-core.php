@@ -953,4 +953,55 @@ class SRMTestCore extends WP_UnitTestCase {
 		$this->assertSame( $expected_redirect, $actual_redirect, 'The redirect destination does not meet the expectation' );
 		$this->assertSame( $expected_status, $actual_status, 'The redirect status does npt meet the expectation.' );
 	}
+
+	/**
+	 * Test that root-relative targets resolve against a home URL with a path (subdirectory multisite subsite).
+	 *
+	 * @dataProvider dataRelativeRedirectWithSubdirectoryHome
+	 *
+	 * @param string $requested_path Requested path.
+	 * @param string $redirect_from  Redirect from.
+	 * @param string $redirect_to    Redirect to.
+	 * @param bool   $use_regex      Whether the rule is a regex.
+	 * @param string $expected       Expected redirect destination.
+	 */
+	public function testRelativeRedirectWithSubdirectoryHome( $requested_path, $redirect_from, $redirect_to, $use_regex, $expected ) {
+		add_filter(
+			'pre_option_home',
+			function () {
+				return 'http://example.org/sub';
+			}
+		);
+
+		$_SERVER['REQUEST_URI'] = $requested_path;
+		$redirected_to_actual   = '';
+		srm_create_redirect( $redirect_from, $redirect_to, 301, $use_regex );
+
+		add_action(
+			'srm_do_redirect',
+			function ( $requested_path, $redirected_to, $status_code ) use ( &$redirected_to_actual ) {
+				$redirected_to_actual = $redirected_to;
+			},
+			10,
+			3
+		);
+
+		SRM_Redirect::factory()->maybe_redirect();
+
+		$this->assertSame( $expected, $redirected_to_actual );
+	}
+
+	/**
+	 * Data provider for testRelativeRedirectWithSubdirectoryHome.
+	 *
+	 * @return array
+	 */
+	public function dataRelativeRedirectWithSubdirectoryHome() {
+		return array(
+			'relative'          => array( '/sub/old', '/old', '/new/', false, 'http://example.org/sub/new/' ),
+			'absolute'          => array( '/sub/old', '/old', 'https://example.com/new/', false, 'https://example.com/new/' ),
+			'protocol-relative' => array( '/sub/old', '/old', '//example.com/new/', false, '//example.com/new/' ),
+			'regex'             => array( '/sub/old/123', '/old/(.*)', '/new/$1', true, 'http://example.org/sub/new/123' ),
+		);
+	}
 }
