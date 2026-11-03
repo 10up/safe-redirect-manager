@@ -44,8 +44,10 @@ class SRM_Post_Type {
 		add_action( 'quick_edit_custom_box', array( $this, 'action_quick_edit_custom_redirect_columns' ), 10, 2 );
 		add_action( 'bulk_edit_custom_box', array( $this, 'action_quick_edit_custom_redirect_columns' ), 10, 2 );
 		add_action( 'transition_post_status', array( $this, 'action_transition_post_status' ), 10, 3 );
+		add_action( 'transition_post_status', array( $this, 'action_redirect_conflict_check' ), 20, 3 );
 		add_filter( 'post_updated_messages', array( $this, 'filter_redirect_updated_messages' ) );
 		add_action( 'admin_notices', array( $this, 'action_redirect_chain_alert' ) );
+		add_action( 'admin_notices', array( $this, 'action_redirect_conflict_notice' ) );
 		add_filter( 'the_title', array( $this, 'filter_admin_title' ), 100, 2 );
 		add_action( 'admin_print_styles-edit.php', array( $this, 'action_print_logo_css' ), 10, 1 );
 		add_action( 'admin_print_styles-post.php', array( $this, 'action_print_logo_css' ), 10, 1 );
@@ -433,6 +435,196 @@ class SRM_Post_Type {
 		if ( 'redirect_rule' === $post->post_type ) {
 			srm_flush_cache();
 		}
+	}
+
+	/**
+	 * Checks whether a published post's permalink collides with a redirect rule.
+	 *
+	 * Safe Redirect Manager redirects on the front end even when content exists at
+	 * the requested path, so a post that matches a redirect rule is unreachable.
+	 * When a collision is found it is stored on the user, so the notice can be
+	 * shown on the next admin page they load, including after the block editor
+	 * saves over a REST request without a page reload.
+	 *
+	 * @since 2.4.0
+	 * @param string  $new_status New post status.
+	 * @param string  $old_status Old post status.
+	 * @param WP_Post $post       Post object.
+	 * @return void
+	 */
+	public function action_redirect_conflict_check( $new_status, $old_status, $post ) {
+		// Only run when a post first becomes published, not on every later update.
+		if ( 'publish' !== $new_status || 'publish' === $old_status ) {
+			return;
+		}
+
+		if ( ! is_object( $post ) ) {
+			return;
+		}
+
+		// Never flag the redirect post type, its permalink is a redirect source by design.
+		if ( 'redirect_rule' === $post->post_type || ! is_post_type_viewable( $post->post_type ) ) {
+			return;
+		}
+
+		/**
+		 * Whether to warn when a post's permalink collides with a redirect rule.
+		 *
+		 * @hook srm_redirect_conflict_check
+		 * @param {bool} $check_conflict Whether to check for redirect conflicts. Default is `true`.
+		 * @returns {bool} Bool to check for redirect conflicts.
+		 */
+		if ( ! apply_filters( 'srm_redirect_conflict_check', true ) ) {
+			return;
+		}
+
+		/*
+		 * Notify the user who performed the save. Scheduled publishes run with no
+		 * current user, so fall back to the post author in that case.
+		 */
+		$user_id = get_current_user_id();
+
+		if ( ! $user_id ) {
+			$user_id = (int) $post->post_author;
+		}
+
+		if ( ! $user_id ) {
+			return;
+		}
+
+		$matched = $this->get_redirect_conflict( $post->ID );
+
+		if ( empty( $matched ) ) {
+			return;
+		}
+
+		$meta_key  = $this->get_conflict_meta_key();
+		$conflicts = get_user_meta( $user_id, $meta_key, true );
+
+		if ( ! is_array( $conflicts ) ) {
+			$conflicts = array();
+		}
+
+		if ( ! in_array( $post->ID, $conflicts, true ) ) {
+			$conflicts[] = $post->ID;
+		}
+
+		update_user_meta( $user_id, $meta_key, $conflicts );
+	}
+
+	/**
+	 * Returns the user meta key used to store redirect conflicts.
+	 *
+	 * User meta is shared across a multisite network, so the key is scoped to the
+	 * current site to keep conflicts from leaking between sites.
+	 *
+	 * @since 2.4.0
+	 * @return string
+	 */
+	private function get_conflict_meta_key() {
+		return '_srm_redirect_conflicts_' . get_current_blog_id();
+	}
+
+	/**
+	 * Returns the redirect that matches a post's permalink, if there is one.
+	 *
+	 * The path is normalized the same way a front end request is before matching,
+	 * so the result reflects what visitors would actually get. When redirects only
+	 * run on 404, published content is never redirected and there is no conflict.
+	 *
+	 * @since 2.4.0
+	 * @param int $post_id Post ID.
+	 * @return array|bool Redirect data on conflict, false otherwise.
+	 */
+	private function get_redirect_conflict( $post_id ) {
+		$only_404 = apply_filters( 'srm_redirect_only_on_404', false );
+
+		if ( $only_404 ) {
+			return false;
+		}
+
+		$permalink = get_permalink( $post_id );
+
+		if ( ! $permalink ) {
+			return false;
+		}
+
+		return srm_match_redirect( untrailingslashit( wp_make_link_relative( $permalink ) ) );
+	}
+
+	/**
+	 * Displays a notice when a post's permalink collides with a redirect rule.
+	 *
+	 * Each stored conflict is checked again before it is shown, so a collision
+	 * that has since been resolved is not reported.
+	 *
+	 * @since 2.4.0
+	 * @return void
+	 */
+	public function action_redirect_conflict_notice() {
+		$user_id = get_current_user_id();
+
+		if ( ! $user_id ) {
+			return;
+		}
+
+		$meta_key  = $this->get_conflict_meta_key();
+		$conflicts = get_user_meta( $user_id, $meta_key, true );
+
+		if ( empty( $conflicts ) || ! is_array( $conflicts ) ) {
+			return;
+		}
+
+		$can_manage = current_user_can( $this->get_redirect_capability() );
+		$rows       = array();
+
+		foreach ( $conflicts as $post_id ) {
+			$post = get_post( $post_id );
+
+			if ( ! $post || 'publish' !== $post->post_status ) {
+				continue;
+			}
+
+			$matched = $this->get_redirect_conflict( $post->ID );
+
+			if ( empty( $matched ) ) {
+				continue;
+			}
+
+			$rows[] = array(
+				'post'        => $post,
+				'redirect_id' => $matched['redirect_id'],
+				'can_edit'    => current_user_can( 'edit_post', $post->ID ),
+			);
+		}
+
+		if ( empty( $rows ) ) {
+			// Nothing left to report, drop the stale entries.
+			delete_user_meta( $user_id, $meta_key );
+			return;
+		}
+
+		// Clear the list once we are about to show it.
+		delete_user_meta( $user_id, $meta_key );
+		?>
+		<div class="notice notice-warning">
+			<p><?php esc_html_e( 'The following posts are unreachable because their permalink is already redirected by Safe Redirect Manager.', 'safe-redirect-manager' ); ?></p>
+			<ul style="list-style: inside;">
+				<?php foreach ( $rows as $row ) : ?>
+					<li>
+						<?php if ( $row['can_edit'] ) : ?>
+							<a href="<?php echo esc_url( get_edit_post_link( $row['post']->ID ) ); ?>"><?php echo esc_html( get_the_title( $row['post'] ) ); ?></a>
+						<?php else : ?>
+							<?php echo esc_html( get_the_title( $row['post'] ) ); ?>
+						<?php endif; ?>
+						<?php if ( $can_manage ) : ?>
+							(<a href="<?php echo esc_url( get_edit_post_link( $row['redirect_id'] ) ); ?>"><?php esc_html_e( 'edit redirect rule', 'safe-redirect-manager' ); ?></a>)
+						<?php endif; ?>
+					</li>
+				<?php endforeach; ?>
+			</ul>
+		</div>
+		<?php
 	}
 
 	/**
