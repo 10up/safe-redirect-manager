@@ -1,9 +1,8 @@
 name: Deploy to WordPress.org
 
 on:
-  push:
-    tags:
-    - "*"
+  release:
+    types: [released]
 
 permissions:
   contents: write
