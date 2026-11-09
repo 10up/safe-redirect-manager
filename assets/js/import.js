@@ -1,5 +1,6 @@
 ( function ($) {
 	var BATCH_SIZE = 100;
+	var settings   = window.srmImport;
 
 	var $wrap   = $( '#srm-import' );
 	var $button = $( '#srm-import-btn' );
@@ -20,7 +21,7 @@
 
 	function showProgress( done, total ) {
 		$text.text(
-			$status.data( 'importing' )
+			settings.importing
 				.replace( '%1$s', done.toLocaleString() )
 				.replace( '%2$s', total.toLocaleString() )
 		);
@@ -74,18 +75,18 @@
 			var batch = rows.slice( done, done + BATCH_SIZE );
 
 			if ( ! batch.length ) {
-				window.location.href = $wrap.data( 'done-url' ) + '&srm_imported=' + created + '&srm_skipped=' + skipped;
+				window.location.href = settings.doneUrl + '&srm_imported=' + created + '&srm_skipped=' + skipped;
 				return;
 			}
 
-			$.post( $wrap.data( 'ajax-url' ), {
+			$.post( settings.ajaxUrl, {
 				action: 'srm_import',
-				_ajax_nonce: $wrap.data( 'nonce' ),
+				_ajax_nonce: settings.nonce,
 				header: header,
 				rows: batch
 			} ).done( function ( response ) {
 				if ( ! response || ! response.success ) {
-					showError( $status.data( 'failed' ) );
+					showError( settings.failed );
 					return;
 				}
 
@@ -95,7 +96,7 @@
 				showProgress( done, rows.length );
 				next();
 			} ).fail( function () {
-				showError( $status.data( 'failed' ) );
+				showError( settings.failed );
 			} );
 		}
 
@@ -112,7 +113,7 @@
 		}
 
 		if ( ! /\.csv$/i.test( file.name ) ) {
-			showError( $status.data( 'invalid' ) );
+			showError( settings.invalid );
 			return;
 		}
 
@@ -126,7 +127,7 @@
 			} );
 
 			if ( -1 === columns.indexOf( 'redirect_from' ) || -1 === columns.indexOf( 'redirect_to' ) || ! records.length ) {
-				showError( $status.data( 'invalid' ) );
+				showError( settings.invalid );
 				return;
 			}
 
@@ -134,7 +135,7 @@
 			importRows( columns.join( ',' ), records );
 		};
 		reader.onerror = function () {
-			showError( $status.data( 'failed' ) );
+			showError( settings.failed );
 		};
 		reader.readAsText( file );
 	}

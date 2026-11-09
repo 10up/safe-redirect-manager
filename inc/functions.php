@@ -106,6 +106,10 @@ function srm_get_redirect_data( $redirect_id, $optional_fields = array() ) {
 		$redirect_data['post_status'] = get_post_status( $redirect_id );
 	}
 
+	if ( in_array( 'menu_order', $optional_fields, true ) ) {
+		$redirect_data['menu_order'] = (int) get_post_field( 'menu_order', $redirect_id );
+	}
+
 	return $redirect_data;
 }
 
@@ -118,7 +122,7 @@ function srm_get_redirect_data( $redirect_id, $optional_fields = array() ) {
 function srm_get_export_fields() {
 	return apply_filters(
 		'srm_export_fields',
-		array( 'ID', 'redirect_from', 'redirect_to', 'status_code', 'enable_regex', 'post_status', 'notes', 'message', 'force_https' )
+		array( 'ID', 'redirect_from', 'redirect_to', 'status_code', 'enable_regex', 'post_status', 'notes', 'message', 'force_https', 'menu_order' )
 	);
 }
 
@@ -189,7 +193,7 @@ function srm_each_export_redirect( $callback ) {
 				break 2;
 			}
 
-			$redirect = srm_get_redirect_data( $redirect_id, array( 'post_status', 'notes' ) );
+			$redirect = srm_get_redirect_data( $redirect_id, array( 'post_status', 'notes', 'menu_order' ) );
 			$row      = array();
 
 			foreach ( $fields as $field ) {
@@ -339,7 +343,7 @@ function srm_check_for_possible_redirect_loops() {
  * @param int    $menu_order Menu order
  * @param string $notes Notes
  * @param int    $author_id Author ID
- * @param bool   $keep_regex_source Since 2.4.0. Store a regex "from" as entered, as the edit screen does. Default false.
+ * @param bool   $keep_regex_source Since x.x.x. Store a regex "from" as entered, as the edit screen does. Default false.
  * @since 1.8
  * @uses wp_insert_post, update_post_meta
  * @return int|WP_Error

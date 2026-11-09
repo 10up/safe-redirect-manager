@@ -17,7 +17,7 @@ class SRM_Import {
 	/**
 	 * Factory method.
 	 *
-	 * @since 2.4.0
+	 * @since x.x.x
 	 * @return self
 	 */
 	public static function factory() {
@@ -34,7 +34,7 @@ class SRM_Import {
 	/**
 	 * Sets up import hooks.
 	 *
-	 * @since 2.4.0
+	 * @since x.x.x
 	 * @return void
 	 */
 	public function setup() {
@@ -43,12 +43,13 @@ class SRM_Import {
 		add_action( 'manage_posts_extra_tablenav', array( $this, 'add_import_button' ) );
 		add_action( 'admin_footer', array( $this, 'render_import_form' ) );
 		add_action( 'admin_notices', array( $this, 'import_notice' ) );
+		add_filter( 'removable_query_args', array( $this, 'removable_query_args' ) );
 	}
 
 	/**
 	 * Whether the current screen is the redirect list and the user may manage redirects.
 	 *
-	 * @since 2.4.0
+	 * @since x.x.x
 	 * @return bool
 	 */
 	protected function is_redirect_list() {
@@ -60,20 +61,35 @@ class SRM_Import {
 	/**
 	 * Loads the importer assets on the redirect list, including when it is empty.
 	 *
-	 * @since 2.4.0
+	 * @since x.x.x
 	 * @return void
 	 */
 	public function enqueue_assets() {
-		if ( $this->is_redirect_list() ) {
-			wp_enqueue_style( 'redirectjs', SRM_PLUGIN_URL . 'assets/css/redirect.css', array(), SRM_VERSION );
-			wp_enqueue_script( 'srm-import', SRM_PLUGIN_URL . 'assets/js/import.js', array( 'jquery' ), SRM_VERSION, true );
+		if ( ! $this->is_redirect_list() ) {
+			return;
 		}
+
+		wp_enqueue_style( 'redirectjs', SRM_PLUGIN_URL . 'assets/css/redirect.css', array(), SRM_VERSION );
+		wp_enqueue_script( 'srm-import', SRM_PLUGIN_URL . 'assets/js/import.js', array( 'jquery' ), SRM_VERSION, true );
+		wp_localize_script(
+			'srm-import',
+			'srmImport',
+			array(
+				'ajaxUrl'   => admin_url( 'admin-ajax.php' ),
+				'nonce'     => wp_create_nonce( 'srm_import' ),
+				'doneUrl'   => admin_url( 'edit.php?post_type=redirect_rule' ),
+				/* translators: 1: number of rows imported so far, 2: total number of rows */
+				'importing' => __( 'Importing %1$s of %2$s…', 'safe-redirect-manager' ),
+				'invalid'   => __( 'Please choose a CSV file exported from Safe Redirect Manager.', 'safe-redirect-manager' ),
+				'failed'    => __( 'The import did not finish. Please try again; rows already imported are updated, not duplicated.', 'safe-redirect-manager' ),
+			)
+		);
 	}
 
 	/**
 	 * Renders the import button after the filter bar in the redirect list table.
 	 *
-	 * @since 2.4.0
+	 * @since x.x.x
 	 * @param string $which Position in the table ('top' or 'bottom').
 	 * @return void
 	 */
@@ -95,7 +111,7 @@ class SRM_Import {
 	 * Printed in the footer because the list table is already inside a form;
 	 * assets/js/import.js moves it below the page title.
 	 *
-	 * @since 2.4.0
+	 * @since x.x.x
 	 * @return void
 	 */
 	public function render_import_form() {
@@ -103,10 +119,7 @@ class SRM_Import {
 			return;
 		}
 		?>
-		<div id="srm-import" class="srm-import" hidden
-			data-ajax-url="<?php echo esc_url( admin_url( 'admin-ajax.php' ) ); ?>"
-			data-nonce="<?php echo esc_attr( wp_create_nonce( 'srm_import' ) ); ?>"
-			data-done-url="<?php echo esc_url( admin_url( 'edit.php?post_type=redirect_rule' ) ); ?>">
+		<div id="srm-import" class="srm-import" hidden>
 			<button type="button" class="srm-import__close dashicons">
 				<span class="screen-reader-text"><?php esc_html_e( 'Close importer', 'safe-redirect-manager' ); ?></span>
 			</button>
@@ -116,11 +129,7 @@ class SRM_Import {
 				<p><?php echo esc_html_x( 'or', 'Uploader: Drop a file here - or - Select File', 'safe-redirect-manager' ); ?></p>
 				<button type="button" class="button button-hero srm-import__select"><?php esc_html_e( 'Select File', 'safe-redirect-manager' ); ?></button>
 			</div>
-			<div class="srm-import__status"
-				<?php /* translators: 1: number of rows imported so far, 2: total number of rows */ ?>
-				data-importing="<?php esc_attr_e( 'Importing %1$s of %2$s…', 'safe-redirect-manager' ); ?>"
-				data-invalid="<?php esc_attr_e( 'Please choose a CSV file exported from Safe Redirect Manager.', 'safe-redirect-manager' ); ?>"
-				data-failed="<?php esc_attr_e( 'The import did not finish. Please try again; rows already imported are updated, not duplicated.', 'safe-redirect-manager' ); ?>">
+			<div class="srm-import__status">
 				<h2 class="srm-import__status-text" role="status"></h2>
 				<p class="srm-import__filename"></p>
 				<div class="srm-import__progress"><div></div></div>
@@ -133,7 +142,7 @@ class SRM_Import {
 	/**
 	 * Imports one batch of CSV rows sent by assets/js/import.js.
 	 *
-	 * @since 2.4.0
+	 * @since x.x.x
 	 * @return void
 	 */
 	public function ajax_import() {
@@ -153,9 +162,9 @@ class SRM_Import {
 
 	/**
 	 * Creates or updates a redirect for each CSV row in the export format,
-	 * keeping its status and regex source.
+	 * keeping every exported setting.
 	 *
-	 * @since 2.4.0
+	 * @since x.x.x
 	 * @param string[] $header Column names.
 	 * @param string[] $rows   CSV rows.
 	 * @return array Counts of 'created' (created or updated) and 'skipped' rows.
@@ -171,14 +180,14 @@ class SRM_Import {
 			$code = absint( $rule['status_code'] ?? 0 ) ? absint( $rule['status_code'] ) : 302;
 
 			// 403, 404 and 410 rules have no destination.
-			if ( empty( $rule['redirect_from'] ) || ( '' === $to && ! in_array( $code, array( 403, 404, 410 ), true ) ) ) {
+			if ( srm_max_redirects_reached() || empty( $rule['redirect_from'] ) || ( '' === $to && ! in_array( $code, array( 403, 404, 410 ), true ) ) ) {
 				++$skipped;
 				continue;
 			}
 
 			$regex  = filter_var( $rule['enable_regex'] ?? false, FILTER_VALIDATE_BOOLEAN );
 			$status = in_array( $rule['post_status'] ?? '', array( 'publish', 'draft', 'pending', 'private' ), true ) ? $rule['post_status'] : 'publish';
-			$id     = srm_create_redirect( $rule['redirect_from'], $to, $code, $regex, $status, 0, $rule['notes'] ?? '', get_current_user_id(), true );
+			$id     = srm_create_redirect( $rule['redirect_from'], $to, $code, $regex, $status, absint( $rule['menu_order'] ?? 0 ), $rule['notes'] ?? '', get_current_user_id(), true );
 
 			if ( is_wp_error( $id ) ) {
 				++$skipped;
@@ -188,11 +197,18 @@ class SRM_Import {
 			// srm_create_redirect() stores '/' for an empty destination.
 			if ( '' === $to ) {
 				delete_post_meta( $id, '_redirect_rule_to' );
-				srm_flush_cache();
 			}
+
+			$message = sanitize_text_field( $rule['message'] ?? '' );
+			'' !== $message ? update_post_meta( $id, '_redirect_rule_message', $message ) : delete_post_meta( $id, '_redirect_rule_message' );
+
+			filter_var( $rule['force_https'] ?? false, FILTER_VALIDATE_BOOLEAN ) ? update_post_meta( $id, '_force_https', true ) : delete_post_meta( $id, '_force_https' );
 
 			++$created;
 		}
+
+		// Meta changed after srm_create_redirect() flushed the cache.
+		srm_flush_cache();
 
 		return array(
 			'created' => $created,
@@ -203,7 +219,7 @@ class SRM_Import {
 	/**
 	 * Shows the result of the last import.
 	 *
-	 * @since 2.4.0
+	 * @since x.x.x
 	 * @return void
 	 */
 	public function import_notice() {
@@ -224,5 +240,19 @@ class SRM_Import {
 			array( 'type' => 'success' )
 		);
 		// phpcs:enable
+	}
+
+	/**
+	 * Removes the import result args from the URL once the notice has shown.
+	 *
+	 * @since x.x.x
+	 * @param string[] $args Query args removed from the URL.
+	 * @return string[]
+	 */
+	public function removable_query_args( $args ) {
+		$args[] = 'srm_imported';
+		$args[] = 'srm_skipped';
+
+		return $args;
 	}
 }

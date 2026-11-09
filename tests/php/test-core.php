@@ -667,17 +667,21 @@ class SRMTestCore extends WP_UnitTestCase {
 	}
 
 	/**
-	 * Tests that an export imports back with its status, regex source and
-	 * empty 410 destination, and that importing again updates instead of duplicating.
+	 * Tests that an export imports back with its status, regex source, order,
+	 * message, force https and empty 410 destination, and that importing again
+	 * updates instead of duplicating.
 	 *
-	 * @since 2.4.0
+	 * @since x.x.x
 	 */
 	public function testExportImportRoundTrip() {
 		wp_set_current_user( self::factory()->user->create( array( 'role' => 'administrator' ) ) );
 
-		srm_create_redirect( '/draft-page', '/new-draft', 302, false, 'draft', 0, 'legacy note' );
-		srm_create_redirect( '^blog/(.*)$', '/news/$1', 301, true, 'publish', 0, '', 1, true );
-		delete_post_meta( srm_create_redirect( '/gone', '/', 410 ), '_redirect_rule_to' );
+		srm_create_redirect( '/draft-page', '/new-draft', 302, false, 'draft', 2, 'legacy note' );
+		$regex_id = srm_create_redirect( '^blog/(.*)$', '/news/$1', 301, true, 'publish', 1, '', 1, true );
+		update_post_meta( $regex_id, '_force_https', true );
+		$gone_id = srm_create_redirect( '/gone', '/', 410 );
+		delete_post_meta( $gone_id, '_redirect_rule_to' );
+		update_post_meta( $gone_id, '_redirect_rule_message', 'This page is gone.' );
 
 		$export = function () {
 			$rows = array();
