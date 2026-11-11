@@ -20,9 +20,10 @@ class SRMTestAbilities extends WP_UnitTestCase {
 	 * Test abilities are registered
 	 */
 	public function testAbilitiesRegistered() {
-		$this->assertInstanceOf( 'WP_Ability', wp_get_ability( 'safe-redirect-manager/list-redirects' ) );
-		$this->assertInstanceOf( 'WP_Ability', wp_get_ability( 'safe-redirect-manager/create-redirect' ) );
-		$this->assertInstanceOf( 'WP_Ability', wp_get_ability( 'safe-redirect-manager/delete-redirect' ) );
+		$this->assertInstanceOf( 'WP_Ability', wp_get_ability( 'safe-redirect-manager/redirects-query' ) );
+		$this->assertInstanceOf( 'WP_Ability', wp_get_ability( 'safe-redirect-manager/redirect-create' ) );
+		$this->assertInstanceOf( 'WP_Ability', wp_get_ability( 'safe-redirect-manager/redirect-update' ) );
+		$this->assertInstanceOf( 'WP_Ability', wp_get_ability( 'safe-redirect-manager/redirect-delete' ) );
 	}
 
 	/**
@@ -31,7 +32,7 @@ class SRMTestAbilities extends WP_UnitTestCase {
 	public function testPermissionDenied() {
 		wp_set_current_user( self::factory()->user->create( array( 'role' => 'editor' ) ) );
 
-		$result = wp_get_ability( 'safe-redirect-manager/list-redirects' )->execute();
+		$result = wp_get_ability( 'safe-redirect-manager/redirects-query' )->execute();
 
 		$this->assertWPError( $result );
 		$this->assertSame( 'ability_invalid_permissions', $result->get_error_code() );
@@ -41,7 +42,7 @@ class SRMTestAbilities extends WP_UnitTestCase {
 	 * Test creating, listing and deleting a redirect
 	 */
 	public function testCreateListDelete() {
-		$created = wp_get_ability( 'safe-redirect-manager/create-redirect' )->execute(
+		$created = wp_get_ability( 'safe-redirect-manager/redirect-create' )->execute(
 			array(
 				'redirect_from' => '/ability-from/',
 				'redirect_to'   => '/ability-to/',
@@ -53,7 +54,7 @@ class SRMTestAbilities extends WP_UnitTestCase {
 
 		$this->assertIsInt( $created['id'] );
 
-		$redirects = wp_get_ability( 'safe-redirect-manager/list-redirects' )->execute();
+		$redirects = wp_get_ability( 'safe-redirect-manager/redirects-query' )->execute();
 		$redirect  = wp_list_filter( $redirects, array( 'ID' => $created['id'] ) );
 		$redirect  = reset( $redirect );
 
@@ -64,7 +65,7 @@ class SRMTestAbilities extends WP_UnitTestCase {
 		$this->assertSame( 'Created by ability', $redirect['notes'] );
 		$this->assertSame( get_current_user_id(), (int) get_post_field( 'post_author', $created['id'] ) );
 
-		$deleted = wp_get_ability( 'safe-redirect-manager/delete-redirect' )->execute( array( 'id' => $created['id'] ) );
+		$deleted = wp_get_ability( 'safe-redirect-manager/redirect-delete' )->execute( array( 'id' => $created['id'] ) );
 
 		$this->assertSame( array( 'id' => $created['id'] ), $deleted );
 		$this->assertSame( 'trash', get_post_status( $created['id'] ) );
@@ -74,7 +75,7 @@ class SRMTestAbilities extends WP_UnitTestCase {
 	 * Test invalid status codes are rejected
 	 */
 	public function testCreateInvalidStatusCode() {
-		$result = wp_get_ability( 'safe-redirect-manager/create-redirect' )->execute(
+		$result = wp_get_ability( 'safe-redirect-manager/redirect-create' )->execute(
 			array(
 				'redirect_from' => '/from/',
 				'redirect_to'   => '/to/',
@@ -93,7 +94,7 @@ class SRMTestAbilities extends WP_UnitTestCase {
 		$_SERVER['REQUEST_URI'] = '/blog/hello';
 		$actual_redirect        = '';
 
-		$created = wp_get_ability( 'safe-redirect-manager/create-redirect' )->execute(
+		$created = wp_get_ability( 'safe-redirect-manager/redirect-create' )->execute(
 			array(
 				'redirect_from' => '/blog/(.*)$',
 				'redirect_to'   => '/news/$1',
@@ -123,7 +124,7 @@ class SRMTestAbilities extends WP_UnitTestCase {
 	 * Test enable_regex sent as the string "false" creates a plain rule
 	 */
 	public function testCreateRegexFalseString() {
-		$created = wp_get_ability( 'safe-redirect-manager/create-redirect' )->execute(
+		$created = wp_get_ability( 'safe-redirect-manager/redirect-create' )->execute(
 			array(
 				'redirect_from' => '/a.b/',
 				'redirect_to'   => '/to/',
@@ -146,7 +147,7 @@ class SRMTestAbilities extends WP_UnitTestCase {
 			}
 		);
 
-		$created = wp_get_ability( 'safe-redirect-manager/create-redirect' )->execute(
+		$created = wp_get_ability( 'safe-redirect-manager/redirect-create' )->execute(
 			array(
 				'redirect_from' => '/late/',
 				'redirect_to'   => '/to/',
@@ -164,9 +165,9 @@ class SRMTestAbilities extends WP_UnitTestCase {
 		$redirect_id = srm_create_redirect( '/restore-me/', '/to/' );
 		$slug        = get_post_field( 'post_name', $redirect_id );
 
-		wp_get_ability( 'safe-redirect-manager/delete-redirect' )->execute( array( 'id' => $redirect_id ) );
+		wp_get_ability( 'safe-redirect-manager/redirect-delete' )->execute( array( 'id' => $redirect_id ) );
 
-		$created = wp_get_ability( 'safe-redirect-manager/create-redirect' )->execute(
+		$created = wp_get_ability( 'safe-redirect-manager/redirect-create' )->execute(
 			array(
 				'redirect_from' => '/restore-me/',
 				'redirect_to'   => '/new-to/',
@@ -187,7 +188,7 @@ class SRMTestAbilities extends WP_UnitTestCase {
 
 		wp_trash_post( $redirect_id );
 
-		$result = wp_get_ability( 'safe-redirect-manager/create-redirect' )->execute(
+		$result = wp_get_ability( 'safe-redirect-manager/redirect-create' )->execute(
 			array(
 				'redirect_from' => '/stay-trashed/',
 				'redirect_to'   => '/new-to/',
@@ -212,7 +213,7 @@ class SRMTestAbilities extends WP_UnitTestCase {
 			}
 		);
 
-		$result = wp_get_ability( 'safe-redirect-manager/create-redirect' )->execute(
+		$result = wp_get_ability( 'safe-redirect-manager/redirect-create' )->execute(
 			array(
 				'redirect_from' => '/existing/',
 				'redirect_to'   => '/new-to/',
@@ -226,7 +227,7 @@ class SRMTestAbilities extends WP_UnitTestCase {
 	 * Test invalid regex patterns are rejected
 	 */
 	public function testCreateInvalidRegex() {
-		$result = wp_get_ability( 'safe-redirect-manager/create-redirect' )->execute(
+		$result = wp_get_ability( 'safe-redirect-manager/redirect-create' )->execute(
 			array(
 				'redirect_from' => '/blog/(.*',
 				'redirect_to'   => '/news/',
@@ -242,7 +243,7 @@ class SRMTestAbilities extends WP_UnitTestCase {
 	 * Test creating with an existing from path overwrites that rule
 	 */
 	public function testCreateOverwritesExisting() {
-		$ability = wp_get_ability( 'safe-redirect-manager/create-redirect' );
+		$ability = wp_get_ability( 'safe-redirect-manager/redirect-create' );
 		$first   = $ability->execute(
 			array(
 				'redirect_from' => '/same/',
@@ -275,7 +276,7 @@ class SRMTestAbilities extends WP_UnitTestCase {
 			}
 		);
 
-		$result = wp_get_ability( 'safe-redirect-manager/create-redirect' )->execute(
+		$result = wp_get_ability( 'safe-redirect-manager/redirect-create' )->execute(
 			array(
 				'redirect_from' => '/new/',
 				'redirect_to'   => '/to/',
@@ -291,7 +292,7 @@ class SRMTestAbilities extends WP_UnitTestCase {
 	 */
 	public function testDeleteIsIdempotent() {
 		$redirect_id = srm_create_redirect( '/trash-me/', '/to/' );
-		$ability     = wp_get_ability( 'safe-redirect-manager/delete-redirect' );
+		$ability     = wp_get_ability( 'safe-redirect-manager/redirect-delete' );
 
 		$ability->execute( array( 'id' => $redirect_id ) );
 
@@ -303,7 +304,7 @@ class SRMTestAbilities extends WP_UnitTestCase {
 	 * Test a from path that sanitizes to nothing is rejected
 	 */
 	public function testCreateEmptyFrom() {
-		$result = wp_get_ability( 'safe-redirect-manager/create-redirect' )->execute(
+		$result = wp_get_ability( 'safe-redirect-manager/redirect-create' )->execute(
 			array(
 				'redirect_from' => '.htaccess',
 				'redirect_to'   => '/to/',
@@ -318,7 +319,7 @@ class SRMTestAbilities extends WP_UnitTestCase {
 	 * Test the regex check compiles the pattern the way redirects do, without trailing slashes
 	 */
 	public function testCreateRegexTrailingBackslash() {
-		$result = wp_get_ability( 'safe-redirect-manager/create-redirect' )->execute(
+		$result = wp_get_ability( 'safe-redirect-manager/redirect-create' )->execute(
 			array(
 				'redirect_from' => '/foo\\',
 				'redirect_to'   => '/to/',
@@ -342,7 +343,7 @@ class SRMTestAbilities extends WP_UnitTestCase {
 			}
 		);
 
-		$ability = wp_get_ability( 'safe-redirect-manager/create-redirect' );
+		$ability = wp_get_ability( 'safe-redirect-manager/redirect-create' );
 		$draft   = $ability->execute(
 			array(
 				'redirect_from' => '/draft/',
@@ -382,7 +383,7 @@ class SRMTestAbilities extends WP_UnitTestCase {
 			2
 		);
 
-		wp_get_ability( 'safe-redirect-manager/delete-redirect' )->execute( array( 'id' => $redirect_id ) );
+		wp_get_ability( 'safe-redirect-manager/redirect-delete' )->execute( array( 'id' => $redirect_id ) );
 
 		$this->assertNotContains( $redirect_id, wp_list_pluck( srm_get_redirects(), 'ID' ) );
 	}
@@ -391,7 +392,7 @@ class SRMTestAbilities extends WP_UnitTestCase {
 	 * Test an empty destination is rejected instead of redirecting to the site root
 	 */
 	public function testCreateEmptyTo() {
-		$result = wp_get_ability( 'safe-redirect-manager/create-redirect' )->execute(
+		$result = wp_get_ability( 'safe-redirect-manager/redirect-create' )->execute(
 			array(
 				'redirect_from' => '/empty-to/',
 				'redirect_to'   => '   ',
@@ -406,7 +407,7 @@ class SRMTestAbilities extends WP_UnitTestCase {
 	 * Test negative status codes are rejected
 	 */
 	public function testCreateNegativeStatusCode() {
-		$result = wp_get_ability( 'safe-redirect-manager/create-redirect' )->execute(
+		$result = wp_get_ability( 'safe-redirect-manager/redirect-create' )->execute(
 			array(
 				'redirect_from' => '/negative/',
 				'redirect_to'   => '/to/',
@@ -438,7 +439,7 @@ class SRMTestAbilities extends WP_UnitTestCase {
 			}
 		);
 
-		$result = wp_get_ability( 'safe-redirect-manager/create-redirect' )->execute(
+		$result = wp_get_ability( 'safe-redirect-manager/redirect-create' )->execute(
 			array(
 				'redirect_from' => '/retrash/',
 				'redirect_to'   => '/new-to/',
@@ -462,7 +463,7 @@ class SRMTestAbilities extends WP_UnitTestCase {
 			}
 		);
 
-		$result = wp_get_ability( 'safe-redirect-manager/create-redirect' )->execute(
+		$result = wp_get_ability( 'safe-redirect-manager/redirect-create' )->execute(
 			array(
 				'redirect_from' => '/new/',
 				'redirect_to'   => '/to/',
@@ -481,7 +482,7 @@ class SRMTestAbilities extends WP_UnitTestCase {
 		$author_id   = self::factory()->user->create( array( 'role' => 'editor' ) );
 		$redirect_id = srm_create_redirect( '/authored/', '/to/', 302, false, 'publish', 0, '', $author_id );
 
-		wp_get_ability( 'safe-redirect-manager/create-redirect' )->execute(
+		wp_get_ability( 'safe-redirect-manager/redirect-create' )->execute(
 			array(
 				'redirect_from' => '/authored/',
 				'redirect_to'   => '/new-to/',
@@ -492,7 +493,7 @@ class SRMTestAbilities extends WP_UnitTestCase {
 	}
 
 	/**
-	 * Test list-redirects returns force_https as a boolean
+	 * Test redirects-query returns force_https as a boolean
 	 */
 	public function testListForceHttpsBoolean() {
 		$forced = srm_create_redirect( '/forced/', '/to/' );
@@ -500,7 +501,7 @@ class SRMTestAbilities extends WP_UnitTestCase {
 
 		update_post_meta( $forced, '_force_https', true );
 
-		$redirects = array_column( wp_get_ability( 'safe-redirect-manager/list-redirects' )->execute(), null, 'ID' );
+		$redirects = array_column( wp_get_ability( 'safe-redirect-manager/redirects-query' )->execute(), null, 'ID' );
 
 		$this->assertTrue( $redirects[ $forced ]['force_https'] );
 		$this->assertFalse( $redirects[ $plain ]['force_https'] );
@@ -510,7 +511,7 @@ class SRMTestAbilities extends WP_UnitTestCase {
 	 * Test rejected input returns a client error status over REST, not 500
 	 */
 	public function testRestClientErrorStatus() {
-		$request = new WP_REST_Request( 'DELETE', '/wp-abilities/v1/abilities/safe-redirect-manager/create-redirect/run' );
+		$request = new WP_REST_Request( 'DELETE', '/wp-abilities/v1/abilities/safe-redirect-manager/redirect-create/run' );
 		$request->set_query_params(
 			array(
 				'input' => array(
@@ -523,7 +524,7 @@ class SRMTestAbilities extends WP_UnitTestCase {
 
 		$this->assertSame( 400, rest_do_request( $request )->get_status() );
 
-		$request = new WP_REST_Request( 'DELETE', '/wp-abilities/v1/abilities/safe-redirect-manager/delete-redirect/run' );
+		$request = new WP_REST_Request( 'DELETE', '/wp-abilities/v1/abilities/safe-redirect-manager/redirect-delete/run' );
 		$request->set_query_params( array( 'input' => array( 'id' => self::factory()->post->create() ) ) );
 
 		$this->assertSame( 404, rest_do_request( $request )->get_status() );
@@ -535,9 +536,136 @@ class SRMTestAbilities extends WP_UnitTestCase {
 	public function testDeleteNonRedirect() {
 		$post_id = self::factory()->post->create();
 
-		$result = wp_get_ability( 'safe-redirect-manager/delete-redirect' )->execute( array( 'id' => $post_id ) );
+		$result = wp_get_ability( 'safe-redirect-manager/redirect-delete' )->execute( array( 'id' => $post_id ) );
 
 		$this->assertWPError( $result );
 		$this->assertSame( 'publish', get_post_status( $post_id ) );
+	}
+
+	/**
+	 * Test updating changes only the fields sent
+	 */
+	public function testUpdateSentFieldsOnly() {
+		$redirect_id = srm_create_redirect( '/update-from/', '/update-to/', 301, false, 'publish', 5, 'Original notes' );
+		update_post_meta( $redirect_id, '_redirect_rule_message', 'Kept message' );
+
+		$result = wp_get_ability( 'safe-redirect-manager/redirect-update' )->execute(
+			array(
+				'id'          => $redirect_id,
+				'redirect_to' => '/updated-to/',
+				'post_status' => 'draft',
+			)
+		);
+
+		$this->assertSame( array( 'id' => $redirect_id ), $result );
+
+		$redirect = srm_get_redirect_data( $redirect_id, array( 'post_status', 'notes', 'menu_order' ) );
+
+		$this->assertSame( '/update-from/', $redirect['redirect_from'] );
+		$this->assertSame( '/updated-to/', $redirect['redirect_to'] );
+		$this->assertSame( 301, $redirect['status_code'] );
+		$this->assertSame( 'draft', $redirect['post_status'] );
+		$this->assertSame( 'Original notes', $redirect['notes'] );
+		$this->assertSame( 'Kept message', $redirect['message'] );
+		$this->assertSame( 5, $redirect['menu_order'] );
+	}
+
+	/**
+	 * Test updating the from path applies to front-end redirects
+	 */
+	public function testUpdateFromPathFlushesCache() {
+		$redirect_id = srm_create_redirect( '/before/', '/to/' );
+		srm_get_redirects(); // Prime the cache.
+
+		wp_get_ability( 'safe-redirect-manager/redirect-update' )->execute(
+			array(
+				'id'            => $redirect_id,
+				'redirect_from' => '/after/',
+			)
+		);
+
+		$this->assertSame( array( '/after/' ), wp_list_pluck( srm_get_redirects(), 'redirect_from' ) );
+	}
+
+	/**
+	 * Test a from path used by another rule is rejected
+	 */
+	public function testUpdateDuplicateFrom() {
+		srm_create_redirect( '/taken/', '/to/' );
+		$redirect_id = srm_create_redirect( '/mine/', '/to/' );
+
+		$result = wp_get_ability( 'safe-redirect-manager/redirect-update' )->execute(
+			array(
+				'id'            => $redirect_id,
+				'redirect_from' => '/taken/',
+			)
+		);
+
+		$this->assertWPError( $result );
+		$this->assertSame( 'redirect-exists', $result->get_error_code() );
+		$this->assertSame( '/mine/', get_post_meta( $redirect_id, '_redirect_rule_from', true ) );
+	}
+
+	/**
+	 * Test invalid values are rejected and nothing is saved
+	 */
+	public function testUpdateInvalidInput() {
+		$redirect_id = srm_create_redirect( '/blog/(.*)', '/news/', 302, true );
+		$ability     = wp_get_ability( 'safe-redirect-manager/redirect-update' );
+
+		foreach ( array( array( 'status_code' => 999 ), array( 'redirect_from' => '/blog/(.*' ), array( 'redirect_to' => ' ' ) ) as $input ) {
+			$this->assertWPError( $ability->execute( array( 'id' => $redirect_id ) + $input ) );
+		}
+
+		$this->assertSame( '/blog/(.*)', srm_get_redirect_data( $redirect_id )['redirect_from'] );
+		$this->assertSame( 302, srm_get_redirect_data( $redirect_id )['status_code'] );
+		$this->assertSame( '/news/', srm_get_redirect_data( $redirect_id )['redirect_to'] );
+	}
+
+	/**
+	 * Test publishing a draft is refused at the maximum
+	 */
+	public function testUpdatePublishAtMaxRedirects() {
+		srm_create_redirect( '/published/', '/to/' );
+		$redirect_id = srm_create_redirect( '/draft/', '/to/', 302, false, 'draft' );
+
+		add_filter(
+			'srm_max_redirects',
+			function () {
+				return 1;
+			}
+		);
+
+		$result = wp_get_ability( 'safe-redirect-manager/redirect-update' )->execute(
+			array(
+				'id'          => $redirect_id,
+				'post_status' => 'publish',
+			)
+		);
+
+		$this->assertWPError( $result );
+		$this->assertSame( 'max-redirects-reached', $result->get_error_code() );
+		$this->assertSame( 'draft', get_post_status( $redirect_id ) );
+	}
+
+	/**
+	 * Test trashed redirects and other posts can't be updated
+	 */
+	public function testUpdateInvalidId() {
+		$trashed_id = srm_create_redirect( '/trashed/', '/to/' );
+		wp_trash_post( $trashed_id );
+
+		foreach ( array( $trashed_id, self::factory()->post->create() ) as $id ) {
+			$result = wp_get_ability( 'safe-redirect-manager/redirect-update' )->execute(
+				array(
+					'id'    => $id,
+					'notes' => 'Changed',
+				)
+			);
+
+			$this->assertWPError( $result );
+			$this->assertSame( 'invalid-redirect', $result->get_error_code() );
+			$this->assertSame( '', get_post_meta( $id, '_redirect_rule_notes', true ) );
+		}
 	}
 }
