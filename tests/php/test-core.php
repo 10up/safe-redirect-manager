@@ -287,6 +287,100 @@ class SRMTestCore extends WP_UnitTestCase {
 	}
 
 	/**
+	 * Test that percent-encoded non-ASCII request paths match their redirects.
+	 *
+	 * @dataProvider dataNonAsciiRedirect
+	 *
+	 * @param string $redirect_from Redirect rule from path.
+	 * @param string $request_uri   Requested URI as sent by the browser.
+	 */
+	public function testNonAsciiRedirect( $redirect_from, $request_uri ) {
+		$_SERVER['REQUEST_URI'] = $request_uri;
+		$redirected             = false;
+		srm_create_redirect( $redirect_from, '/gohere' );
+
+		add_action(
+			'srm_do_redirect',
+			function ( $requested_path, $redirected_to ) use ( &$redirected ) {
+				$redirected = ( '/gohere' === $redirected_to );
+			},
+			10,
+			2
+		);
+
+		SRM_Redirect::factory()->maybe_redirect();
+
+		$this->assertTrue( $redirected );
+	}
+
+	/**
+	 * Data provider for testNonAsciiRedirect and testNonAsciiMatchRedirect.
+	 *
+	 * @return array
+	 */
+	public function dataNonAsciiRedirect() {
+		return array(
+			'cjk'            => array( '/轉址/', '/%E8%BD%89%E5%9D%80/' ),
+			'cjk lowercase'  => array( '/轉址/', '/%e8%bd%89%e5%9d%80/' ),
+			'accented'       => array( '/café', '/caf%C3%A9' ),
+			'stored encoded' => array( '/%E8%BD%89%E5%9D%80/', '/%E8%BD%89%E5%9D%80/' ),
+		);
+	}
+
+	/**
+	 * Test that srm_match_redirect() accepts percent-encoded non-ASCII paths.
+	 *
+	 * @dataProvider dataNonAsciiRedirect
+	 *
+	 * @param string $redirect_from Redirect rule from path.
+	 * @param string $path          Path passed to srm_match_redirect().
+	 */
+	public function testNonAsciiMatchRedirect( $redirect_from, $path ) {
+		srm_create_redirect( $redirect_from, '/gohere' );
+
+		$matched_redirect = srm_match_redirect( untrailingslashit( $path ) );
+
+		$this->assertSame( '/gohere', $matched_redirect['redirect_to'] ?? false );
+	}
+
+	/**
+	 * Test that encoded path delimiters are not decoded into real ones.
+	 *
+	 * @dataProvider dataEncodedDelimiterNoRedirect
+	 *
+	 * @param string $redirect_from Redirect rule from path.
+	 * @param string $request_uri   Requested URI as sent by the browser.
+	 */
+	public function testEncodedDelimiterNoRedirect( $redirect_from, $request_uri ) {
+		$_SERVER['REQUEST_URI'] = $request_uri;
+		$redirected             = false;
+		srm_create_redirect( $redirect_from, '/gohere' );
+
+		add_action(
+			'srm_do_redirect',
+			function () use ( &$redirected ) {
+				$redirected = true;
+			}
+		);
+
+		SRM_Redirect::factory()->maybe_redirect();
+
+		$this->assertFalse( $redirected );
+	}
+
+	/**
+	 * Data provider for testEncodedDelimiterNoRedirect.
+	 *
+	 * @return array
+	 */
+	public function dataEncodedDelimiterNoRedirect() {
+		return array(
+			'slash'         => array( '/a/b', '/a%2Fb' ),
+			'question mark' => array( '/a', '/a%3Fb=1' ),
+		);
+	}
+
+	/**
 	 * Test lots of permutations of URL trailing slashes with and without regex
 	 *
 	 * @since 1.7.3
