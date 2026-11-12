@@ -4,6 +4,9 @@ All notable changes to this project will be documented in this file, per [the Ke
 
 ## [Unreleased] - TBD
 
+### Added
+- Store revisions for redirect rules, so changes to a redirect can be reviewed and restored from the revision screen. The number of revisions kept can be limited using `wp_revisions_to_keep` (props [@faisalahammad](https://github.com/faisalahammad) via [#85](https://github.com/10up/safe-redirect-manager/issues/85)).
+
 ## [2.3.0] - 2026-09-21
 **Note that this version bumps the WordPress minimum from 6.5 to 6.9.**
 
