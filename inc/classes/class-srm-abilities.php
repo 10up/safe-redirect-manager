@@ -172,6 +172,10 @@ class SRM_Abilities {
 			'notes'       => isset( $input['notes'] ) ? sanitize_text_field( $input['notes'] ) : null,
 		);
 
+		if ( '' === $meta['from'] ) {
+			return new WP_Error( 'invalid-argument', __( 'Redirect from is invalid.', 'safe-redirect-manager' ) );
+		}
+
 		foreach ( $meta as $key => $value ) {
 			if ( null !== $value ) {
 				update_post_meta( $id, '_redirect_rule_' . $key, wp_slash( $value ) );

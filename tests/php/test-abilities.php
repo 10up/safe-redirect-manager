@@ -29,6 +29,8 @@ class SRMTestAbilities extends WP_UnitTestCase {
 
 		$this->assertContains( $id, wp_list_pluck( $run( 'redirects-query' ), 'ID' ) );
 		$this->assertWPError( $run( 'redirect-update', array( 'id' => $id, 'status_code' => 999 ) ) );
+		$this->assertWPError( $run( 'redirect-update', array( 'id' => $id, 'redirect_from' => ' ' ) ) );
+		$this->assertSame( '/old/', get_post_meta( $id, '_redirect_rule_from', true ) );
 
 		$run( 'redirect-update', array( 'id' => $id, 'redirect_to' => '/newer/', 'post_status' => 'draft' ) );
 		$this->assertSame( '/newer/', get_post_meta( $id, '_redirect_rule_to', true ) );
