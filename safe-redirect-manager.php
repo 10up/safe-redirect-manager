@@ -75,6 +75,7 @@ require_once __DIR__ . '/inc/classes/class-srm-redirect.php';
 require_once __DIR__ . '/inc/classes/class-srm-loop-detection.php';
 require_once __DIR__ . '/inc/classes/class-srm-export.php';
 require_once __DIR__ . '/inc/classes/class-srm-import.php';
+require_once __DIR__ . '/inc/classes/class-srm-abilities.php';
 
 define( 'SRM_VERSION', '2.3.0' );
 define( 'SRM_PLUGIN_FULL_FILE', __FILE__ );
@@ -89,3 +90,4 @@ if ( defined( 'WP_CLI' ) && WP_CLI ) {
 \SRM_Redirect::factory();
 \SRM_Export::factory();
 \SRM_Import::factory();
+\SRM_Abilities::factory();
