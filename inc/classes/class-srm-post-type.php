@@ -567,7 +567,7 @@ class SRM_Post_Type {
 			}
 
 			if ( ! empty( $_POST['srm_redirect_rule_from'] ) ) {
-				update_post_meta( $post_id, '_redirect_rule_from', srm_sanitize_redirect_from( wp_unslash( $_POST['srm_redirect_rule_from'] ), $allow_regex ) );
+				update_post_meta( $post_id, '_redirect_rule_from', wp_slash( srm_sanitize_redirect_from( wp_unslash( $_POST['srm_redirect_rule_from'] ), $allow_regex ) ) );
 			} else {
 				delete_post_meta( $post_id, '_redirect_rule_from' );
 			}
