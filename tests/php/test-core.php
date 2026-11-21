@@ -1007,4 +1007,29 @@ class SRMTestCore extends WP_UnitTestCase {
 		$this->assertSame( $expected_redirect, $actual_redirect, 'The redirect destination does not meet the expectation' );
 		$this->assertSame( $expected_status, $actual_status, 'The redirect status does npt meet the expectation.' );
 	}
+
+	/**
+	 * Test saving a regex rule from the edit screen keeps its backslashes.
+	 *
+	 * @see https://github.com/10up/safe-redirect-manager/issues/487
+	 */
+	public function testSaveRegexRedirectFromKeepsBackslashes487() {
+		wp_set_current_user( self::factory()->user->create( array( 'role' => 'administrator' ) ) );
+		$post_id       = self::factory()->post->create( array( 'post_type' => 'redirect_rule' ) );
+		$redirect_from = '^\/test\/?(\?.*)?$';
+
+		// WordPress slashes request data.
+		$_POST = wp_slash(
+			array(
+				'srm_redirect_nonce'           => wp_create_nonce( 'srm-save-redirect-meta' ),
+				'srm_redirect_rule_from_regex' => '1',
+				'srm_redirect_rule_from'       => $redirect_from,
+			)
+		);
+
+		SRM_Post_Type::factory()->action_save_post( $post_id );
+		$_POST = array();
+
+		$this->assertSame( $redirect_from, get_post_meta( $post_id, '_redirect_rule_from', true ) );
+	}
 }
